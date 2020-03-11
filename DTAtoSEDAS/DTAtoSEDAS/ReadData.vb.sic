@@ -1,0 +1,169 @@
+﻿Public Class ReadData
+
+    ''' <summary>
+    ''' Liest die Daten einer alten DTA-Datei ein und gibt die enthaltenen Werte als 2-dimensionales Array zurück.
+    ''' </summary>
+    ''' <param name="Inhalt">Pfad zur DTA-Datei, die eingelesen werden soll.</param>
+    ''' <returns></returns>
+    Public Shared Function ReadDATData(Inhalt As String, BestelldatumTTMMJJ As String) As String(,)
+        '==============================================================================================
+        'Quelle
+        '1030051800009175N       300518                                     1428200000001000+
+        '1030051800009175N       300518                                     1501100000001000+
+        '1030051800009175N       300518                                     1511100000001000+
+        '---------------------------------
+        '10,300518,00009175,N,       ,300518,                                     ,14282,00000001,000+
+        '? ,LiDat ,KdNr    ,?,       ,Liefedatum,                                 ,ArtNr,Menge,?
+        '==============================================================================================
+
+        'Prüfen, ob Datei existiert
+        'If Not System.IO.File.Exists(Source) Then
+        If Inhalt = "" Then
+            ReadDATData = Nothing
+            Return ReadDATData
+        End If
+
+        'Prüfen, ob Daten vorhanden
+
+        '-------------------------------------------------------------------------
+        Try
+            '-- QUELL-DATEI EINLESEN
+            'Datei auslesen + Datum ermitteln
+            'TODO Übergabe Bestelldatum einbringen
+            'TODO Übergabe Daten per String einbringen. Dateioperationen aus Funktion entfernen.
+            Dim arrSourceLines() As String  'Array mit Zeilen der Quelldatei
+            Dim arrOutputData(,) As String  'Array mit zerlegten Zeilen der Quelldatei in Einzelinformationen.
+            'FileDate = System.IO.File.GetCreationTime(SourcePath).ToString
+            'Bestelldatum = ReverseDate(Mid(FileDate, 1, 10).Replace(".", "").Remove(4, 2))
+
+            'Using srSource As IO.StreamReader = New IO.StreamReader(SourcePath)
+            '    'Alle Zeilen der Quelldatei in Array einlesen
+            '    arrSourceLines = Split(srSource.ReadToEnd, vbCrLf)
+            'End Using
+
+            arrSourceLines = Split(Inhalt, vbCrLf)
+            '---------------------------------------------------------------------
+
+            'arrOutputData neu Dimensionieren auf die Anzal eingelesener (nicht leerer) Zeilen.
+            Dim redimVal As Integer = -1
+            For j = 0 To arrSourceLines.GetUpperBound(0)
+                If Not arrSourceLines(j) = "" Then redimVal = redimVal + 1
+            Next
+            ReDim arrOutputData(redimVal, 10)
+
+            'Einzelinformationen aus LINE-Array in Datenarray übernehmen.
+            Dim z As Integer = 0
+            'Eingelesenen Datensatz abarbeiten.
+            For i = 0 To arrSourceLines.GetUpperBound(0) 'Or arrSourceLines(i) = ""
+                Dim text As String = arrSourceLines(i)
+
+                If text <> "" Then      'Leerzeilen auslassen
+                    'String zerlegen:
+                    'TODO Zerlegen in Klasseneigenschaften und Properties, dann erst in Array schreiben.
+
+                    arrOutputData(z, 2) = MyTRIM(Mid(arrSourceLines(i), 9, 8))   'Kundennummer      00009175
+                    arrOutputData(z, 3) = BestelldatumTTMMJJ                     'Bestelldatum ttmmjj      300518
+                    arrOutputData(z, 4) = MyTRIM(Mid(arrSourceLines(i), 18, 13)) 'LieferDatum ttmmjj, wie Pos2 (?)    300518
+                    arrOutputData(z, 6) = Trim(Mid(arrSourceLines(i), 73, 11))   'Menge            00000001000
+                    arrOutputData(z, 8) = Trim(Mid(arrSourceLines(i), 31, 42))   'Artikelnummer     14282
+
+                    z += 1
+                End If
+                i = i + 1
+            Next i
+
+            'ReadDATData = DeleteEntries1(arrOutputData)
+
+        Catch ex As Exception
+            ReadDATData = Nothing
+        End Try
+
+    End Function
+
+
+    ''' <summary>
+    ''' Liest eine neue *.DAT Datei ein und bereitet die Daten für die Erstellung einer SEDAS.DAT vor.
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function ReadNewDATData(Inhalt As String) As String(,)
+
+        Try
+            '-- QUELL-DATEI EINLESEN          
+            Dim arrSourceLines() As String  'Array mit Zeilen der Quelldatei
+            Dim arrOutputData(,) As String  'Array mit zerlegten Zeilen der Quelldatei in Einzelinformationen.
+
+            'Using srSource As IO.StreamReader = New IO.StreamReader(SourcePath)
+            '    'Alle Zeilen der Quelldatei in Array einlesen
+            '    arrSourceLines = Split(srSource.ReadToEnd, vbCrLf)
+            'End Using
+
+            arrSourceLines = Split(Inhalt, vbCrLf)
+
+            'arrOutputData neu Dimensionieren auf die Anzal eingelesener (nicht leerer) Zeilen.
+            Dim redimVal As Integer = -1
+            For j = 0 To arrSourceLines.GetUpperBound(0)
+                If Not arrSourceLines(j) = "" Then redimVal = redimVal + 1
+            Next
+            ReDim arrOutputData(redimVal, 10)
+
+            'Einzelinformationen aus LINE-Array in Datenarray übernehmen.
+            Dim z As Integer = 0
+            For i = 0 To arrSourceLines.GetUpperBound(0) 'Or arrSourceLines(i) = ""
+                Dim arrLineData As String() = Split(arrSourceLines(i), ";")
+                If arrLineData(0) <> "" Then       'Leerzeilen überspringen
+
+                    'Bestelldatumttmmjj = ReverseDate(arrLineData(3))
+
+                    'TODO Zerlegen in Klasseneigenschaften und Properties, dann erst in Array schreiben.
+                    'arrOutputData(z, 1) = "10"                          'Führende Ziffer 10
+                    arrOutputData(z, 2) = arrLineData(2)                'Kundennummer      00009175
+                    arrOutputData(z, 3) = ReverseDate(arrLineData(3))   'Datum ttmmjj      300518
+                    arrOutputData(z, 4) = ReverseDate(arrLineData(4))   'Datum ttmmjj, wie Pos2 (?)    300518
+                    arrOutputData(z, 6) = arrLineData(6)                'Menge            00000001000
+                    arrOutputData(z, 8) = arrLineData(8)                'Artikelnummer     14282
+
+                    z += 1
+                End If
+
+            Next i
+
+            'ReadNewDATData = DeleteEntries1(arrOutputData)
+
+        Catch ex As Exception
+            ReadNewDATData = Nothing
+        End Try
+
+        Return ReadNewDATData
+    End Function
+
+    ''' <summary>
+    ''' Spiegelt ein übergebenen Datumsstring: aabbcc >> ccbbaa (bzw. umgekehrt).
+    ''' </summary>
+    ''' <param name="str">Zu spiegelndes Datum im Format aabbcc.</param>
+    ''' <returns></returns>
+    Shared Function ReverseDate(str As String) As String
+        ReverseDate = ""
+        If Not str = "" Then
+            str = Trim(str)
+            For i = Len(str) - 1 To 1 Step -2
+                Dim Part As String = Mid(str, i, 2)
+                ReverseDate = ReverseDate & Part
+            Next
+        End If
+
+    End Function
+
+    ''' <summary>
+    ''' Entfernt Leerzeichen vom Anfang und Ende eines Strings, sowie eventuell führende Nullen.
+    ''' </summary>
+    ''' <param name="MyText">Zu verarbeitender String.</param>
+    ''' <returns></returns>
+    Shared Function MyTRIM(MyText As String) As String
+        MyText = Trim(MyText)
+
+        Do While Mid(MyText, 1, 1) = "0"
+            MyText = Mid(MyText, 2)
+        Loop
+        MyTRIM = MyText
+    End Function
+End Class

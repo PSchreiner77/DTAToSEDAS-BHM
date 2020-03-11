@@ -1,0 +1,25 @@
+﻿--------------------
+Changelog DATtoSEDAS
+--------------------
+
+-- ToDo --
+- Prüfen, ob Dateiname im Schalter angegeben ist.
+- Prüfen, ob Pfadangaben in Schalter gemacht wurden.
+- Configdatei mit Pfadangaben zu Quell- und Zieldatei erstellen
+  Wird übergangen, wenn Pfad im Schalter angegeben ist.
+- Dateinamen für Quelldatei per Schalter vergeben
+- Dateiname für Zieldatei in Config festlegen (optional).
+  Wird übergangen, wenn Dateiname in Zielpfad vorhanden ist.
+- Fehlermeldungen aud INI.DLL entfernen.
+
+
+
+
+
+
+
+
+
+
+
+-- Done --
