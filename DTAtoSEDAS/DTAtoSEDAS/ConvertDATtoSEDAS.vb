@@ -19,6 +19,7 @@
     ''' </summary>
     ''' <param name="s">Quelldateipfad</param>
     ''' <param name="d">Zieldateipfad</param>
+    ''' <param name="c">Counter der Bestelldatei</param>
     Public Sub New(s As String, d As String, c As Integer)
         'Properties setzen
         Source = s
