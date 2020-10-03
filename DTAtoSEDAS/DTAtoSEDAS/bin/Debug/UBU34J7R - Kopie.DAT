@@ -1,0 +1,60 @@
+# Neues Programm zum Einlesen der folgenden Datei
+# UTF8 Zeichensatz!!
+# Kundennummer per Parameter mitgegeben
+# Mehrere Dateien pro Kunde in gleiche Zieldatei
+# Quell-/Zielpfad per Parameter mitgegeben
+# Dateien werden an Ziel angefgt.
+# Format fr Zieldatei frei w„hlbar.
+#
+# Parameter: 	Kundennummer
+#				Quellpfad mit Datei
+# 				Zielpfad mit Datei
+
+‏D‏IMPORT\FORMULAR.DBF;5;255
+‏D‏IMPORT\RECORDS.DBF;6;254
+
+‏F‏175
+
+‏V‏VON‏1
+‏V‏AN‏3
+‏V‏KUNDE‏0
+‏V‏FILIALE‏175			=> Filialnummer
+‏V‏NUMMER‏UBU34J7R
+‏V‏DATUM‏20180622		=> Lieferdatum
+‏V‏PERSON‏    2368
+‏V‏ZEIT‏12:57:35
+‏V‏ART‏1
+‏V‏BESTELL‏
+‏V‏LIEFER‏
+‏V‏RETOUR‏
+‏V‏EINTRAG‏10
+‏V‏VERBUCHT‏
+‏V‏BON‏
+‏V‏BESTAND‏
+
+ Definition IMPORT\FORMULAR.DBF
+
+ FORMULAR
+
+ Definition IMPORT\RECORDS.DBF
+
+ RECORDS
+
+ Daten
+
+##########################
+# Relevante Daten ab hier:
+-;-;-;Key ;Anz ;?;?;?;?;Prei;;;?;?;?;Art;Stkzahl;
+-;-;-;4849;2.00;0;0;0;0;0.32;;;0;0;0;537;120.000;
+
+-ש-ש-ש4849ש2.00ש0ש0ש0ש0ש0.32ששש0ש0ש0ש537ש120.000ש
+-ש-ש-ש867ש2.00ש0ש0ש0ש0ש1.95ששש0ש0ש0ש597ש15.000ש
+-ש-ש-ש2865ש1.00ש0ש0ש0ש0ש0.65ששש0ש0ש0ש3517ש60.000ש
+-ש-ש-ש4222ש1.00ש0ש0ש0ש0ש1.80ששש0ש0ש0ש3547ש18.000ש
+-ש-ש-ש4343ש1.00ש0ש0ש0ש0ש0.70ששש0ש0ש0ש3594ש80.000ש
+-ש-ש-ש5416ש1.00ש0ש0ש0ש0ש1.80ששש0ש0ש0ש3696ש20.000ש
+-ש-ש-ש5538ש1.00ש0ש0ש0ש0ש1.50ששש0ש0ש0ש3730ש30.000ש
+-ש-ש-ש5405ש1.00ש0ש0ש0ש0ש0.85ששש0ש0ש0ש30523ש80.000ש
+-ש-ש-ש5407ש1.00ש0ש0ש0ש0ש0.85ששש0ש0ש0ש30526ש50.000ש
+-ש-ש-ש5995ש1.00ש0ש0ש0ש0ש1.50ששש0ש0ש0ש80587ש36.000ש
+
