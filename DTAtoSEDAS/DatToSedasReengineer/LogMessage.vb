@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports DatToSedasReengineer.My
 Imports Microsoft.VisualBasic.CompilerServices
 
 Public Class LogMessage
@@ -188,8 +189,8 @@ Public Class LogMessage
             ' The following expression was wrapped in a checked-statement
             If flag4 Then
                 LogMessage.LogOnly(String.Concat(New String() {"Verkleinern der Logdatei von ", Conversions.ToString(num), text2, " auf ca. ", Conversions.ToString(num / 2L), text2}))
-                Using Dim streamReader As StreamReader = New StreamReader(LogMessage._Path)
-						text = StreamReader.ReadToEnd()
+                Using streamReader As StreamReader = New StreamReader(LogMessage._Path)
+                    text = streamReader.ReadToEnd()
                 End Using
                 Dim array As String() = Strings.Split(text, vbCrLf, -1, CompareMethod.Binary)
                 Dim num3 As Integer = array.Count(Of String)() / 2
@@ -208,8 +209,8 @@ Public Class LogMessage
                     End While
                 Finally
                     Dim enumerator As List(Of String).Enumerator
-						(CType(enumerator, IDisposable)).Dispose()
-					End Try
+                    CType(enumerator, IDisposable).Dispose()
+                End Try
                 File.AppendAllText(LogMessage._Path, text)
             End If
         End If

@@ -1,5 +1,6 @@
 ﻿Imports System
 Imports System.IO
+Imports DatToSedasReengineer.My
 Imports Microsoft.VisualBasic.CompilerServices
 
 Module Module1
@@ -61,13 +62,13 @@ Module Module1
         If flag4 Then
             LogMessage.Show("Datei " + Module1.Param.SourceFullPath + " erstellt.")
         Else
-            LogMessage.Show("Fehler beim Konvertieren/Erstellen der Sedas.dat.", MsgType.Critical)
+            LogMessage.Show("Fehler beim Konvertieren/Erstellen der Sedas.dat.", LogMessage.MsgType.Critical)
             Module1.ExitProgram()
         End If
         LogMessage.LogOnly("Counter in Config.ini zurückschreiben...")
         Dim flag5 As Boolean = Not Module1.INI.Write("Setup", "Counter", Conversions.ToString(Module1.Param.Counter))
         If flag5 Then
-            LogMessage.Show("Zähler konnte nicht in Config.ini zurückgeschrieben werden!" & vbCrLf & "Weitere Programmausführung nicht möglich!", MsgType.Critical)
+            LogMessage.Show("Zähler konnte nicht in Config.ini zurückgeschrieben werden!" & vbCrLf & "Weitere Programmausführung nicht möglich!", LogMessage.MsgType.Critical)
             Module1.ExitProgram()
         End If
         Dim deleteSourceFile As Boolean = Module1.Param.DeleteSourceFile
@@ -78,18 +79,22 @@ Module Module1
         LogMessage.LogOnly("--- Programm normal beendet. ---")
         LogMessage.LogOnly("********************************")
         LogMessage.LogOnly("")
+
+        Dim sr As New StreamReader("C:\Temp\test.txt")
+
     End Sub
 
     Public Function InitProgram() As Boolean
         Dim flag As Boolean = True
         LogMessage.LogOnly("Initialisierung des Programms...")
         LogMessage.LogOnly("Einlesen der Config.ini Datei...")
+
         Dim flag2 As Boolean = File.Exists(Directory.GetCurrentDirectory() + "\config.ini")
         If flag2 Then
             Module1.INI = New INIFile(Directory.GetCurrentDirectory() + "\Config.ini")
             Dim flag3 As Boolean = Not Module1.ReadIniValues()
             If flag3 Then
-                LogMessage.Show("Fehler beim Auslesen der Config.ini. Bitte Einstellungen prüfen. Programm wird beendet.", MsgType.Critical)
+                LogMessage.Show("Fehler beim Auslesen der Config.ini. Bitte Einstellungen prüfen. Programm wird beendet.", LogMessage.MsgType.Critical)
                 flag = Not flag
             Else
                 LogMessage.LogOnly("Einlesen der Config.ini Datei erfolgreich.")
@@ -98,13 +103,13 @@ Module Module1
                 If flag4 Then
                     Module1.ListDelCustomer = New List(Of String)()
                     Try
-                        Using Dim streamReader As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\loeschKunde.txt")
-								While True
-                                Dim endOfStream As Boolean = StreamReader.EndOfStream
+                        Using streamReader As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\loeschKunde.txt")
+                            While True
+                                Dim endOfStream As Boolean = streamReader.EndOfStream
                                 If endOfStream Then
                                     Exit While
                                 End If
-                                Dim text As String = StreamReader.ReadLine()
+                                Dim text As String = streamReader.ReadLine()
                                 Dim flag5 As Boolean = Operators.CompareString(text, "", False) <> 0
                                 If flag5 Then
                                     Module1.ListDelCustomer.Add(text)
@@ -125,7 +130,7 @@ Module Module1
                     Catch expr_199 As Exception
                         ProjectData.SetProjectError(expr_199)
                         Dim ex2 As Exception = expr_199
-                        LogMessage.Show("Die Datei 'loeschKunde.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." & vbCrLf & "Das Programm wird beendet", MsgType.Critical)
+                        LogMessage.Show("Die Datei 'loeschKunde.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." & vbCrLf & "Das Programm wird beendet", LogMessage.MsgType.Critical)
                         LogMessage.LogOnly(ex2.ToString())
                         flag = Not flag
                         ProjectData.ClearProjectError()
@@ -138,8 +143,8 @@ Module Module1
                 If flag6 Then
                     Module1.ListDelArticle = New List(Of String)()
                     Try
-                        Using Dim streamReader2 As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\loeschArtikel.txt")
-								While True
+                        Using streamReader2 As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\loeschArtikel.txt")
+                            While True
                                 Dim endOfStream2 As Boolean = streamReader2.EndOfStream
                                 If endOfStream2 Then
                                     Exit While
@@ -165,7 +170,7 @@ Module Module1
                     Catch expr_2B1 As Exception
                         ProjectData.SetProjectError(expr_2B1)
                         Dim ex4 As Exception = expr_2B1
-                        LogMessage.Show("Die Datei 'loeschArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." & vbCrLf & "Das Programm wird beendet", MsgType.Critical)
+                        LogMessage.Show("Die Datei 'loeschArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." & vbCrLf & "Das Programm wird beendet", LogMessage.MsgType.Critical)
                         LogMessage.LogOnly(ex4.ToString())
                         flag = Not flag
                         ProjectData.ClearProjectError()
@@ -178,8 +183,8 @@ Module Module1
                 If flag8 Then
                     Module1.ListChangeArticle = New List(Of String)()
                     Try
-                        Using Dim streamReader3 As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\tauscheArtikel.txt")
-								While True
+                        Using streamReader3 As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\tauscheArtikel.txt")
+                            While True
                                 Dim endOfStream3 As Boolean = streamReader3.EndOfStream
                                 If endOfStream3 Then
                                     Exit While
@@ -194,7 +199,7 @@ Module Module1
                     Catch expr_387 As Exception
                         ProjectData.SetProjectError(expr_387)
                         Dim ex5 As Exception = expr_387
-                        LogMessage.Show("Fehler beim Einlesen der tauscheArtikel.txt." & vbCrLf & "Programm wird beendet.", MsgType.Critical)
+                        LogMessage.Show("Fehler beim Einlesen der tauscheArtikel.txt." & vbCrLf & "Programm wird beendet.", LogMessage.MsgType.Critical)
                         LogMessage.LogOnly(ex5.ToString())
                         flag = Not flag
                         ProjectData.ClearProjectError()
@@ -206,7 +211,7 @@ Module Module1
                     Catch expr_3D2 As Exception
                         ProjectData.SetProjectError(expr_3D2)
                         Dim ex6 As Exception = expr_3D2
-                        LogMessage.Show("Die Datei 'tauscheArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." & vbCrLf & "Das Programm wird beendet", MsgType.Critical)
+                        LogMessage.Show("Die Datei 'tauscheArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." & vbCrLf & "Das Programm wird beendet", LogMessage.MsgType.Critical)
                         LogMessage.LogOnly(ex6.ToString())
                         flag = Not flag
                         ProjectData.ClearProjectError()
@@ -216,12 +221,12 @@ Module Module1
                 LogMessage.LogOnly("Einlesen der Datei tauscheArtikel.txt erfolgreich.")
             End If
         Else
-            LogMessage.Show("! Es wurde keine Config.ini Datei gefunden. Es wird eine neue Config.ini mit " & vbCrLf & "  Standardeinstellungen erstellt.", MsgType.Warning)
+            LogMessage.Show("! Es wurde keine Config.ini Datei gefunden. Es wird eine neue Config.ini mit " & vbCrLf & "  Standardeinstellungen erstellt.", LogMessage.MsgType.Warning)
             Dim flag10 As Boolean = Not Module1.CreateNewConfigIni()
             If flag10 Then
-                LogMessage.Show("Eine neue Config.ini konnte nicht erstellt werden. Programm wird beendet.", MsgType.Critical)
+                LogMessage.Show("Eine neue Config.ini konnte nicht erstellt werden. Programm wird beendet.", LogMessage.MsgType.Critical)
             Else
-                LogMessage.Show("Die Datei 'Config.ini' hat nicht existiert und wurde neu angelegt." & vbCrLf & "  Bitte die Einstellungen kontrollieren, bevor das Programm erneut ausgeführt wird.", MsgType.Critical)
+                LogMessage.Show("Die Datei 'Config.ini' hat nicht existiert und wurde neu angelegt." & vbCrLf & "  Bitte die Einstellungen kontrollieren, bevor das Programm erneut ausgeführt wird.", LogMessage.MsgType.Critical)
             End If
             flag = Not flag
         End If
@@ -275,8 +280,8 @@ Module Module1
         LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini...")
         Dim value As String = "-----------------------" & vbCrLf & "DATtoSEDAS Config-Datei" & vbCrLf & "-----------------------" & vbCrLf & "Quell- und Zielpfad müssen mit Laufwerksbuchstabe angegeben werden (vollständig), jedoch ohne Dateiname." & vbCrLf & "Der Dateiname der Quell- und Zieldatei wird separat eingetragen." & vbCrLf & "Werden Quell- und Zieldateiname beim Programmstart per Schalter übergeben (/Q=, /Z=), werden die Einträge" & vbCrLf & "in der Config.ini übergangen." & vbCrLf & "Dies gilt auch für alle weiteren Schalter (z.B. QuelleLöschen, /D)" & vbCrLf & vbCrLf & "[Setup]" & vbCrLf & "Counter=" & vbCrLf & "Quelldateipfad=" & vbCrLf & "Quelldateiname=1.txt" & vbCrLf & "Zieldateipfad=C:\Temp" & vbCrLf & "Zieldateiname=Sedas.dat" & vbCrLf & vbCrLf & "QuelleLöschen=0" & vbCrLf & "IgnoriereMeldungen=0" & vbCrLf & "DatenAnhängen=0"
         Try
-            Using Dim streamWriter As StreamWriter = New StreamWriter(Directory.GetCurrentDirectory() + "\Config.ini")
-					StreamWriter.WriteLine(value)
+            Using streamWriter As StreamWriter = New StreamWriter(Directory.GetCurrentDirectory() + "\Config.ini")
+                streamWriter.WriteLine(value)
             End Using
         Catch expr_49 As Exception
             ProjectData.SetProjectError(expr_49)
@@ -313,16 +318,16 @@ Module Module1
             Dim arg_C5_0 As Boolean = Module1.Arguments.GetUpperBound(0) > 1
             Dim arg_C0_0 As String() = Module1.Arguments
             Dim arg_C0_1 As Predicate(Of String)
-            If Module1._Closure$__.$I12-0 IsNot Nothing Then
-					arg_C0_1 = Module1._Closure$__.$I12-0
-				Else
-                Dim expr_BA As Predicate(Of String) = AddressOf Module1._Closure$__.$I._Lambda$__12-0
-					arg_C0_1 = expr_BA
-                Module1._Closure$__.$I12-0 = expr_BA
-				End If
+            'TODO        If Module1._Closure$__.$I12-0 IsNot Nothing Then
+            '	arg_C0_1 = Module1._Closure$__.$I12-0
+            'Else
+            '            Dim expr_BA As Predicate(Of String) = AddressOf Module1._Closure$__.$I._Lambda$__12-0
+            '	arg_C0_1 = expr_BA
+            '            Module1._Closure$__.$I12-0 = expr_BA
+            'End If
             Dim flag5 As Boolean = arg_C5_0 And Array.Exists(Of String)(arg_C0_0, arg_C0_1)
             If flag5 Then
-                LogMessage.Show("Falsche Startparameter angegeben. '/?' darf nur alleine verwendet werden.", MsgType.Critical)
+                LogMessage.Show("Falsche Startparameter angegeben. '/?' darf nur alleine verwendet werden.", LogMessage.MsgType.Critical)
                 flag = False
                 flag = flag
             Else
@@ -341,7 +346,7 @@ Module Module1
                             If Operators.CompareString(left, "/D", False) <> 0 Then
                                 If Operators.CompareString(left, "/I", False) <> 0 Then
                                     If Operators.CompareString(left, "/A", False) <> 0 Then
-                                        LogMessage.Show("Falsche Startparameter angegeben.", MsgType.Critical)
+                                        LogMessage.Show("Falsche Startparameter angegeben.", LogMessage.MsgType.Critical)
                                         flag = False
                                         flag = flag
                                         Return flag
@@ -403,13 +408,13 @@ Module Module1
         Dim flag2 As Boolean = Operators.CompareString(Module1.Param.SourceFullPath, "", False) = 0
         If flag2 Then
             flag = False
-            LogMessage.Show("Es wurde keine Quelldatei angegeben.", MsgType.Critical)
+            LogMessage.Show("Es wurde keine Quelldatei angegeben.", LogMessage.MsgType.Critical)
             flag = flag
         Else
             Dim flag3 As Boolean = Not File.Exists(Module1.Param.SourceFullPath)
             If flag3 Then
                 flag = False
-                LogMessage.Show("Die Quelldatei existiert nicht oder ist nicht erreichbar.", MsgType.Critical)
+                LogMessage.Show("Die Quelldatei existiert nicht oder ist nicht erreichbar.", LogMessage.MsgType.Critical)
                 flag = flag
             Else
                 flag = flag
@@ -431,7 +436,7 @@ Module Module1
 
     Public Sub ShowHelp()
         Console.WriteLine()
-        Console.WriteLine("DATtoSEDAS-Converter, Version " + MyProject.Application.Info.Version.ToString())
+        Console.WriteLine("DATtoSEDAS-Converter, Version " + MyProject.Application.Info.Version.ToString()) 'TODO
         Console.WriteLine("Wandelt eine Bestell.dat in eine SEDAS.dat um, für den Import in CSB.")
         Console.WriteLine("Wird das Programm ohne Parameter gestartet, werden Pfad und Dateiinformationen")
         Console.WriteLine("aus der Datei Config.ini übernommen.")
