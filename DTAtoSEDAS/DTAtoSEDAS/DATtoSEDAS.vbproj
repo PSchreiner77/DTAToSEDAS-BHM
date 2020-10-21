@@ -109,6 +109,7 @@
     <None Include="bin\Debug\Sedas.dat" />
     <None Include="bin\Debug\SedasOriginal.dat" />
     <None Include="bin\Debug\TestAusgabeAldiDat.dat" />
+    <None Include="bin\Debug\TestDatToSedasAldi.bat" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
