@@ -1,0 +1,473 @@
+﻿Imports System
+Imports System.IO
+Imports Microsoft.VisualBasic.CompilerServices
+
+Module Module1
+    Public Enum MsgType
+        Message
+        Warning
+        Critical
+    End Enum
+
+    Public Enum Output
+        Console = 1
+    End Enum
+
+    Private Arguments As String() = Environment.GetCommandLineArgs()
+
+    Public FileDate As String = ""
+
+    Private INI As INIFile
+
+    Public Param As Parameter = New Parameter()
+
+    Public ListDelCustomer As List(Of String)
+
+    Public ListDelArticle As List(Of String)
+
+    Public ListChangeArticle As List(Of String)
+
+    <STAThread()>
+    Public Sub Main()
+        LogMessage.SetGlobalLog = True
+        LogMessage.SetGlobalOutputToConsole = True
+        LogMessage.LogOnly("**********************************")
+        LogMessage.LogOnly("--------- PROGRAMMSTART ----------")
+        LogMessage.CheckLogFile(100)
+        Dim flag As Boolean = Not Module1.InitProgram()
+        If flag Then
+            LogMessage.LogOnly("Initialisierung des Programms fehlgeschlagen.")
+            Module1.ExitProgram()
+        End If
+        LogMessage.LogOnly("Initialisierung des Programms erfolgreich.")
+        Dim flag2 As Boolean = Not Module1.CheckParameters()
+        If flag2 Then
+            LogMessage.LogOnly("Prüfung der Parameter fehlgeschlagen.")
+            Module1.ExitProgram()
+        End If
+        LogMessage.LogOnly("Prüfung der Parameter erfolgreich.")
+        Dim flag3 As Boolean = Not Module1.CheckSource()
+        If flag3 Then
+            LogMessage.LogOnly("Prüfung des Quellpfades fehlgeschlagen.")
+            Module1.ExitProgram()
+        End If
+        LogMessage.LogOnly("Prüfung des Quellpfades erfolgreich.")
+        Module1.Param.SetDestinationFullPath(Module1.Param.DestinationFilePath, Module1.Param.DestinationFileName)
+        ' The following expression was wrapped in a checked-expression
+        Module1.Param.Counter = Module1.Param.Counter + 1
+        LogMessage.LogOnly("Start der Konvertierung der Bestelldatei in eine Sedas.dat...")
+        Dim convertDATtoSEDAS As ConvertDATtoSEDAS = New ConvertDATtoSEDAS(Module1.Param.SourceFullPath, Module1.Param.DestinationFullPath, Module1.Param.Counter, Module1.ListDelCustomer, Module1.ListDelArticle)
+        Dim flag4 As Boolean = convertDATtoSEDAS.ConvertFile()
+        If flag4 Then
+            LogMessage.Show("Datei " + Module1.Param.SourceFullPath + " erstellt.")
+        Else
+            LogMessage.Show("Fehler beim Konvertieren/Erstellen der Sedas.dat.", MsgType.Critical)
+            Module1.ExitProgram()
+        End If
+        LogMessage.LogOnly("Counter in Config.ini zurückschreiben...")
+        Dim flag5 As Boolean = Not Module1.INI.Write("Setup", "Counter", Conversions.ToString(Module1.Param.Counter))
+        If flag5 Then
+            LogMessage.Show("Zähler konnte nicht in Config.ini zurückgeschrieben werden!" & vbCrLf & "Weitere Programmausführung nicht möglich!", MsgType.Critical)
+            Module1.ExitProgram()
+        End If
+        Dim deleteSourceFile As Boolean = Module1.Param.DeleteSourceFile
+        If deleteSourceFile Then
+            LogMessage.LogOnly("Quelldatei wird gelöscht.")
+            File.Delete(Module1.Param.SourceFullPath)
+        End If
+        LogMessage.LogOnly("--- Programm normal beendet. ---")
+        LogMessage.LogOnly("********************************")
+        LogMessage.LogOnly("")
+    End Sub
+
+    Public Function InitProgram() As Boolean
+        Dim flag As Boolean = True
+        LogMessage.LogOnly("Initialisierung des Programms...")
+        LogMessage.LogOnly("Einlesen der Config.ini Datei...")
+        Dim flag2 As Boolean = File.Exists(Directory.GetCurrentDirectory() + "\config.ini")
+        If flag2 Then
+            Module1.INI = New INIFile(Directory.GetCurrentDirectory() + "\Config.ini")
+            Dim flag3 As Boolean = Not Module1.ReadIniValues()
+            If flag3 Then
+                LogMessage.Show("Fehler beim Auslesen der Config.ini. Bitte Einstellungen prüfen. Programm wird beendet.", MsgType.Critical)
+                flag = Not flag
+            Else
+                LogMessage.LogOnly("Einlesen der Config.ini Datei erfolgreich.")
+                LogMessage.LogOnly("Einlesen der Datei loeschKunde.txt...")
+                Dim flag4 As Boolean = File.Exists(Directory.GetCurrentDirectory() + "\loeschKunde.txt")
+                If flag4 Then
+                    Module1.ListDelCustomer = New List(Of String)()
+                    Try
+                        Using Dim streamReader As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\loeschKunde.txt")
+								While True
+                                Dim endOfStream As Boolean = StreamReader.EndOfStream
+                                If endOfStream Then
+                                    Exit While
+                                End If
+                                Dim text As String = StreamReader.ReadLine()
+                                Dim flag5 As Boolean = Operators.CompareString(text, "", False) <> 0
+                                If flag5 Then
+                                    Module1.ListDelCustomer.Add(text)
+                                End If
+                            End While
+                        End Using
+                    Catch expr_157 As Exception
+                        ProjectData.SetProjectError(expr_157)
+                        Dim ex As Exception = expr_157
+                        LogMessage.LogOnly(ex.ToString())
+                        flag = Not flag
+                        ProjectData.ClearProjectError()
+                        Return flag
+                    End Try
+                Else
+                    Try
+                        File.CreateText(Directory.GetCurrentDirectory() + "\loeschKunde.txt")
+                    Catch expr_199 As Exception
+                        ProjectData.SetProjectError(expr_199)
+                        Dim ex2 As Exception = expr_199
+                        LogMessage.Show("Die Datei 'loeschKunde.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." & vbCrLf & "Das Programm wird beendet", MsgType.Critical)
+                        LogMessage.LogOnly(ex2.ToString())
+                        flag = Not flag
+                        ProjectData.ClearProjectError()
+                        Return flag
+                    End Try
+                End If
+                LogMessage.LogOnly("Einlesen der Datei loeschKunde.txt erfolgreich.")
+                LogMessage.LogOnly("Einlesen der Datei loeschArtikel.txt...")
+                Dim flag6 As Boolean = File.Exists(Directory.GetCurrentDirectory() + "\loeschArtikel.txt")
+                If flag6 Then
+                    Module1.ListDelArticle = New List(Of String)()
+                    Try
+                        Using Dim streamReader2 As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\loeschArtikel.txt")
+								While True
+                                Dim endOfStream2 As Boolean = streamReader2.EndOfStream
+                                If endOfStream2 Then
+                                    Exit While
+                                End If
+                                Dim text2 As String = streamReader2.ReadLine()
+                                Dim flag7 As Boolean = Operators.CompareString(text2, "", False) <> 0
+                                If flag7 Then
+                                    Module1.ListDelArticle.Add(text2)
+                                End If
+                            End While
+                        End Using
+                    Catch expr_26F As Exception
+                        ProjectData.SetProjectError(expr_26F)
+                        Dim ex3 As Exception = expr_26F
+                        LogMessage.LogOnly(ex3.ToString())
+                        flag = Not flag
+                        ProjectData.ClearProjectError()
+                        Return flag
+                    End Try
+                Else
+                    Try
+                        File.CreateText(Directory.GetCurrentDirectory() + "\loeschArtikel.txt")
+                    Catch expr_2B1 As Exception
+                        ProjectData.SetProjectError(expr_2B1)
+                        Dim ex4 As Exception = expr_2B1
+                        LogMessage.Show("Die Datei 'loeschArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." & vbCrLf & "Das Programm wird beendet", MsgType.Critical)
+                        LogMessage.LogOnly(ex4.ToString())
+                        flag = Not flag
+                        ProjectData.ClearProjectError()
+                        Return flag
+                    End Try
+                End If
+                LogMessage.LogOnly("Einlesen der Datei loeschArtikel.txt erfolgreich.")
+                LogMessage.LogOnly("Einlesen der Datei tauscheArtikel.txt...")
+                Dim flag8 As Boolean = File.Exists(Directory.GetCurrentDirectory() + "\tauscheArtikel.txt")
+                If flag8 Then
+                    Module1.ListChangeArticle = New List(Of String)()
+                    Try
+                        Using Dim streamReader3 As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\tauscheArtikel.txt")
+								While True
+                                Dim endOfStream3 As Boolean = streamReader3.EndOfStream
+                                If endOfStream3 Then
+                                    Exit While
+                                End If
+                                Dim text3 As String = streamReader3.ReadLine()
+                                Dim flag9 As Boolean = Operators.CompareString(text3, "", False) <> 0
+                                If flag9 Then
+                                    Module1.ListChangeArticle.Add(text3)
+                                End If
+                            End While
+                        End Using
+                    Catch expr_387 As Exception
+                        ProjectData.SetProjectError(expr_387)
+                        Dim ex5 As Exception = expr_387
+                        LogMessage.Show("Fehler beim Einlesen der tauscheArtikel.txt." & vbCrLf & "Programm wird beendet.", MsgType.Critical)
+                        LogMessage.LogOnly(ex5.ToString())
+                        flag = Not flag
+                        ProjectData.ClearProjectError()
+                        Return flag
+                    End Try
+                Else
+                    Try
+                        File.CreateText(Directory.GetCurrentDirectory() + "\tauscheArtikel.txt")
+                    Catch expr_3D2 As Exception
+                        ProjectData.SetProjectError(expr_3D2)
+                        Dim ex6 As Exception = expr_3D2
+                        LogMessage.Show("Die Datei 'tauscheArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." & vbCrLf & "Das Programm wird beendet", MsgType.Critical)
+                        LogMessage.LogOnly(ex6.ToString())
+                        flag = Not flag
+                        ProjectData.ClearProjectError()
+                        Return flag
+                    End Try
+                End If
+                LogMessage.LogOnly("Einlesen der Datei tauscheArtikel.txt erfolgreich.")
+            End If
+        Else
+            LogMessage.Show("! Es wurde keine Config.ini Datei gefunden. Es wird eine neue Config.ini mit " & vbCrLf & "  Standardeinstellungen erstellt.", MsgType.Warning)
+            Dim flag10 As Boolean = Not Module1.CreateNewConfigIni()
+            If flag10 Then
+                LogMessage.Show("Eine neue Config.ini konnte nicht erstellt werden. Programm wird beendet.", MsgType.Critical)
+            Else
+                LogMessage.Show("Die Datei 'Config.ini' hat nicht existiert und wurde neu angelegt." & vbCrLf & "  Bitte die Einstellungen kontrollieren, bevor das Programm erneut ausgeführt wird.", MsgType.Critical)
+            End If
+            flag = Not flag
+        End If
+        Return flag
+    End Function
+
+    Public Function ReadIniValues() As Boolean
+        Dim result As Boolean = True
+        Try
+            Module1.Param.SourceFileName = Module1.INI.Read("Setup", "Quelldateiname")
+            Module1.Param.SourceFilePath = Module1.INI.Read("Setup", "Quelldateipfad")
+            Dim flag As Boolean = Operators.CompareString(Module1.Param.SourceFilePath, "", False) <> 0
+            If flag Then
+                Dim flag2 As Boolean = Operators.CompareString(Strings.Mid(Module1.Param.SourceFilePath, Strings.Len(Module1.Param.SourceFilePath), 1), "\", False) <> 0
+                If flag2 Then
+                    Module1.Param.SourceFilePath = Module1.Param.SourceFilePath + "\"
+                End If
+            Else
+                Module1.Param.SourceFilePath = Directory.GetCurrentDirectory() + "\"
+            End If
+            Module1.Param.DestinationFileName = Module1.INI.Read("Setup", "Zieldateiname")
+            Module1.Param.DestinationFilePath = Module1.INI.Read("Setup", "Zieldateipfad")
+            Dim flag3 As Boolean = Operators.CompareString(Module1.Param.DestinationFilePath, "", False) <> 0
+            If flag3 Then
+                Dim flag4 As Boolean = Operators.CompareString(Strings.Mid(Module1.Param.DestinationFilePath, Strings.Len(Module1.Param.DestinationFilePath), 1), "\", False) <> 0
+                If flag4 Then
+                    Module1.Param.DestinationFilePath = Module1.Param.DestinationFilePath + "\"
+                End If
+            Else
+                Module1.Param.DestinationFilePath = Directory.GetCurrentDirectory() + "\"
+            End If
+            Dim flag5 As Boolean = Operators.CompareString(Module1.Param.DestinationFileName, "", False) = 0 And Operators.CompareString(Module1.Param.DestinationFilePath, "", False) <> 0
+            If flag5 Then
+                Module1.Param.DestinationFileName = "SEDAS.DAT"
+            End If
+            Module1.Param.DeleteSourceFile = Conversions.ToBoolean(Module1.INI.Read("Setup", "QuelleLöschen"))
+            Module1.Param.IgnoreMessages = Conversions.ToBoolean(Module1.INI.Read("Setup", "IgnoriereMeldungen"))
+            Module1.Param.Counter = Conversions.ToInteger(Module1.INI.Read("Setup", "Counter"))
+        Catch expr_24D As Exception
+            ProjectData.SetProjectError(expr_24D)
+            Dim ex As Exception = expr_24D
+            LogMessage.LogOnly("Fehler beim Einlesen der Config.ini: " & vbCrLf + ex.ToString())
+            result = False
+            ProjectData.ClearProjectError()
+        End Try
+        Return result
+    End Function
+
+    Public Function CreateNewConfigIni() As Boolean
+        Dim flag As Boolean = True
+        LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini...")
+        Dim value As String = "-----------------------" & vbCrLf & "DATtoSEDAS Config-Datei" & vbCrLf & "-----------------------" & vbCrLf & "Quell- und Zielpfad müssen mit Laufwerksbuchstabe angegeben werden (vollständig), jedoch ohne Dateiname." & vbCrLf & "Der Dateiname der Quell- und Zieldatei wird separat eingetragen." & vbCrLf & "Werden Quell- und Zieldateiname beim Programmstart per Schalter übergeben (/Q=, /Z=), werden die Einträge" & vbCrLf & "in der Config.ini übergangen." & vbCrLf & "Dies gilt auch für alle weiteren Schalter (z.B. QuelleLöschen, /D)" & vbCrLf & vbCrLf & "[Setup]" & vbCrLf & "Counter=" & vbCrLf & "Quelldateipfad=" & vbCrLf & "Quelldateiname=1.txt" & vbCrLf & "Zieldateipfad=C:\Temp" & vbCrLf & "Zieldateiname=Sedas.dat" & vbCrLf & vbCrLf & "QuelleLöschen=0" & vbCrLf & "IgnoriereMeldungen=0" & vbCrLf & "DatenAnhängen=0"
+        Try
+            Using Dim streamWriter As StreamWriter = New StreamWriter(Directory.GetCurrentDirectory() + "\Config.ini")
+					StreamWriter.WriteLine(value)
+            End Using
+        Catch expr_49 As Exception
+            ProjectData.SetProjectError(expr_49)
+            Dim ex As Exception = expr_49
+            LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini fehlgeschlagen: " & vbCrLf + ex.ToString())
+            flag = False
+            ProjectData.ClearProjectError()
+        End Try
+        flag = flag
+        Return flag
+    End Function
+
+    Public Function CheckParameters() As Boolean
+        Dim flag As Boolean = True
+        LogMessage.LogOnly("Prüfung der übergebenen Parameter...")
+        Dim flag2 As Boolean = Module1.Arguments.GetUpperBound(0) < 1
+        ' The following expression was wrapped in a checked-statement
+        If flag2 Then
+            LogMessage.LogOnly("Es wurden keine Parameter übergeben.")
+            flag = flag
+        Else
+            Dim flag3 As Boolean = Module1.Arguments.GetUpperBound(0) = 1
+            If flag3 Then
+                Dim flag4 As Boolean = Strings.InStr(Module1.Arguments(1), "/?", CompareMethod.Binary) > 0
+                If flag4 Then
+                    Module1.Param.Help = True
+                    LogMessage.LogOnly("Nur /? (Hilfe) übergeben. Hilfe wird angezeigt.")
+                    Module1.ShowHelp()
+                    flag = False
+                    flag = flag
+                    Return flag
+                End If
+            End If
+            Dim arg_C5_0 As Boolean = Module1.Arguments.GetUpperBound(0) > 1
+            Dim arg_C0_0 As String() = Module1.Arguments
+            Dim arg_C0_1 As Predicate(Of String)
+            If Module1._Closure$__.$I12-0 IsNot Nothing Then
+					arg_C0_1 = Module1._Closure$__.$I12-0
+				Else
+                Dim expr_BA As Predicate(Of String) = AddressOf Module1._Closure$__.$I._Lambda$__12-0
+					arg_C0_1 = expr_BA
+                Module1._Closure$__.$I12-0 = expr_BA
+				End If
+            Dim flag5 As Boolean = arg_C5_0 And Array.Exists(Of String)(arg_C0_0, arg_C0_1)
+            If flag5 Then
+                LogMessage.Show("Falsche Startparameter angegeben. '/?' darf nur alleine verwendet werden.", MsgType.Critical)
+                flag = False
+                flag = flag
+            Else
+                Dim upperBound As Integer = Module1.Arguments.GetUpperBound(0)
+                For i As Integer = 1 To upperBound
+                    Dim text As String = Module1.Arguments(i)
+                    Dim flag6 As Boolean = Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) > 0
+                    If flag6 Then
+                        text = Strings.Mid(Module1.Arguments(i), 1, Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary))
+                    Else
+                        text = Module1.Arguments(i)
+                    End If
+                    Dim left As String = text.ToUpper()
+                    If Operators.CompareString(left, "/Q=", False) <> 0 Then
+                        If Operators.CompareString(left, "/Z=", False) <> 0 Then
+                            If Operators.CompareString(left, "/D", False) <> 0 Then
+                                If Operators.CompareString(left, "/I", False) <> 0 Then
+                                    If Operators.CompareString(left, "/A", False) <> 0 Then
+                                        LogMessage.Show("Falsche Startparameter angegeben.", MsgType.Critical)
+                                        flag = False
+                                        flag = flag
+                                        Return flag
+                                    End If
+                                    Module1.Param.Append = True
+                                Else
+                                    Module1.Param.IgnoreMessages = True
+                                End If
+                            Else
+                                Module1.Param.DeleteSourceFile = True
+                            End If
+                        Else
+                            Dim flag7 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1), "\", CompareMethod.Binary) > 0
+                            If flag7 Then
+                                Dim flag8 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "\", -1, CompareMethod.Binary) + 1), ".", CompareMethod.Binary) > 0
+                                If flag8 Then
+                                    Dim text2 As String = Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "=", -1, CompareMethod.Binary) + 1)
+                                    Dim destinationFileName As String = Strings.Mid(text2, Strings.InStrRev(text2, "\", -1, CompareMethod.Binary) + 1)
+                                    Dim destinationFilePath As String = Strings.Mid(text2, 1, Strings.InStrRev(text2, "\", -1, CompareMethod.Binary))
+                                    Module1.Param.DestinationFilePath = destinationFilePath
+                                    Module1.Param.DestinationFileName = destinationFileName
+                                Else
+                                    Module1.Param.DestinationFilePath = Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1)
+                                End If
+                            Else
+                                Dim flag9 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "\", -1, CompareMethod.Binary) + 1), ".", CompareMethod.Binary) > 0
+                                If flag9 Then
+                                    Module1.Param.DestinationFileName = Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1)
+                                End If
+                            End If
+                        End If
+                    Else
+                        Dim flag10 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1), "\", CompareMethod.Binary) > 0
+                        If flag10 Then
+                            Dim flag11 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "\", -1, CompareMethod.Binary) + 1), ".", CompareMethod.Binary) > 0
+                            If flag11 Then
+                                Module1.Param.SetSourceFullPath(Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1))
+                            Else
+                                Module1.Param.SourceFilePath = Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1)
+                            End If
+                        Else
+                            Dim flag12 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "\", -1, CompareMethod.Binary) + 1), ".", CompareMethod.Binary) > 0
+                            If flag12 Then
+                                Module1.Param.SourceFileName = Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1)
+                            End If
+                        End If
+                    End If
+                Next
+                flag = flag
+            End If
+        End If
+        Return flag
+    End Function
+
+    Public Function CheckSource() As Boolean
+        Dim flag As Boolean = True
+        Module1.Param.SetSourceFullPath(Module1.Param.SourceFilePath, Module1.Param.SourceFileName)
+        LogMessage.LogOnly("Prüfen des Quellpfades: " + Module1.Param.SourceFullPath)
+        Dim flag2 As Boolean = Operators.CompareString(Module1.Param.SourceFullPath, "", False) = 0
+        If flag2 Then
+            flag = False
+            LogMessage.Show("Es wurde keine Quelldatei angegeben.", MsgType.Critical)
+            flag = flag
+        Else
+            Dim flag3 As Boolean = Not File.Exists(Module1.Param.SourceFullPath)
+            If flag3 Then
+                flag = False
+                LogMessage.Show("Die Quelldatei existiert nicht oder ist nicht erreichbar.", MsgType.Critical)
+                flag = flag
+            Else
+                flag = flag
+            End If
+        End If
+        Return flag
+    End Function
+
+    Public Sub ShowMessage(Message As String, Optional Ignorable As Boolean = True, Optional Pause As Boolean = False)
+        Dim flag As Boolean = Not Module1.Param.IgnoreMessages Or Ignorable
+        If flag Then
+            Console.WriteLine(Message)
+            If Pause Then
+                Console.Write("<Enter> drücken...")
+                Console.ReadLine()
+            End If
+        End If
+    End Sub
+
+    Public Sub ShowHelp()
+        Console.WriteLine()
+        Console.WriteLine("DATtoSEDAS-Converter, Version " + MyProject.Application.Info.Version.ToString())
+        Console.WriteLine("Wandelt eine Bestell.dat in eine SEDAS.dat um, für den Import in CSB.")
+        Console.WriteLine("Wird das Programm ohne Parameter gestartet, werden Pfad und Dateiinformationen")
+        Console.WriteLine("aus der Datei Config.ini übernommen.")
+        Console.WriteLine("Parameter, die mit Schaltern übergeben werden überschreiben Einstellungen ")
+        Console.WriteLine("der Config.ini")
+        Console.WriteLine()
+        Console.WriteLine("DATtoSEDAS.exe [/Q=][Laufwerk:][Pfad][Dateiname] [/Z=][Laufwerk:][Pfad][Dateiname] [/D] [/I]")
+        Console.WriteLine("               [/A] [/?]")
+        Console.WriteLine("[Laufwerk:]  Laufwerksbuchstabe, z.B. C:")
+        Console.WriteLine("[Pfad]       Verzeichnispfad")
+        Console.WriteLine("[Dateiname]  Dateiname")
+        Console.WriteLine()
+        Console.WriteLine(" /Q=         Laufwerk/Pfad/Dateiname der Quelldatei.")
+        Console.WriteLine("                Wird nur ein Dateiname angegeben, wird dieser im Programm-")
+        Console.WriteLine("                Verzeichnis gesucht.")
+        Console.WriteLine(" /Z=         Laufwerk/Pfad/Dateiname der Zieldatei." & vbCrLf & "                Wird kein Zielpfad angegeben,wird die " & vbCrLf & "                Zieldatei im Programmverzeichnis abgelegt." & vbCrLf & "              ! Existiert eine gleichnamige Zieldatei bereits, wird")
+        Console.WriteLine("                sie ohne Rückfrage überschrieben!")
+        Console.WriteLine(" /D          Quelldatei wird nach der Konvertierung gelöscht.")
+        Console.WriteLine(" /I          Statusmeldungen werden nicht angezeigt (jedoch Fehlermeldungen!).")
+        Console.WriteLine(" /?          Ruft diese Hilfeseite auf.")
+        Console.WriteLine()
+        Console.WriteLine("Beispiel:")
+        Console.WriteLine(">> DATtoSEDAS.exe /Q=C:\Daten\Bestell.dat /Z=D:\Import\Sedas.dat /D /I")
+        Console.WriteLine(" - Quelldatei wird in Zieldatei eingelesen, die Quelldatei wird anschließend gelöscht.")
+        Console.WriteLine("   Statusmeldungen werden nicht ausgegeben.")
+        Console.WriteLine()
+        Console.WriteLine(">> DATtoSEDAS.exe /Q=C:\Daten\Bestell.dat /I")
+        Console.WriteLine(" - Quelldatei wird in Zieldatei eingelesen. Statusmeldungen werden nicht ausgegeben.")
+        Console.WriteLine()
+        Console.Write("<Enter> drücken...")
+        Console.ReadLine()
+    End Sub
+
+    Public Sub ExitProgram()
+        LogMessage.Show("Programm wird nach Fehler beendet.")
+        Environment.[Exit](0)
+    End Sub
+End Module
+

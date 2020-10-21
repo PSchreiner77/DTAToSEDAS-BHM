@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.902
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DATtoSEDAS", "DTAtoSEDAS\DATtoSEDAS.vbproj", "{98667DBD-CA50-48C8-8973-E4A0A7813185}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DatToSedasReengineer", "DatToSedasReengineer\DatToSedasReengineer.vbproj", "{9A9B86AD-4477-455C-81CB-A4AAAD8B7CD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{98667DBD-CA50-48C8-8973-E4A0A7813185}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98667DBD-CA50-48C8-8973-E4A0A7813185}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98667DBD-CA50-48C8-8973-E4A0A7813185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A9B86AD-4477-455C-81CB-A4AAAD8B7CD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A9B86AD-4477-455C-81CB-A4AAAD8B7CD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A9B86AD-4477-455C-81CB-A4AAAD8B7CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A9B86AD-4477-455C-81CB-A4AAAD8B7CD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
