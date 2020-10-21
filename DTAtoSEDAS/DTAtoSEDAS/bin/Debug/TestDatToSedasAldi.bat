@@ -1,0 +1,1 @@
+dattosedas.exe /Q=D:\DEVELOP\Dot.NET\DTAToSedas\DTAtoSEDAS\DTAtoSEDAS\bin\Debug\TestAusgabeAldiDat.dat /Z=D:\DEVELOP\Dot.NET\DTAToSedas\DTAtoSEDAS\DTAtoSEDAS\bin\Debug\TestAusgabeSEDASAldi.dat
