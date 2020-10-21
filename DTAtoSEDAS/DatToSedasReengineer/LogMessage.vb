@@ -193,7 +193,7 @@ Public Class LogMessage
                     text = streamReader.ReadToEnd()
                 End Using
                 Dim array As String() = Strings.Split(text, vbCrLf, -1, CompareMethod.Binary)
-                Dim num3 As Integer = array.Count(Of String)() / 2
+                Dim num3 As Integer = array.Count / 2
                 Dim upperBound As Integer = array.GetUpperBound(0)
                 For i As Integer = num3 To upperBound
                     list.Add(array(i))

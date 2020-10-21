@@ -9,7 +9,7 @@ Imports System.Runtime.InteropServices
 ' Werte der Assemblyattribute überprüfen
 
 <Assembly: AssemblyTitle("DatToSedasReengineer")>
-<Assembly: AssemblyDescription("Aldi Variante")>
+<Assembly: AssemblyDescription("DatToSedass wandelt eine DAT-Bestelldatei in eine SEDAS-DAT-Datei um zur Einspielung in CSB.")>
 <Assembly: AssemblyCompany("")>
 <Assembly: AssemblyProduct("DatToSedasReengineer")>
 <Assembly: AssemblyCopyright("Copyright ©  2020")>
