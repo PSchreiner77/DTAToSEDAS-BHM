@@ -53,7 +53,7 @@ Module Module1
             Module1.ExitProgram()
         End If
         LogMessage.LogOnly("Prüfung des Quellpfades erfolgreich.")
-        Module1.Param.SetDestinationFullPath(Module1.Param.DestinationFilePath, Module1.Param.DestinationFileName)
+        'Module1.Param.SetDestinationFullPath(Module1.Param.DestinationFilePath, Module1.Param.DestinationFileName)
         ' The following expression was wrapped in a checked-expression
         Module1.Param.Counter = Module1.Param.Counter + 1
         LogMessage.LogOnly("Start der Konvertierung der Bestelldatei in eine Sedas.dat...")
@@ -295,115 +295,118 @@ Module Module1
     End Function
 
     Public Function CheckParameters() As Boolean
-        Dim flag As Boolean = True
-        LogMessage.LogOnly("Prüfung der übergebenen Parameter...")
-        Dim flag2 As Boolean = Module1.Arguments.GetUpperBound(0) < 1
-        ' The following expression was wrapped in a checked-statement
-        If flag2 Then
-            LogMessage.LogOnly("Es wurden keine Parameter übergeben.")
-            flag = flag
-        Else
-            Dim flag3 As Boolean = Module1.Arguments.GetUpperBound(0) = 1
-            If flag3 Then
-                Dim flag4 As Boolean = Strings.InStr(Module1.Arguments(1), "/?", CompareMethod.Binary) > 0
-                If flag4 Then
-                    Module1.Param.Help = True
-                    LogMessage.LogOnly("Nur /? (Hilfe) übergeben. Hilfe wird angezeigt.")
-                    Module1.ShowHelp()
-                    flag = False
-                    flag = flag
-                    Return flag
-                End If
-            End If
-            Dim arg_C5_0 As Boolean = Module1.Arguments.GetUpperBound(0) > 1
-            Dim arg_C0_0 As String() = Module1.Arguments
-            Dim arg_C0_1 As Predicate(Of String)
-            'TODO        If Module1._Closure$__.$I12-0 IsNot Nothing Then
-            '	arg_C0_1 = Module1._Closure$__.$I12-0
-            'Else
-            '            Dim expr_BA As Predicate(Of String) = AddressOf Module1._Closure$__.$I._Lambda$__12-0
-            '	arg_C0_1 = expr_BA
-            '            Module1._Closure$__.$I12-0 = expr_BA
-            'End If
-            Dim flag5 As Boolean = arg_C5_0 And Array.Exists(Of String)(arg_C0_0, arg_C0_1)
-            If flag5 Then
-                LogMessage.Show("Falsche Startparameter angegeben. '/?' darf nur alleine verwendet werden.", LogMessage.MsgType.Critical)
-                flag = False
-                flag = flag
-            Else
-                Dim upperBound As Integer = Module1.Arguments.GetUpperBound(0)
-                For i As Integer = 1 To upperBound
-                    Dim text As String = Module1.Arguments(i)
-                    Dim flag6 As Boolean = Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) > 0
-                    If flag6 Then
-                        text = Strings.Mid(Module1.Arguments(i), 1, Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary))
-                    Else
-                        text = Module1.Arguments(i)
-                    End If
-                    Dim left As String = text.ToUpper()
-                    If Operators.CompareString(left, "/Q=", False) <> 0 Then
-                        If Operators.CompareString(left, "/Z=", False) <> 0 Then
-                            If Operators.CompareString(left, "/D", False) <> 0 Then
-                                If Operators.CompareString(left, "/I", False) <> 0 Then
-                                    If Operators.CompareString(left, "/A", False) <> 0 Then
-                                        LogMessage.Show("Falsche Startparameter angegeben.", LogMessage.MsgType.Critical)
-                                        flag = False
-                                        flag = flag
-                                        Return flag
-                                    End If
-                                    Module1.Param.Append = True
-                                Else
-                                    Module1.Param.IgnoreMessages = True
-                                End If
-                            Else
-                                Module1.Param.DeleteSourceFile = True
-                            End If
-                        Else
-                            Dim flag7 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1), "\", CompareMethod.Binary) > 0
-                            If flag7 Then
-                                Dim flag8 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "\", -1, CompareMethod.Binary) + 1), ".", CompareMethod.Binary) > 0
-                                If flag8 Then
-                                    Dim text2 As String = Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "=", -1, CompareMethod.Binary) + 1)
-                                    Dim destinationFileName As String = Strings.Mid(text2, Strings.InStrRev(text2, "\", -1, CompareMethod.Binary) + 1)
-                                    Dim destinationFilePath As String = Strings.Mid(text2, 1, Strings.InStrRev(text2, "\", -1, CompareMethod.Binary))
-                                    Module1.Param.DestinationFilePath = destinationFilePath
-                                    Module1.Param.DestinationFileName = destinationFileName
-                                Else
-                                    Module1.Param.DestinationFilePath = Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1)
-                                End If
-                            Else
-                                Dim flag9 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "\", -1, CompareMethod.Binary) + 1), ".", CompareMethod.Binary) > 0
-                                If flag9 Then
-                                    Module1.Param.DestinationFileName = Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1)
-                                End If
-                            End If
-                        End If
-                    Else
-                        Dim flag10 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1), "\", CompareMethod.Binary) > 0
-                        If flag10 Then
-                            Dim flag11 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "\", -1, CompareMethod.Binary) + 1), ".", CompareMethod.Binary) > 0
-                            If flag11 Then
-                                Module1.Param.SetSourceFullPath(Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1))
-                            Else
-                                Module1.Param.SourceFilePath = Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1)
-                            End If
-                        Else
-                            Dim flag12 As Boolean = Strings.InStr(Strings.Mid(Module1.Arguments(i), Strings.InStrRev(Module1.Arguments(i), "\", -1, CompareMethod.Binary) + 1), ".", CompareMethod.Binary) > 0
-                            If flag12 Then
-                                Module1.Param.SourceFileName = Strings.Mid(Module1.Arguments(i), Strings.InStr(Module1.Arguments(i), "=", CompareMethod.Binary) + 1)
-                            End If
-                        End If
-                    End If
-                Next
-                flag = flag
+        CheckParameters = True
+
+        '-----------------------------------------------------------------------------------------
+        'Keine Parameter übergeben. Funktion Ende.
+        If Arguments.GetUpperBound(0) < 1 Then
+            'Keine Parameter übergeben
+            Return CheckParameters
+        End If
+
+        '-----------------------------------------------------------------------------------------
+        'Wenn nur ein Element übergeben wurde, prüfen, ob es /? ist.
+        If Arguments.GetUpperBound(0) = 1 Then
+            If InStr(Arguments(1), "/?") > 0 Then
+                Param.Help = True
+                ShowHelp()
+                CheckParameters = False
+                Return CheckParameters
             End If
         End If
-        Return flag
+
+        '-----------------------------------------------------------------------------------------
+        'Prüfen, ob mehr als 1 Argument übergeben und im Array /? vorkommt
+        'Wenn ja, dann Parameter falsch.
+        If Arguments.GetUpperBound(0) > 1 And Array.Exists(Arguments, Function(element)
+                                                                          Return element.Contains("/?")
+                                                                      End Function) Then
+            ShowMessage("FEHLER! Falsche Startparameter angegeben. '/?' darf nur alleine verwendet werden.", False)
+            CheckParameters = False
+            Return CheckParameters
+        End If
+
+        '-----------------------------------------------------------------------------------------
+        '## Parameter auswerten.
+        Dim erg As Integer = 0
+        For i = 1 To Arguments.GetUpperBound(0)
+            Dim Switch As String = Arguments(i)
+
+            'Parameter ermitteln
+            If InStr(Arguments(i), "=") > 0 Then        'Prüfen, ob der Parameter ein = enthält
+                Switch = Mid(Arguments(i), 1, InStr(Arguments(i), "="))
+            Else
+                Switch = Arguments(i)
+            End If
+
+            'Parameter prüfen und Parameterwert setzen
+            Select Case Switch.ToUpper
+
+                Case = "/Q="
+                    'Prüfen, ob Eintrag aus Pfad und/oder Dateiname besteht
+                    If InStr(Mid(Arguments(i), InStr(Arguments(i), "=") + 1), "\") > 0 Then
+                        'Pfad enthalten.
+                        If InStr(Mid(Arguments(i), InStrRev(Arguments(i), "\") + 1), ".") > 0 Then
+                            'Dateiname enthalten: Eintrag als kompletten Pfad übernehmen.
+                            Param.SetSourceFullPath(Mid(Arguments(i), InStr(Arguments(i), "=") + 1))
+                        Else
+                            'Kein Dateiname enthalten: Eintrag als nur Pfad übernehmen.
+                            Param.SourceFilePath = Mid(Arguments(i), InStr(Arguments(i), "=") + 1)
+                        End If
+                    Else
+                        'Kein Pfad enthalten
+                        If InStr(Mid(Arguments(i), InStrRev(Arguments(i), "\") + 1), ".") > 0 Then
+                            'Dateiname enthalten: Eintrag als Dateiname übernehmen.
+                            Param.SourceFileName = Mid(Arguments(i), InStr(Arguments(i), "=") + 1)
+                        End If
+                    End If
+
+                Case = "/Z="
+                    If InStr(Mid(Arguments(i), InStr(Arguments(i), "=") + 1), "\") > 0 Then
+                        'Pfad enthalten.
+                        If InStr(Mid(Arguments(i), InStrRev(Arguments(i), "\") + 1), ".") > 0 Then
+                            'Dateiname enthalten: Eintrag als kompletten Pfad übernehmen.
+                            Param.SetDestinationFullPath(Mid(Arguments(i), InStr(Arguments(i), "=") + 1))
+                        Else
+                            'Kein Dateiname enthalten: Eintrag als nur Pfad übernehmen.
+                            Param.DestinationFilePath = Mid(Arguments(i), InStr(Arguments(i), "=") + 1)
+                        End If
+                    Else
+                        'Kein Pfad enthalten
+                        If InStr(Mid(Arguments(i), InStrRev(Arguments(i), "\") + 1), ".") > 0 Then
+                            'Dateiname enthalten: Eintrag als Dateiname übernehmen.
+                            Param.DestinationFileName = Mid(Arguments(i), InStr(Arguments(i), "=") + 1)
+                        End If
+                    End If
+
+
+                Case = "/D"
+                    Param.DeleteSourceFile = True
+                    'erg = erg + 1
+
+                Case = "/I"
+                    'Fehlermeldungen unterdrücken
+                    Param.IgnoreMessages = True
+
+                Case = "/A"
+                    'Fehlermeldungen unterdrücken
+                    Param.Append = True
+
+                Case Else
+                    ShowMessage("FEHLER! Falsche Startparameter angegeben.", False)
+                    CheckParameters = False
+                    Return CheckParameters
+            End Select
+        Next
+        Return CheckParameters
     End Function
 
     Public Function CheckSource() As Boolean
         Dim flag As Boolean = True
-        Module1.Param.SetSourceFullPath(Module1.Param.SourceFilePath, Module1.Param.SourceFileName)
+        If Param.SourceFullPath = "" Then
+            Module1.Param.SetSourceFullPath(Module1.Param.SourceFilePath, Module1.Param.SourceFileName)
+        End If
+
         LogMessage.LogOnly("Prüfen des Quellpfades: " + Module1.Param.SourceFullPath)
         Dim flag2 As Boolean = Operators.CompareString(Module1.Param.SourceFullPath, "", False) = 0
         If flag2 Then
