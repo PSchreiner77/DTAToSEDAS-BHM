@@ -436,7 +436,7 @@ Module Module1
 
     Public Sub ShowHelp()
         Console.WriteLine()
-        Console.WriteLine("DATtoSEDAS-Converter, Version " + MyProject.Application.Info.Version.ToString()) 'TODO
+        Console.WriteLine("DATtoSEDAS-Converter, Version " + MyProject.Application.Info.Version.ToString())
         Console.WriteLine("Wandelt eine Bestell.dat in eine SEDAS.dat um, für den Import in CSB.")
         Console.WriteLine("Wird das Programm ohne Parameter gestartet, werden Pfad und Dateiinformationen")
         Console.WriteLine("aus der Datei Config.ini übernommen.")
