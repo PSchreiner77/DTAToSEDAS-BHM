@@ -56,6 +56,7 @@ Module Module1
         'Module1.Param.SetDestinationFullPath(Module1.Param.DestinationFilePath, Module1.Param.DestinationFileName)
         ' The following expression was wrapped in a checked-expression
         Module1.Param.Counter = Module1.Param.Counter + 1
+        If Param.Counter > 999 Then Param.Counter = 1
         LogMessage.LogOnly("Start der Konvertierung der Bestelldatei in eine Sedas.dat...")
         Dim convertDATtoSEDAS As ConvertDATtoSEDAS = New ConvertDATtoSEDAS(Module1.Param.SourceFullPath, Module1.Param.DestinationFullPath, Module1.Param.Counter, Module1.ListDelCustomer, Module1.ListDelArticle)
         Dim flag4 As Boolean = convertDATtoSEDAS.ConvertFile()
