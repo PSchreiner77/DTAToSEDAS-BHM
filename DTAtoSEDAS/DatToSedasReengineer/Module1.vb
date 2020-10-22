@@ -80,7 +80,7 @@ Module Module1
         LogMessage.LogOnly("********************************")
         LogMessage.LogOnly("")
 
-        Dim sr As New StreamReader("C:\Temp\test.txt")
+
 
     End Sub
 
