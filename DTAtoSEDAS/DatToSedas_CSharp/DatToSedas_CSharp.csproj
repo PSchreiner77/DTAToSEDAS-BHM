@@ -51,6 +51,29 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="bin\Debug\BestellNF.DAT" />
+    <None Include="bin\Debug\Config - Kopie.ini" />
+    <None Include="bin\Debug\Config.ini" />
+    <None Include="bin\Debug\Datenbeschreibung.xlsx" />
+    <None Include="bin\Debug\DatToSedas_CSharp.exe.config" />
+    <None Include="bin\Debug\Sedas.dat" />
+    <None Include="bin\Debug\SedasOriginal.dat" />
+    <None Include="bin\Debug\TestAusgabeAldiDat.dat" />
+    <None Include="bin\Debug\Testdaten\TestAldiDat.dat" />
+    <None Include="bin\Debug\TestDatToSedasAldi.bat" />
+    <None Include="bin\Debug\UBU34J7R - Kopie.DAT" />
+    <None Include="bin\Debug\UBU34J7R.DAT" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\1.txt" />
+    <Content Include="bin\Debug\1_Info.txt" />
+    <Content Include="bin\Debug\2 - Kopie.TXT" />
+    <Content Include="bin\Debug\2.TXT" />
+    <Content Include="bin\Debug\DatToSedas_CSharp.exe" />
+    <Content Include="bin\Debug\DatToSedas_CSharp.pdb" />
+    <Content Include="bin\Debug\loeschArtikel.txt" />
+    <Content Include="bin\Debug\loeschKunde.txt" />
+    <Content Include="bin\Debug\Rohdatenvergleich.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
