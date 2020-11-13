@@ -114,6 +114,8 @@
     </None>
     <None Include="App.config" />
     <None Include="Testdaten\20201022.dat" />
+    <None Include="Testdaten\20201022_2.dat" />
+    <None Include="Testdaten\TestAusgabeSEDASAldiDat.dat" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="bin\Debug\DatToSedasReengineer.exe" />
