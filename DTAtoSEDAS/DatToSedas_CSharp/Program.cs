@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DatToSedas_CSharp
-{     
+{
     class Program
     {
 
@@ -27,31 +27,32 @@ namespace DatToSedas_CSharp
         //< STAThread() >
         public void Main()
         {
-            LogMessage.GlobalLog = True
-            LogMessage.GlobalOutputToConsole = True
-            LogMessage.LogOnly("**********************************")
-            LogMessage.LogOnly("--------- PROGRAMMSTART ----------")
-            LogMessage.CheckLogFile(100)
-            Dim flag As Boolean = Not Module1.InitProgram()
+            LogMessage.GlobalLog = true;
+            LogMessage.GlobalOutputToConsole = true;
+            LogMessage.LogOnly("**********************************");
+            LogMessage.LogOnly("--------- PROGRAMMSTART ----------");
+            LogMessage.CheckLogFile(100);
+            Dim flag As Boolean = Not Module1.InitProgram();
             If flag Then
-                LogMessage.LogOnly("Initialisierung des Programms fehlgeschlagen.")
-                Module1.ExitProgram()
+                LogMessage.LogOnly("Initialisierung des Programms fehlgeschlagen.");
+            Module1.ExitProgram();
             End If
-            LogMessage.LogOnly("Initialisierung des Programms erfolgreich.")
-            Dim flag2 As Boolean = Not Module1.CheckParameters()
+            LogMessage.LogOnly("Initialisierung des Programms erfolgreich.");
+            Dim flag2 As Boolean = Not Module1.CheckParameters();
             If flag2 Then
-                LogMessage.LogOnly("Prüfung der Parameter fehlgeschlagen.")
-                Module1.ExitProgram()
+                LogMessage.LogOnly("Prüfung der Parameter fehlgeschlagen.");
+            Module1.ExitProgram();
             End If
-            LogMessage.LogOnly("Prüfung der Parameter erfolgreich.")
-            Dim flag3 As Boolean = Not Module1.CheckSource()
+            LogMessage.LogOnly("Prüfung der Parameter erfolgreich.");
+            Dim flag3 As Boolean = Not Module1.CheckSource();
             If flag3 Then
-                LogMessage.LogOnly("Prüfung des Quellpfades fehlgeschlagen.")
-                Module1.ExitProgram()
+                LogMessage.LogOnly("Prüfung des Quellpfades fehlgeschlagen.");
+            Module1.ExitProgram();
             End If
-            LogMessage.LogOnly("Prüfung des Quellpfades erfolgreich.")
-            'Module1.Param.SetDestinationFullPath(Module1.Param.DestinationFilePath, Module1.Param.DestinationFileName)
-            ' The following expression was wrapped in a checked-expression
+            LogMessage.LogOnly("Prüfung des Quellpfades erfolgreich.");
+            
+            //Module1.Param.SetDestinationFullPath(Module1.Param.DestinationFilePath, Module1.Param.DestinationFileName)  ;
+            // The following expression was wrapped in a checked-expression
             Module1.Param.Counter = Module1.Param.Counter + 1
             If Param.Counter > 999 Then Param.Counter = 1
             LogMessage.LogOnly("Start der Konvertierung der Bestelldatei in eine Sedas.dat...")
@@ -76,14 +77,14 @@ namespace DatToSedas_CSharp
             End If
             LogMessage.LogOnly("--- Programm normal beendet. ---")
             LogMessage.LogOnly("********************************")
-            LogMessage.LogOnly("")
+            LogMessage.LogOnly("");
 
         }
 
 
-        public bool Function InitProgram()
+        public bool InitProgram()
         {
-            Dim flag As Boolean = True
+            Dim flag As Boolean = true
             LogMessage.LogOnly("Initialisierung des Programms...")
             LogMessage.LogOnly("Einlesen der Config.ini Datei...")
 
@@ -102,13 +103,13 @@ namespace DatToSedas_CSharp
                         Module1.ListDelCustomer = New List(Of String)()
                         Try
                             Using streamReader As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\loeschKunde.txt")
-                                While True
+                                While true
                                     Dim endOfStream As Boolean = streamReader.EndOfStream
                                     If endOfStream Then
                                         Exit While
                                     End If
                                     Dim text As String = streamReader.ReadLine()
-                                    Dim flag5 As Boolean = Operators.CompareString(text, "", False) <> 0
+                                    Dim flag5 As Boolean = Operators.CompareString(text, "", false) <> 0
                                     If flag5 Then
                                         Module1.ListDelCustomer.Add(text)
                                     End If
@@ -142,13 +143,13 @@ namespace DatToSedas_CSharp
                         Module1.ListDelArticle = New List(Of String)()
                         Try
                             Using streamReader2 As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\loeschArtikel.txt")
-                                While True
+                                While true
                                     Dim endOfStream2 As Boolean = streamReader2.EndOfStream
                                     If endOfStream2 Then
                                         Exit While
                                     End If
                                     Dim text2 As String = streamReader2.ReadLine()
-                                    Dim flag7 As Boolean = Operators.CompareString(text2, "", False) <> 0
+                                    Dim flag7 As Boolean = Operators.CompareString(text2, "", false) <> 0
                                     If flag7 Then
                                         Module1.ListDelArticle.Add(text2)
                                     End If
@@ -182,13 +183,13 @@ namespace DatToSedas_CSharp
                         Module1.ListChangeArticle = New List(Of String)()
                         Try
                             Using streamReader3 As StreamReader = New StreamReader(Directory.GetCurrentDirectory() + "\tauscheArtikel.txt")
-                                While True
+                                While true
                                     Dim endOfStream3 As Boolean = streamReader3.EndOfStream
                                     If endOfStream3 Then
                                         Exit While
                                     End If
                                     Dim text3 As String = streamReader3.ReadLine()
-                                    Dim flag9 As Boolean = Operators.CompareString(text3, "", False) <> 0
+                                    Dim flag9 As Boolean = Operators.CompareString(text3, "", false) <> 0
                                     If flag9 Then
                                         Module1.ListChangeArticle.Add(text3)
                                     End If
@@ -228,19 +229,19 @@ namespace DatToSedas_CSharp
                 End If
                 flag = Not flag
             End If
-            Return flag
+            return flag;
         }
 
 
-        public bool Function ReadIniValues()
+        public bool ReadIniValues()
         {
-            Dim result As Boolean = True
+            Dim result As Boolean = true
             Try
                 Module1.Param.SourceFileName = Module1.INI.Read("Setup", "Quelldateiname")
                 Module1.Param.SourceFilePath = Module1.INI.Read("Setup", "Quelldateipfad")
-                Dim flag As Boolean = Operators.CompareString(Module1.Param.SourceFilePath, "", False) <> 0
+                Dim flag As Boolean = Operators.CompareString(Module1.Param.SourceFilePath, "", false) <> 0
                 If flag Then
-                    Dim flag2 As Boolean = Operators.CompareString(Strings.Mid(Module1.Param.SourceFilePath, Strings.Len(Module1.Param.SourceFilePath), 1), "\", False) <> 0
+                    Dim flag2 As Boolean = Operators.CompareString(Strings.Mid(Module1.Param.SourceFilePath, Strings.Len(Module1.Param.SourceFilePath), 1), "\", false) <> 0
                     If flag2 Then
                         Module1.Param.SourceFilePath = Module1.Param.SourceFilePath + "\"
                     End If
@@ -249,16 +250,16 @@ namespace DatToSedas_CSharp
                 End If
                 Module1.Param.DestinationFileName = Module1.INI.Read("Setup", "Zieldateiname")
                 Module1.Param.DestinationFilePath = Module1.INI.Read("Setup", "Zieldateipfad")
-                Dim flag3 As Boolean = Operators.CompareString(Module1.Param.DestinationFilePath, "", False) <> 0
+                Dim flag3 As Boolean = Operators.CompareString(Module1.Param.DestinationFilePath, "", false) <> 0
                 If flag3 Then
-                    Dim flag4 As Boolean = Operators.CompareString(Strings.Mid(Module1.Param.DestinationFilePath, Strings.Len(Module1.Param.DestinationFilePath), 1), "\", False) <> 0
+                    Dim flag4 As Boolean = Operators.CompareString(Strings.Mid(Module1.Param.DestinationFilePath, Strings.Len(Module1.Param.DestinationFilePath), 1), "\", false) <> 0
                     If flag4 Then
                         Module1.Param.DestinationFilePath = Module1.Param.DestinationFilePath + "\"
                     End If
                 Else
                     Module1.Param.DestinationFilePath = Directory.GetCurrentDirectory() + "\"
                 End If
-                Dim flag5 As Boolean = Operators.CompareString(Module1.Param.DestinationFileName, "", False) = 0 And Operators.CompareString(Module1.Param.DestinationFilePath, "", False) <> 0
+                Dim flag5 As Boolean = Operators.CompareString(Module1.Param.DestinationFileName, "", false) = 0 And Operators.CompareString(Module1.Param.DestinationFilePath, "", false) <> 0
                 If flag5 Then
                     Module1.Param.DestinationFileName = "SEDAS.DAT"
                 End If
@@ -269,15 +270,15 @@ namespace DatToSedas_CSharp
                 ProjectData.SetProjectError(expr_24D)
                 Dim ex As Exception = expr_24D
                 LogMessage.LogOnly("Fehler beim Einlesen der Config.ini: " & vbCrLf + ex.ToString())
-                result = False
+                result = false
                 ProjectData.ClearProjectError()
             End Try
-            Return result
+            return result;
         }
 
-        public bool Function CreateNewConfigIni()
+        public bool CreateNewConfigIni()
         {
-            Dim flag As Boolean = True
+            Dim flag As Boolean = true
             LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini...")
             Dim value As String = "-----------------------" & vbCrLf & "DATtoSEDAS Config-Datei" & vbCrLf & "-----------------------" & vbCrLf & "Quell- und Zielpfad müssen mit Laufwerksbuchstabe angegeben werden (vollständig), jedoch ohne Dateiname." & vbCrLf & "Der Dateiname der Quell- und Zieldatei wird separat eingetragen." & vbCrLf & "Werden Quell- und Zieldateiname beim Programmstart per Schalter übergeben (/Q=, /Z=), werden die Einträge" & vbCrLf & "in der Config.ini übergangen." & vbCrLf & "Dies gilt auch für alle weiteren Schalter (z.B. QuelleLöschen, /D)" & vbCrLf & vbCrLf & "[Setup]" & vbCrLf & "Counter=" & vbCrLf & "Quelldateipfad=" & vbCrLf & "Quelldateiname=1.txt" & vbCrLf & "Zieldateipfad=C:\Temp" & vbCrLf & "Zieldateiname=Sedas.dat" & vbCrLf & vbCrLf & "QuelleLöschen=0" & vbCrLf & "IgnoriereMeldungen=0" & vbCrLf & "DatenAnhängen=0"
             Try
@@ -288,16 +289,16 @@ namespace DatToSedas_CSharp
                 ProjectData.SetProjectError(expr_49)
                 Dim ex As Exception = expr_49
                 LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini fehlgeschlagen: " & vbCrLf + ex.ToString())
-                flag = False
+                flag = false
                 ProjectData.ClearProjectError()
             End Try
             flag = flag
-            Return flag
-       }
+            return flag;
+        }
 
-        public bool Function CheckParameters()
+        public bool CheckParameters()
         {
-            CheckParameters = True
+            CheckParameters = true
 
             '-----------------------------------------------------------------------------------------
             'Keine Parameter übergeben. Funktion Ende.
@@ -310,9 +311,9 @@ namespace DatToSedas_CSharp
             'Wenn nur ein Element übergeben wurde, prüfen, ob es /? ist.
             If Arguments.GetUpperBound(0) = 1 Then
                 If InStr(Arguments(1), "/?") > 0 Then
-                    Param.Help = True
+                    Param.Help = true
                     ShowHelp()
-                    CheckParameters = False
+                    CheckParameters = false
                     Return CheckParameters
                 End If
             End If
@@ -323,8 +324,8 @@ namespace DatToSedas_CSharp
             If Arguments.GetUpperBound(0) > 1 And Array.Exists(Arguments, Function(element)
                                                                               Return element.Contains("/?")
                                                                           End Function) Then
-                ShowMessage("FEHLER! Falsche Startparameter angegeben. '/?' darf nur alleine verwendet werden.", False)
-                CheckParameters = False
+                ShowMessage("FEHLER! Falsche Startparameter angegeben. '/?' darf nur alleine verwendet werden.", false)
+                CheckParameters = false
                 Return CheckParameters
             End If
 
@@ -383,63 +384,72 @@ namespace DatToSedas_CSharp
 
 
                     Case = "/D"
-                        Param.DeleteSourceFile = True
+                        Param.DeleteSourceFile = true
                         'erg = erg + 1
 
                     Case = "/I"
                         'Fehlermeldungen unterdrücken
-                        Param.IgnoreMessages = True
+                        Param.IgnoreMessages = true
 
                     Case = "/A"
                         'Fehlermeldungen unterdrücken
-                        Param.Append = True
+                        Param.Append = true
 
                     Case Else
-                        ShowMessage("FEHLER! Falsche Startparameter angegeben.", False)
-                        CheckParameters = False
+                        ShowMessage("FEHLER! Falsche Startparameter angegeben.", false)
+                        CheckParameters = false
                         Return CheckParameters
                 End Select
             Next
-            Return CheckParameters
+            return CheckParameters;
         }
 
-        public bool Function CheckSource()
+        public bool CheckSource()
         {
-            Dim flag As Boolean = True
-            If Param.SourceFullPath = "" Then
-                Module1.Param.SetSourceFullPath(Module1.Param.SourceFilePath, Module1.Param.SourceFileName)
-            End If
+            Dim flag As Boolean = true;
+            if ()// Param.SourceFullPath = "" Then
+            {
+                Module1.Param.SetSourceFullPath(Module1.Param.SourceFilePath, Module1.Param.SourceFileName);
+            }
 
-            LogMessage.LogOnly("Prüfen des Quellpfades: " + Module1.Param.SourceFullPath)
-            Dim flag2 As Boolean = Operators.CompareString(Module1.Param.SourceFullPath, "", False) = 0
-            If flag2 Then
-                flag = False
-                LogMessage.Show("Es wurde keine Quelldatei angegeben.", LogMessage.MsgType.Critical)
-                flag = flag
-            Else
-                Dim flag3 As Boolean = Not File.Exists(Module1.Param.SourceFullPath)
-                If flag3 Then
-                    flag = False
-                    LogMessage.Show("Die Quelldatei existiert nicht oder ist nicht erreichbar.", LogMessage.MsgType.Critical)
-                    flag = flag
-                Else
-                    flag = flag
-                End If
-            End If
-            Return flag
+            LogMessage.LogOnly("Prüfen des Quellpfades: " + Module1.Param.SourceFullPath);
+            Dim flag2 As Boolean = Operators.CompareString(Module1.Param.SourceFullPath, "", false) = 0;
+            if ()// flag2 Then
+            {
+                flag = false;
+                LogMessage.Show("Es wurde keine Quelldatei angegeben.", LogMessage.MsgType.Critical);
+                flag = flag;
+            }
+            else
+            {
+                Dim flag3 As Boolean = Not File.Exists(Module1.Param.SourceFullPath);
+                if ()// flag3 Then
+                {
+                    flag = false;
+                    LogMessage.Show("Die Quelldatei existiert nicht oder ist nicht erreichbar.", LogMessage.MsgType.Critical);
+                    flag = flag;
+                }
+                else
+                {
+                    flag = flag;
+                }
+            }
+            return flag;
         }
 
-        public void ShowMessage(Message As String, Optional Ignorable As Boolean = True, Optional Pause As Boolean = False)
+        public void ShowMessage(string Message, bool Ignorable = true, bool Pause = false)
         {
-            Dim flag As Boolean = Not Module1.Param.IgnoreMessages Or Ignorable
-            If flag Then
-                Console.WriteLine(Message)
-                If Pause Then
-                    Console.Write("<Enter> drücken...")
-                    Console.ReadLine()
-                End If
-            End If
-    }
+            bool flag = Not Module1.Param.IgnoreMessages Or Ignorable;
+            if (flag)
+            {
+                Console.WriteLine(Message);
+                if (Pause)
+                {
+                    Console.Write("<Enter> drücken...");
+                    Console.ReadLine();
+                }
+            }
+        }
 
         public void ShowHelp()
         {
@@ -481,7 +491,7 @@ namespace DatToSedas_CSharp
         public void ExitProgram()
         {
             LogMessage.Show("Programm wird nach Fehler beendet.")
-            Environment.[Exit](0)
+            Environment.[Exit](0);
         }
     }
 }
