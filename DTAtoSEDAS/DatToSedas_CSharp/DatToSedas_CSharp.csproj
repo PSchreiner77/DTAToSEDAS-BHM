@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="ConvertDatToSedas.cs" />
     <Compile Include="INIFile.cs" />
+    <Compile Include="LogMessage.cs" />
     <Compile Include="Parameter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

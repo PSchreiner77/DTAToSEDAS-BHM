@@ -5,15 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DatToSedas_CSharp
-{
-    enum MsgType  //Logging
-    {
-        Message,
-        Warning,
-        Critical,
-    }
-
-
+{     
     class Program
     {
 
@@ -23,7 +15,7 @@ namespace DatToSedas_CSharp
 
         private INIFile INI;
 
-        public Parameter Param = New Parameter();
+        public Parameter Param = new Parameter();
 
         public List<string> ListDelCustomer;
 
@@ -31,11 +23,12 @@ namespace DatToSedas_CSharp
 
         public List<string> ListChangeArticle;
 
-        < STAThread() >
+        //TODO ??
+        //< STAThread() >
         public void Main()
         {
-            LogMessage.SetGlobalLog = True
-            LogMessage.SetGlobalOutputToConsole = True
+            LogMessage.GlobalLog = True
+            LogMessage.GlobalOutputToConsole = True
             LogMessage.LogOnly("**********************************")
             LogMessage.LogOnly("--------- PROGRAMMSTART ----------")
             LogMessage.CheckLogFile(100)
