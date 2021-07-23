@@ -8,145 +8,225 @@ namespace DatToSedas_CSharp
 {
     class Parameter
     {
+        private string _Arguments;
+        private string _SourceFileName;
+        private string _SourceFilePath;
+        private string _SourceFullPath;
+        private string _DestinationFileName;
+        private string _DestinationFilePath;
+        private string _DestinationFullPath;
+        private bool _DeleteSourceFile;
+        private bool _IgnoreMessages;
+        private bool _Help;
+        private bool _AppendToSedas;
+        private int _Counter;
+
+        public string[] Arguments { get; set; }
+        public string SourceFileName { get; set; }
+        public string SourceFilePath { get; set; }
+        public string SourceFullPath { get; set; }
+        public string DestinationFileName { get; set; }
+        public string DestinationFilePath { get; set; }
+        public string DestinationFullPath { get; set; }
+        public bool DeleteSourceFile { get; set; }
+        public bool IgnoreMessages { get; set; }
+        public bool Help { get; set; }
+        public bool AppendToSedas { get; set; }
+        public int Counter { get; set; }
+
+        public void New()
+        {
+            Arguments = new string[] { };
+            SourceFullPath = "";
+            DestinationFullPath = "";
+            DeleteSourceFile = false;
+            IgnoreMessages = false;
+            AppendToSedas = false;
+        }
+
+        public void SetSourceFullPath(string SrcFullPath)
+        {
+            if (SrcFullPath != "")
+            {
+                SourceFullPath = SrcFullPath;
+            }
+        }
+
+        public void SetSourceFullPath(string SrcPath, string SrcName)
+        {
+            if (SrcPath != "")
+            {
+                if (SrcPath.Substring(SrcPath.Length, 1) != "\\")
+                {
+                    SrcPath += "\\";
+                }
+            }
+            SourceFullPath = SourceFilePath + SourceFileName;
+        }
+
+        public void SetDestinationFullPath(string DestFullPath)
+        {
+            if (DestFullPath != "")
+            {
+
+                if (DestFullPath.Substring(DestFullPath.Length, 1) != "\\")
+                {
+                    DestFullPath += "\\";
+                }
+            }
+            DestinationFullPath = DestFullPath;
+        }
+
+        public void SetDestinationFullPath(string DestPath, string DestName)
+        {
+            if (DestPath != "")
+            {
+                if (DestPath.Substring(DestPath.Length, 1) != "\\")
+                {
+                    DestPath += "\\";
+                }
+            }
+            DestinationFullPath = DestinationFilePath + DestinationFileName;
+        }
     }
 }
 
 //Imports Microsoft.VisualBasic.CompilerServices
 
-//Public Class Parameter
-//    Private _Arguments As String()
+//public Class Parameter
+//    private _Arguments As String()
 
-//    Private _SourceFileName As String
+//    private _SourceFileName As String
 
-//    Private _SourceFilePath As String
+//    private _SourceFilePath As String
 
-//    Private _SourceFullPath As String
+//    private _SourceFullPath As String
 
-//    Private _DestinationFileName As String
+//    private _DestinationFileName As String
 
-//    Private _DestinationFilePath As String
+//    private _DestinationFilePath As String
 
-//    Private _DestinationFullPath As String
+//    private _DestinationFullPath As String
 
-//    Private _DeleteSourceFile As Boolean
+//    private _DeleteSourceFile As Boolean
 
-//    Private _IgnoreMessages As Boolean
+//    private _IgnoreMessages As Boolean
 
-//    Private _Help As Boolean
+//    private _Help As Boolean
 
-//    Private _AppendToSedas As Boolean
+//    private _AppendToSedas As Boolean
 
-//    Private _Counter As Integer
+//    private _Counter As Integer
 
-//    Public Property Arguments() As String()
-//        Get
-//            Return Me._Arguments
-//        End Get
-//        Set(value As String())
+//    public Property Arguments() As String()
+//        get
+//            return Me._Arguments
+//        End get
+//        set(value As String())
 //            Me._Arguments = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property SourceFileName() As String
-//        Get
-//            Return Me._SourceFileName
-//        End Get
-//        Set(value As String)
+//    public Property SourceFileName() As String
+//        get
+//            return Me._SourceFileName
+//        End get
+//        set(value As String)
 //            Me._SourceFileName = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property SourceFilePath() As String
-//        Get
-//            Return Me._SourceFilePath
-//        End Get
-//        Set(value As String)
+//    public Property SourceFilePath() As String
+//        get
+//            return Me._SourceFilePath
+//        End get
+//        set(value As String)
 //            Me._SourceFilePath = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property SourceFullPath() As String
-//        Get
-//            Return Me._SourceFullPath
-//        End Get
-//        Private Set(value As String)
+//    public Property SourceFullPath() As String
+//        get
+//            return Me._SourceFullPath
+//        End get
+//        private set(value As String)
 //            Me._SourceFullPath = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property DestinationFileName() As String
-//        Get
-//            Return Me._DestinationFileName
-//        End Get
-//        Set(value As String)
+//    public Property DestinationFileName() As String
+//        get
+//            return Me._DestinationFileName
+//        End get
+//        set(value As String)
 //            Me._DestinationFileName = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property DestinationFilePath() As String
-//        Get
-//            Return Me._DestinationFilePath
-//        End Get
-//        Set(value As String)
+//    public Property DestinationFilePath() As String
+//        get
+//            return Me._DestinationFilePath
+//        End get
+//        set(value As String)
 //            Me._DestinationFilePath = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property DestinationFullPath() As String
-//        Get
-//            Return Me._DestinationFullPath
-//        End Get
-//        Private Set(value As String)
+//    public Property DestinationFullPath() As String
+//        get
+//            return Me._DestinationFullPath
+//        End get
+//        private set(value As String)
 //            Me._DestinationFullPath = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property DeleteSourceFile() As Boolean
-//        Get
-//            Return Me._DeleteSourceFile
-//        End Get
-//        Set(value As Boolean)
+//    public Property DeleteSourceFile() As Boolean
+//        get
+//            return Me._DeleteSourceFile
+//        End get
+//        set(value As Boolean)
 //            Me._DeleteSourceFile = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property IgnoreMessages() As Boolean
-//        Get
-//            Return Me._IgnoreMessages
-//        End Get
-//        Set(value As Boolean)
+//    public Property IgnoreMessages() As Boolean
+//        get
+//            return Me._IgnoreMessages
+//        End get
+//        set(value As Boolean)
 //            Me._IgnoreMessages = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property Help() As Boolean
-//        Get
-//            Return Me._Help
-//        End Get
-//        Set(value As Boolean)
+//    public Property Help() As Boolean
+//        get
+//            return Me._Help
+//        End get
+//        set(value As Boolean)
 //            Me._Help = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property Append() As Boolean
-//        Get
-//            Return Me._AppendToSedas
-//        End Get
-//        Set(value As Boolean)
+//    public Property Append() As Boolean
+//        get
+//            return Me._AppendToSedas
+//        End get
+//        set(value As Boolean)
 //            Me._AppendToSedas = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Property Counter() As Integer
-//        Get
-//            Return Me._Counter
-//        End Get
-//        Set(value As Integer)
+//    public Property Counter() As Integer
+//        get
+//            return Me._Counter
+//        End get
+//        set(value As Integer)
 //            Me._Counter = value
-//        End Set
+//        End set
 //    End Property
 
-//    Public Sub New()
+//    public Sub New()
 //        Me.Arguments = New String(-1) { }
 //Me.SourceFullPath = ""
 //        Me.DestinationFullPath = ""
@@ -155,14 +235,14 @@ namespace DatToSedas_CSharp
 //        Me.Append = False
 //    End Sub
 
-//    Public Sub SetSourceFullPath(SrcFullPath As String)
+//    public Sub SetSourceFullPath(SrcFullPath As String)
 //        Dim flag As Boolean = Operators.CompareString(SrcFullPath, "", False) <> 0
 //        If flag Then
 //            Me.SourceFullPath = SrcFullPath
 //        End If
 //    End Sub
 
-//    Public Sub SetSourceFullPath(SrcPath As String, SrcName As String)
+//    public Sub SetSourceFullPath(SrcPath As String, SrcName As String)
 //        Dim flag As Boolean = Operators.CompareString(SrcPath, "", False) <> 0
 //        If flag Then
 //            Dim flag2 As Boolean = Operators.CompareString(Strings.Mid(SrcPath, Strings.Len(SrcPath), 1), "\", False) <> 0
@@ -173,7 +253,7 @@ namespace DatToSedas_CSharp
 //        Me.SourceFullPath = Me.SourceFilePath + Me.SourceFileName
 //    End Sub
 
-//    Public Sub SetDestinationFullPath(DestFullPath As String)
+//    public Sub SetDestinationFullPath(DestFullPath As String)
 //        Dim flag As Boolean = Operators.CompareString(DestFullPath, "", False) <> 0
 //        If flag Then
 //            Dim flag2 As Boolean = Strings.InStr(DestFullPath, "\", CompareMethod.Binary) <= 0
@@ -184,7 +264,7 @@ namespace DatToSedas_CSharp
 //        Me.DestinationFullPath = DestFullPath
 //    End Sub
 
-//    Public Sub SetDestinationFullPath(DestPath As String, DestName As String)
+//    public Sub SetDestinationFullPath(DestPath As String, DestName As String)
 //        Dim flag As Boolean = Operators.CompareString(DestPath, "", False) <> 0
 //        If flag Then
 //            Dim flag2 As Boolean = Operators.CompareString(Strings.Mid(DestPath, Strings.Len(DestPath), 1), "\", False) <> 0

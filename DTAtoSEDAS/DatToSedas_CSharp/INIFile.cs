@@ -8,5 +8,6 @@ namespace DatToSedas_CSharp
 {
     class INIFile
     {
+        //TODO INI.dll einbinden und benutzen
     }
 }
