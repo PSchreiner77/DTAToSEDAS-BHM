@@ -230,20 +230,20 @@ namespace DatToSedas_CSharp
         private string[,] DeleteEntries1(string[,] DATSource)
         {
             // The following expression was wrapped in a checked-statement
-            Dim array As String(,) = New String(DATSource.GetUpperBound(0) + 1 - 1, DATSource.GetUpperBound(1) + 1 - 1) { };
-            Dim num As Integer = 0;
+            string[,] array = New String(DATSource.GetUpperBound(0) + 1 - 1, DATSource.GetUpperBound(1) + 1 - 1) { };
+            int num = 0;
             LogMessage.LogOnly("Löschen von nicht benötigten Kunden- und Artikeldaten laut loeschKunde.txt & loeschArtikel.txt.");
-            Dim upperBound As Integer = DATSource.GetUpperBound(0);
+            int upperBound = DATSource.GetUpperBound(0);
             for ()// i As Integer = 0 To upperBound
             {
-                Dim flag As Boolean = false;
+                bool flag = false;
                 try
                 {
                     Dim enumerator As List(Of String).Enumerator = Module1.ListDelCustomer.GetEnumerator();
                     while ()// enumerator.MoveNext()
                     {
-                        Dim current As String = enumerator.Current;
-                        Dim flag2 As Boolean = Operators.CompareString(this.MyTRIM(DATSource(i, 2)), this.MyTRIM(current), false) = 0;
+                        string  current = enumerator.Current;
+                        bool flag2 = Operators.CompareString(this.MyTRIM(DATSource(i, 2)), this.MyTRIM(current), false) = 0;
                         if (flag2)
                         {
                             flag = true;
@@ -261,8 +261,8 @@ namespace DatToSedas_CSharp
                     Dim enumerator2 As List(Of String).Enumerator = Module1.ListDelArticle.GetEnumerator();
                     while ()// enumerator2.MoveNext()
                     {
-                        Dim current2 As String = enumerator2.Current;
-                        Dim flag3 As Boolean = Operators.CompareString(this.MyTRIM(DATSource(i, 8)), this.MyTRIM(current2), false) = 0;
+                        string current2 enumerator2.Current;
+                        bool flag3  = Operators.CompareString(this.MyTRIM(DATSource(i, 8)), this.MyTRIM(current2), false) = 0;
                         if (flag3)
                         {
                             flag = true;
@@ -275,10 +275,10 @@ namespace DatToSedas_CSharp
                     CType(enumerator2, IDisposable).Dispose();
                 }
 
-                Dim flag4 As Boolean = Not flag;
+                bool flag4  = Not flag;
                 if (flag4)
                 {
-                    Dim upperBound2 As Integer = DATSource.GetUpperBound(1);
+                    int upperBound2 DATSource.GetUpperBound(1);
                     for ()// j As Integer = 0 To upperBound2
                     {
                         array(num, j) = DATSource(i, j);
@@ -288,14 +288,14 @@ namespace DatToSedas_CSharp
             }
 
             Dim array2 As String(,) = New String(num - 1 + 1 - 1, array.GetUpperBound(1) + 1 - 1) { };
-            Dim num2 As Integer = 0;
-            Dim upperBound3 As Integer = array.GetUpperBound(0);
+            int num2 = 0;
+            int upperBound3 = array.GetUpperBound(0);
             for ()// k As Integer = 0 To upperBound3
             {
-                Dim flag5 As Boolean = Not Information.IsNothing(array(k, 2));
+                bool flag5 = Not Information.IsNothing(array(k, 2));
                 if (flag5)
                 {
-                    Dim upperBound4 As Integer = array.GetUpperBound(1);
+                    int upperBound4 = array.GetUpperBound(1);
                     for ()// l As Integer = 0 To upperBound4
                     {
                         array2(num2, l) = array(k, l);
