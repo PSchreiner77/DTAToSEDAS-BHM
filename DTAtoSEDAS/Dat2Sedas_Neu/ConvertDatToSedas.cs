@@ -53,6 +53,7 @@ namespace Dat2Sedas_Neu
             _SourceData = ImportSourceFile(_SourcePath);
             if (_SourceData == null) return false;
 
+            #region Als Delegate bauen ReadDatData
             if (checkIfNewFileFormat())
             {
                 //LogMessage.LogOnly("Einlesen neues Dateiformat...");
@@ -63,12 +64,13 @@ namespace Dat2Sedas_Neu
                 //LogMessage.LogOnly("Einlesen neues Dateiformat...");
                 this._DATContent = ReadOldDATDataFormat(array, this._ErstelldatumSedas);
             }
+            #endregion
 
 
             //Arrayeinträge prüfen und vergleichen.
             try
             {                                                              
-                //  SEDAS schreiben
+                //  Wenn DATContent nicht leer und SEDAS schreiben ok, dann fertig
                 bool flag5 = Not Information.IsNothing(this._DATContent) And this.WriteSedasData();
                 if (flag5)
                 {
@@ -99,6 +101,11 @@ namespace Dat2Sedas_Neu
                         if (line != "") sourceDataList.Add(line);
                     }
                 }
+
+                //TODO Prüfen, ob neues Dateiformat "NF" und Delegate zuweisen
+                //ReadDatData += ReadNewNFDATDataFormat
+                //  ODER
+                //ReadDatData += ReadOldDATDataFormat
             }
             catch (Exception ex)
             { //Fehlerausnahme auslösen und Fehler melden}                
