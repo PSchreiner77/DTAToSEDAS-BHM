@@ -49,13 +49,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="bin\Debug\Config.ini" />
     <None Include="Testdaten\20201022.dat" />
     <None Include="Testdaten\20201022_2.dat" />
+    <None Include="Testdaten\BestellNF.DAT" />
+    <None Include="Testdaten\Sedas.dat" />
+    <None Include="Testdaten\SedasOriginal.dat" />
+    <None Include="Testdaten\TestAusgabeAldiDat.dat" />
     <None Include="Testdaten\TestAusgabeSEDASAldiDat.dat" />
+    <None Include="Testdaten\UBU34J7R - Kopie.DAT" />
+    <None Include="Testdaten\UBU34J7R.DAT" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="bin\Debug\" />
     <Folder Include="bin\Release\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\loeschArtikel.txt" />
+    <Content Include="bin\Debug\loeschKunde.txt" />
+    <Content Include="bin\Debug\tauscheArtikel.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

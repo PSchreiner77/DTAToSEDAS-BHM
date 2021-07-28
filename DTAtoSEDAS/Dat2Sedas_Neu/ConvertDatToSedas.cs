@@ -10,7 +10,7 @@ namespace Dat2Sedas_Neu
     class ConvertDatToSedas
     {
         private string _SourcePath;
-        private string _SourceData;
+        private List<string> _SourceData;
         private string _DestinationPath;
         private string _DestinationData;
         private string _SedasHeader;
@@ -27,11 +27,8 @@ namespace Dat2Sedas_Neu
 
 
         //KONSTRUKTOR
-        public ConvertDatToSedas(string src, string dst, int cnt, List<string> dC = null, List<string> dA = null)
-        {
-            this._SourcePath = "";
-            this._SourceData = "";
-            this._DestinationPath = "";
+        public ConvertDatToSedas(string SourceFilePath, string DestinationFilePath, int CounterEntries, List<string> CustomersToDelete = null, List<string> ArticlesToDelete = null)
+        {               
             this._DestinationData = "";
             this._SedasHeader = "";
             this._SedasFooter = "";
@@ -39,85 +36,39 @@ namespace Dat2Sedas_Neu
             this._DataSets = 0;
             this._Customers = 0;
             this._SummeGes = 0;
-            this._Counter = 0;
             this._ErstelldatumSedas = "";
-            this._SourcePath = src;
-            this._DestinationPath = dst;
-            this._Counter = cnt;
-            this._ListDelArticle = dA;
-            this._ListDelCustomer = dC;
-        }
-
-        public string ReadSourceFile(string SourceFilePath)
-        {
-            string sourceData = "";
-            try
-            {
-                if (!File.Exists(_SourcePath)) { return ""; }
-
-                using (StreamReader sr = new StreamReader(_SourcePath))
-                { sourceData = sr.ReadToEnd(); }
-            }
-            catch (Exception ex)
-            { return ""; }
-
-            return sourceData;
+            this._SourcePath = SourceFilePath;
+            this._DestinationPath = DestinationFilePath;
+            this._Counter = CounterEntries;
+            this._ListDelArticle = ArticlesToDelete;
+            this._ListDelCustomer = CustomersToDelete;
         }
 
         public bool ConvertFile()
         {
             LogMessage.LogOnly("Beginn der Konvertierung...");
-            this._ErstelldatumSedas = ReverseDate(Strings.Mid(DateAndTime.Now.ToString(), 1, 10).Replace(".", "").Remove(4, 2));
 
-            _SourceData = ReadSourceFile(_SourcePath);
-            if (_SourceData == "") return false;
+            this._ErstelldatumSedas = ConvertToSedasDate(DateTime.Now);
 
-            //TODO Region in ReadSourceFile einbinden.
-            #region 
-            //Eingelesene Datei zeilenweise in Array zerlegen. Leere Zeilen überspringen.           
-            string[] array = Strings.Split(this._SourceData, vbCrLf, -1, CompareMethod.Binary);
-            int num = 0;
-            int upperBound = array.GetUpperBound(0);
-            // The following expression was wrapped in a checked-statement
-            for (int i = 0; i <= upperBound; i++)
-            {     //Größe des neuen Arrays ohnle leerzeilen festlegen.
-                //TODO mit List<> arbeiten!
-                if (array[i] == "")
-                {
-                    num += 1;   //?? num??
-                }
-            }
+            _SourceData = ImportSourceFile(_SourcePath);
+            if (_SourceData == null) return false;
 
-            //Daten ohne Leerzeilen in neues Array überführen
-            string[] array2 = new string[num] { }; //TODO  array mit festen dimensionen initialisieren
-            int num2 = 0;
-            int upperBound2 = array.GetUpperBound(0);
-            for (int j = 0; j <= upperBound; j++)
+            if (checkIfNewFileFormat())
             {
-                if (array[j] == "")
-                {
-                    array2[num2] = array[j];
-                    num2 += 1;                  //?? num??
-                }
+                //LogMessage.LogOnly("Einlesen neues Dateiformat...");
+                this._DATContent = ReadNewNFDATDataFormat(array, this._ErstelldatumSedas);
             }
-            array = array2;
-            #endregion
+            else
+            {
+                //LogMessage.LogOnly("Einlesen neues Dateiformat...");
+                this._DATContent = ReadOldDATDataFormat(array, this._ErstelldatumSedas);
+            }
+
 
             //Arrayeinträge prüfen und vergleichen.
             try
-            {
-                bool flag4 = Operators.CompareString(Strings.Mid(array(0), 1, 2), "NF", false) = 0;
-                if (flag4)       // Wenn Zeile mit "NF" beginnt
-                {
-                    LogMessage.LogOnly("Einlesen neues Dateiformat...");
-                    this._DATContent = this.ReadNewDATData(array, this._ErstelldatumSedas);
-                }
-                else
-                {
-                    LogMessage.LogOnly("Einlesen altes Dateiformat...");
-                    this._DATContent = this.ReadOldDATDataFormat(array, this._ErstelldatumSedas);
-                }
-
+            {                                                              
+                //  SEDAS schreiben
                 bool flag5 = Not Information.IsNothing(this._DATContent) And this.WriteSedasData();
                 if (flag5)
                 {
@@ -128,12 +79,40 @@ namespace Dat2Sedas_Neu
             catch (Exception ex)
             {
                 LogMessage.LogOnly("Fehler beim Konvertieren in Sedas.dat." & vbCrLf + ex.ToString());
-
                 return false;
             }
+            
             return false;
         }
 
+
+        private List<string> ImportSourceFile(string SourceFilePath)
+        {
+            List<string> sourceDataList = new List<string>();
+            try
+            {
+                using (StreamReader sr = new StreamReader(_SourcePath))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        if (line != "") sourceDataList.Add(line);
+                    }
+                }
+            }
+            catch (Exception ex)
+            { //Fehlerausnahme auslösen und Fehler melden}                
+            }
+
+            return sourceDataList;
+        }
+
+        private bool checkIfNewFileFormat()
+        {
+            string prefix = _SourceData[0].Substring(0, 2);
+            if (prefix == "NF") return true;
+            return false;
+        }
 
         private string[,] ReadOldDATDataFormat(string[] arrSourceLines, string ErstelldatumTTMMJJ)
         {
@@ -477,6 +456,29 @@ namespace Dat2Sedas_Neu
                 text += str2;
             }
             return text;
+        }
+
+        /// <summary>
+        /// Gibt ein Datum als String zurück in der Form: 'JJMMTT'
+        /// </summary>
+        /// <param name="date">Datum</param>
+        /// <returns>String: 'JJMMTT'</returns>
+        private string ConvertToSedasDate(DateTime date)
+        {
+            string JJ = date.Year.ToString().Substring(2, 2);
+            string MM = date.Month.ToString();
+            string TT = date.Day.ToString();
+            return JJ + MM + TT;
+        }
+
+        private string ConvertToSedasDate(string DateTTMMJJ)
+        {
+            string returnString = "";
+            for (int i = DateTTMMJJ.Length - 1; i >= 0; i -= 2) //i As Integer = num To 1 Step - 2
+            {
+                returnString += DateTTMMJJ.Substring(i - 1, 2);
+            }
+            return returnString;
         }
 
         private string MyTRIM(string MyText)
