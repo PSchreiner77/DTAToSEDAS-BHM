@@ -1,0 +1,2 @@
+alteArtNr;neueArtNr
+540;534

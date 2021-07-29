@@ -20,6 +20,7 @@ namespace Dat2Sedas_Neu
         private int _DataSets;
         private int _Customers;
         private int _SummeGes;
+
         private List<string> _ListDelCustomer = new List<string>();
         private List<string> _ListDelArticle = new List<string>();
         private int _Counter;
@@ -66,23 +67,11 @@ namespace Dat2Sedas_Neu
             }
             #endregion
 
+            //Sedas erstellen
+            // ...
+            // LogMessage.LogOnly("Konvertierung in SEDAS.DAT abgeschlossen.");
+            // LogMessage.LogOnly("Fehler beim Konvertieren in Sedas.dat." & vbCrLf + ex.ToString());
 
-            //Arrayeinträge prüfen und vergleichen.
-            try
-            {
-                //  Wenn DATContent nicht leer und SEDAS schreiben ok, dann fertig
-                bool flag5 = Not Information.IsNothing(this._DATContent) And this.WriteSedasData();
-                if (flag5)
-                {
-                    LogMessage.LogOnly("Konvertierung in SEDAS.DAT abgeschlossen.");
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMessage.LogOnly("Fehler beim Konvertieren in Sedas.dat." & vbCrLf + ex.ToString());
-                return false;
-            }
 
             return false;
         }
@@ -192,167 +181,204 @@ namespace Dat2Sedas_Neu
             10 10               Anzahl Bestellpositionen in Datei
             */
 
+            List<Bestellzeile> Bestellzeilen = new List<Bestellzeile>();
 
-            // The following expression was wrapped in a checked-statement
-            string[,] arrReturn = null;
+            foreach (string eintrag in NewNFDATData)
+            {
+                string[] arrZeile = eintrag.Split(';');
+                Bestellzeile bestellzeile = new Bestellzeile();
+                bestellzeile.NFKennzeichen = arrZeile[0];
+                bestellzeile.BHMFilialNummer = arrZeile[1];
+                bestellzeile.BHMKundenNummer = arrZeile[2];
+                bestellzeile.BestellDatum = arrZeile[3];
+                bestellzeile.LieferDatum = arrZeile[4];
+                bestellzeile.BHMArtikelKey = arrZeile[5];
+                bestellzeile.BestellMenge = arrZeile[6];
+                bestellzeile.Preis = arrZeile[7];
+                bestellzeile.BHMArtikelNummer = arrZeile[8];
+                bestellzeile.Verpackungseinheit = arrZeile[9];
+                bestellzeile.AnzahlBestellPositionen = arrZeile[10];
+
+                Bestellzeilen.Add(bestellzeile);
+            }
+
+            Bestellzeilen = this.DeleteEntries1(Bestellzeilen);        //Zu löschende Einträge entfernen
+            Bestellzeilen = this.ChangeArticleNumbers(Bestellzeilen); //zu tauschende Artikelnummern tauschen
+
+            return Bestellzeilen;
+        }
+
+        private List<Bestellzeile> DeleteCustomers(List<Bestellzeile> bestellzeilen)
+        {
+            bool flag = false;
             try
             {
-                List<Bestellzeile> Bestellzeilen = new List<Bestellzeile>();
-
-                foreach(string eintrag in NewNFDATData)
+                Dim enumerator As List(Of String).Enumerator = Module1.ListDelCustomer.GetEnumerator();
+                while ()// enumerator.MoveNext()
                 {
-                    string[] arrZeile = eintrag.Split(';');
-                    Bestellzeile bestellzeile = new Bestellzeile();
-                    bestellzeile.NFKennzeichen = arrZeile[0];
-                    bestellzeile.BHMFilialNummer= arrZeile[1];
-                    bestellzeile.BHMKundenNummer = arrZeile[2];
-                    bestellzeile.BestellDatum = arrZeile[3];
-                    bestellzeile.LieferDatum = arrZeile[4];
-                    bestellzeile.BHMArtikelKey = arrZeile[5];
-                    bestellzeile.BestellMenge = arrZeile[6];
-                    bestellzeile.Preis = arrZeile[7];
-                    bestellzeile.BHMArtikelNummer = arrZeile[8];
-                    bestellzeile.Verpackungseinheit = arrZeile[9];
-                    bestellzeile.AnzahlBestellPositionen = arrZeile[10];
-
-                    Bestellzeilen.Add(bestellzeile);
-                }
-
-                return Bestellzeilen;
-
-
-                //kann weg wg. Liste
-                #region Arraygröße ermitteln
-                int num = -1;
-                int upperBound = NewNFDATData.GetUpperBound(0);
-                for (int i = 0; i <= upperBound; i++)
-                {
-                    bool flag = Operators.CompareString(NewNFDATData(i), "", false) <> 0;
-                    if (flag)
+                    string current = enumerator.Current;
+                    bool flag2 = Operators.CompareString(this.MyTRIM(DATSource(i, 2)), this.MyTRIM(current), false) = 0;
+                    if (flag2)
                     {
-                        num += 1;
+                        flag = true;
                     }
                 }
-                #endregion
+            }
+            finally
+            {
+                Dim enumerator As List(Of String).Enumerator;
+                CType(enumerator, IDisposable).Dispose();
+            }
+        }
 
-                //Hilfsarray für Zeilenauslesung
-                string[,] arrHilf = new string[,] { };// (num + 1 - 1, 10) { };
-
-                int num2 = 0;
-                int upperBound2 = NewNFDATData.GetUpperBound(0);
-                //Bestellzeilen durchlaufen und einzeln zerlegen.
-                for (int j = 0; j <= upperBound2; j++)
+        private List<Bestellzeile> DeleteArticles()
+        {
+            try
+            {
+                Dim enumerator2 As List(Of String).Enumerator = Module1.ListDelArticle.GetEnumerator();
+                while ()// enumerator2.MoveNext()
                 {
-                    //Bestellzeile zerlegen     in Array
-                    string[] arrZeile = Strings.Split(NewNFDATData(j), ";", -1, CompareMethod.Binary);
-                    bool flag2 = Operators.CompareString(arrZeile(0), "", false) <> 0;
-                    if (flag2) //Wenn erstes Feld der zerlegten Zeile nicht leer...
+                    string current2 enumerator2.Current;
+                    bool flag3 = Operators.CompareString(this.MyTRIM(DATSource(i, 8)), this.MyTRIM(current2), false) = 0;
+                    if (flag3)
                     {
-
-                        //bool flag3 = Operators.CompareString(array(num2, 2), "1678", false) = 0 And Operators.CompareString(array(num2, 6), "222", false) = 0;
-                        //if (flag3)
-                        //{
-                        //    Debugger.Break();
-                        //}
-
-                        //Daten extrahieren in eigenes 2D-Array
-                        arrHilf(num2, 2) = arrZeile(2);                     //KdNr BHM
-                        arrHilf(num2, 3) = ErstelldatumTTMMJJ;            //Bestelldatum
-                        arrHilf(num2, 4) = arrZeile(4);                     //Lieferdatum
-                        arrHilf(num2, 6) = this.Expand(arrZeile(6), 7);     //Menge??
-                        arrHilf(num2, 8) = this.Expand(arrZeile(8), 10);    //Artikelnummer
-                        num2 += 1;
-                        //Umsetzen in eigenes Objekt "Bestellzeile"
+                        flag = true;
                     }
                 }
+            }
+            finally
+            {
+                Dim enumerator2 As List(Of String).Enumerator;
+                CType(enumerator2, IDisposable).Dispose();
+            }
 
-                arrReturn = this.DeleteEntries1(arrHilf);        //Zu löschende Einträge entfernen
-                arrReturn = this.ChangeArticleNumbers(arrReturn); //zu tauschende Artikelnummern tauschen
+        }
+
+        private List<string> LoadDeleteArticlesList(string path)
+        {
+            List<string> delArticles = new List<string>();
+            try
+            {
+                delArticles = File.ReadAllText("Pfad").Split('\n').ToList<string>();
             }
             catch (Exception ex)
-            {
-            }
-            return arrReturn;
+            { }
+            return delArticles;
         }
 
-        private string[,] DeleteArticlesAndCustomers(string[,] DATSource)
+        private void LoadDeleteCustomersList()
         {
-            // The following expression was wrapped in a checked-statement
-            string[,] array = New String(DATSource.GetUpperBound(0) + 1 - 1, DATSource.GetUpperBound(1) + 1 - 1) { };
-            int num = 0;
-            LogMessage.LogOnly("Löschen von nicht benötigten Kunden- und Artikeldaten laut loeschKunde.txt & loeschArtikel.txt.");
-            int upperBound = DATSource.GetUpperBound(0);
-            for ()// i As Integer = 0 To upperBound
-            {
-                bool flag = false;
-                try
-                {
-                    Dim enumerator As List(Of String).Enumerator = Module1.ListDelCustomer.GetEnumerator();
-                    while ()// enumerator.MoveNext()
-                    {
-                        string current = enumerator.Current;
-                        bool flag2 = Operators.CompareString(this.MyTRIM(DATSource(i, 2)), this.MyTRIM(current), false) = 0;
-                        if (flag2)
-                        {
-                            flag = true;
-                        }
-                    }
-                }
-                finally
-                {
-                    Dim enumerator As List(Of String).Enumerator;
-                    CType(enumerator, IDisposable).Dispose();
-                }
 
-                try
-                {
-                    Dim enumerator2 As List(Of String).Enumerator = Module1.ListDelArticle.GetEnumerator();
-                    while ()// enumerator2.MoveNext()
-                    {
-                        string current2 enumerator2.Current;
-                        bool flag3 = Operators.CompareString(this.MyTRIM(DATSource(i, 8)), this.MyTRIM(current2), false) = 0;
-                        if (flag3)
-                        {
-                            flag = true;
-                        }
-                    }
-                }
-                finally
-                {
-                    Dim enumerator2 As List(Of String).Enumerator;
-                    CType(enumerator2, IDisposable).Dispose();
-                }
-
-                bool flag4 = Not flag;
-                if (flag4)
-                {
-                    int upperBound2 DATSource.GetUpperBound(1);
-                    for ()// j As Integer = 0 To upperBound2
-                    {
-                        array(num, j) = DATSource(i, j);
-                    }
-                    num += 1;
-                }
-            }
-
-            Dim array2 As String(,) = New String(num - 1 + 1 - 1, array.GetUpperBound(1) + 1 - 1) { };
-            int num2 = 0;
-            int upperBound3 = array.GetUpperBound(0);
-            for ()// k As Integer = 0 To upperBound3
-            {
-                bool flag5 = Not Information.IsNothing(array(k, 2));
-                if (flag5)
-                {
-                    int upperBound4 = array.GetUpperBound(1);
-                    for ()// l As Integer = 0 To upperBound4
-                    {
-                        array2(num2, l) = array(k, l);
-                    }
-                    num2 += 1;
-                }
-            }
-            return array2;
         }
+
+        private List<string> LoadDeleteItemsList(string path)
+        {
+            List<string> delItems = new List<string>();
+            try
+            {
+                delItems = File.ReadAllText("Pfad").Split('\n').ToList<string>();
+            }
+            catch (Exception ex)
+            { }
+            return delItems;
+        }
+
+        private void LoadChangeArticlesList()
+        {
+
+        }
+
+        //private string[,] DeleteArticlesAndCustomers(string[,] DATSource)
+        //{
+        //    // The following expression was wrapped in a checked-statement
+        //    string[,] arrDatenarray = New String(DATSource.GetUpperBound(0) + 1 - 1, DATSource.GetUpperBound(1) + 1 - 1) { };
+
+        //    int num = 0;
+        //    LogMessage.LogOnly("Löschen von nicht benötigten Kunden- und Artikeldaten laut loeschKunde.txt & loeschArtikel.txt.");
+
+        //    // ## Customer löschen
+        //    //int upperBound = DATSource.GetUpperBound(0);
+        //    //for ()// i As Integer = 0 To upperBound
+        //    //{
+        //    //    bool flag = false;
+        //    //    try
+        //    //    {
+        //    //        Dim enumerator As List(Of String).Enumerator = Module1.ListDelCustomer.GetEnumerator();
+        //    //        while ()// enumerator.MoveNext()
+        //    //        {
+        //    //            string current = enumerator.Current;
+        //    //            bool flag2 = Operators.CompareString(this.MyTRIM(DATSource(i, 2)), this.MyTRIM(current), false) = 0;
+        //    //            if (flag2)
+        //    //            {
+        //    //                flag = true;
+        //    //            }
+        //    //        }
+        //    //    }
+        //    //    finally
+        //    //    {
+        //    //        Dim enumerator As List(Of String).Enumerator;
+        //    //        CType(enumerator, IDisposable).Dispose();
+        //    //    }
+
+
+        //    //Artikel löschen
+        //    //try
+        //    //{
+        //    //    Dim enumerator2 As List(Of String).Enumerator = Module1.ListDelArticle.GetEnumerator();
+        //    //    while ()// enumerator2.MoveNext()
+        //    //    {
+        //    //        string current2 enumerator2.Current;
+        //    //        bool flag3 = Operators.CompareString(this.MyTRIM(DATSource(i, 8)), this.MyTRIM(current2), false) = 0;
+        //    //        if (flag3)
+        //    //        {
+        //    //            flag = true;
+        //    //        }
+        //    //    }
+        //    //}
+        //    //finally
+        //    //{
+        //    //    Dim enumerator2 As List(Of String).Enumerator;
+        //    //    CType(enumerator2, IDisposable).Dispose();
+        //    //}
+
+
+        //    //Daten übernehmen in neues Array
+        //        bool flag4 = Not flag;
+        //        if (flag4)
+        //        {
+        //            int upperBound2 DATSource.GetUpperBound(1);
+        //            for ()// j As Integer = 0 To upperBound2
+        //            {
+        //                arrDatenarray(num, j) = DATSource(i, j);
+        //            }
+        //            num += 1;
+        //        }
+        //    //}
+
+
+        ////Daten  übernehmen in Ausgabearray
+        //    Dim arrReturn As String(,) = New String(num - 1 + 1 - 1, arrDatenarray.GetUpperBound(1) + 1 - 1) { };
+        //    int num2 = 0;
+        //    int upperBound3 = arrDatenarray.GetUpperBound(0);
+        //    for ()// k As Integer = 0 To upperBound3
+        //    {
+        //        bool flag5 = Not Information.IsNothing(arrDatenarray(k, 2));
+        //        if (flag5)
+        //        {
+        //            int upperBound4 = arrDatenarray.GetUpperBound(1);
+        //            for ()// l As Integer = 0 To upperBound4
+        //            {
+        //                array2(num2, l) = arrDatenarray(k, l);
+        //            }
+        //            num2 += 1;
+        //        }
+        //    }
+
+        //    return array2;
+        //}
+
+
+
 
         private string[,] ChangeArticleNumbers(DatSource As String(,))
         {
@@ -633,6 +659,8 @@ namespace Dat2Sedas_Neu
         public string Verpackungseinheit { get; set; }
         public string AnzahlBestellPositionen { get; set; }
     }
+
+
 
 }
 
