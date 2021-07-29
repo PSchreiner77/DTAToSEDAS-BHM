@@ -28,7 +28,7 @@ namespace Dat2Sedas_Neu
 
         //KONSTRUKTOR
         public ConvertDatToSedas(string SourceFilePath, string DestinationFilePath, int CounterEntries, List<string> CustomersToDelete = null, List<string> ArticlesToDelete = null)
-        {               
+        {
             this._DestinationData = "";
             this._SedasHeader = "";
             this._SedasFooter = "";
@@ -69,7 +69,7 @@ namespace Dat2Sedas_Neu
 
             //Arrayeinträge prüfen und vergleichen.
             try
-            {                                                              
+            {
                 //  Wenn DATContent nicht leer und SEDAS schreiben ok, dann fertig
                 bool flag5 = Not Information.IsNothing(this._DATContent) And this.WriteSedasData();
                 if (flag5)
@@ -83,7 +83,7 @@ namespace Dat2Sedas_Neu
                 LogMessage.LogOnly("Fehler beim Konvertieren in Sedas.dat." & vbCrLf + ex.ToString());
                 return false;
             }
-            
+
             return false;
         }
 
@@ -173,52 +173,106 @@ namespace Dat2Sedas_Neu
         }
 
 
-        private string[,] ReadNewNFDATDataFormat(string arrSourcelines, string ErstelldatumTTMMJJ)
+        private List<Bestellzeile> ReadNewNFDATDataFormat(List<string> NewNFDATData, string ErstelldatumTTMMJJ)
         {
+            /*
+            Zeile aus neuer NF-DAT-Datei:            
+            0 ;1   ;2   ;3     ;4     ;5;6   ;7;8 ;9;10
+            NF;1050;1050;200924;200925;;20000;;209;;10
+            0  NF               Kennzeichen neues Format
+            1  FilNr            BHM Filialnummer der Filiale
+            2  KdNr             BHM Kundennummer der Filiale
+            3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen
+            4  Lieferdatum      Lieferdatum
+            5  -leer-           BHM ArtikelKey
+            6  20000            Menge*1000, echte Menge=Menge/1000> 20000=20
+            7  -leer-           Preis (Bsp. 2.00), Dezimal = .
+            8  ArtNummer        BHM ArtikelNummer
+            9  -leer-           VPE
+            10 10               Anzahl Bestellpositionen in Datei
+            */
+
+
             // The following expression was wrapped in a checked-statement
-            string[,] array3 = null;
+            string[,] arrReturn = null;
             try
             {
+                List<Bestellzeile> Bestellzeilen = new List<Bestellzeile>();
+
+                foreach(string eintrag in NewNFDATData)
+                {
+                    string[] arrZeile = eintrag.Split(';');
+                    Bestellzeile bestellzeile = new Bestellzeile();
+                    bestellzeile.NFKennzeichen = arrZeile[0];
+                    bestellzeile.BHMFilialNummer= arrZeile[1];
+                    bestellzeile.BHMKundenNummer = arrZeile[2];
+                    bestellzeile.BestellDatum = arrZeile[3];
+                    bestellzeile.LieferDatum = arrZeile[4];
+                    bestellzeile.BHMArtikelKey = arrZeile[5];
+                    bestellzeile.BestellMenge = arrZeile[6];
+                    bestellzeile.Preis = arrZeile[7];
+                    bestellzeile.BHMArtikelNummer = arrZeile[8];
+                    bestellzeile.Verpackungseinheit = arrZeile[9];
+                    bestellzeile.AnzahlBestellPositionen = arrZeile[10];
+
+                    Bestellzeilen.Add(bestellzeile);
+                }
+
+                return Bestellzeilen;
+
+
+                //kann weg wg. Liste
+                #region Arraygröße ermitteln
                 int num = -1;
-                int upperBound = arrSourcelines.GetUpperBound(0);
+                int upperBound = NewNFDATData.GetUpperBound(0);
                 for (int i = 0; i <= upperBound; i++)
                 {
-                    bool flag = Operators.CompareString(arrSourcelines(i), "", false) <> 0;
+                    bool flag = Operators.CompareString(NewNFDATData(i), "", false) <> 0;
                     if (flag)
                     {
                         num += 1;
                     }
                 }
+                #endregion
 
-                string[,] array = new string[,] { };// (num + 1 - 1, 10) { };
+                //Hilfsarray für Zeilenauslesung
+                string[,] arrHilf = new string[,] { };// (num + 1 - 1, 10) { };
+
                 int num2 = 0;
-                int upperBound2 = arrSourcelines.GetUpperBound(0);
+                int upperBound2 = NewNFDATData.GetUpperBound(0);
+                //Bestellzeilen durchlaufen und einzeln zerlegen.
                 for (int j = 0; j <= upperBound2; j++)
                 {
-                    string[] array2 = Strings.Split(arrSourcelines(j), ";", -1, CompareMethod.Binary);
-                    bool flag2 = Operators.CompareString(array2(0), "", false) <> 0;
-                    if (flag2)
+                    //Bestellzeile zerlegen     in Array
+                    string[] arrZeile = Strings.Split(NewNFDATData(j), ";", -1, CompareMethod.Binary);
+                    bool flag2 = Operators.CompareString(arrZeile(0), "", false) <> 0;
+                    if (flag2) //Wenn erstes Feld der zerlegten Zeile nicht leer...
                     {
-                        bool flag3 = Operators.CompareString(array(num2, 2), "1678", false) = 0 And Operators.CompareString(array(num2, 6), "222", false) = 0;
-                        if (flag3)
-                        {
-                            Debugger.Break();
-                        }
-                        array(num2, 2) = array2(2);
-                        array(num2, 3) = ErstelldatumTTMMJJ;
-                        array(num2, 4) = array2(4);
-                        array(num2, 6) = this.Expand(array2(6), 7);
-                        array(num2, 8) = this.Expand(array2(8), 10);
+
+                        //bool flag3 = Operators.CompareString(array(num2, 2), "1678", false) = 0 And Operators.CompareString(array(num2, 6), "222", false) = 0;
+                        //if (flag3)
+                        //{
+                        //    Debugger.Break();
+                        //}
+
+                        //Daten extrahieren in eigenes 2D-Array
+                        arrHilf(num2, 2) = arrZeile(2);                     //KdNr BHM
+                        arrHilf(num2, 3) = ErstelldatumTTMMJJ;            //Bestelldatum
+                        arrHilf(num2, 4) = arrZeile(4);                     //Lieferdatum
+                        arrHilf(num2, 6) = this.Expand(arrZeile(6), 7);     //Menge??
+                        arrHilf(num2, 8) = this.Expand(arrZeile(8), 10);    //Artikelnummer
                         num2 += 1;
+                        //Umsetzen in eigenes Objekt "Bestellzeile"
                     }
                 }
-                array3 = this.DeleteEntries1(array);
-                array3 = this.ChangeArticleNumbers(array3);
+
+                arrReturn = this.DeleteEntries1(arrHilf);        //Zu löschende Einträge entfernen
+                arrReturn = this.ChangeArticleNumbers(arrReturn); //zu tauschende Artikelnummern tauschen
             }
             catch (Exception ex)
             {
             }
-            return array3;
+            return arrReturn;
         }
 
         private string[,] DeleteArticlesAndCustomers(string[,] DATSource)
@@ -501,15 +555,15 @@ namespace Dat2Sedas_Neu
         private string Shorten(string input, int limit)
         {
             //Kürzt einen String auf die angegebene Länge
-            Dim num As Integer = Strings.Len(input)
-                                Dim flag As Boolean = num > limit
-                                Dim result As String
-                                If flag Then
-                                    ' The following expression was wrapped in a checked-expression
-                                    result = Strings.Mid(input, num - limit + 1)
-                                Else
-            result = input
-                                End If
+            //Dim num As Integer = Strings.Len(input)
+            //                    Dim flag As Boolean = num > limit
+            //                    Dim result As String
+            //                    If flag Then
+            //                        ' The following expression was wrapped in a checked-expression
+            //                        result = Strings.Mid(input, num - limit + 1)
+            //                    Else
+            //result = input
+            //                    End If
 
 
 
@@ -545,4 +599,40 @@ namespace Dat2Sedas_Neu
             return text;
         }
     }
+
+    class Bestellzeile
+    {
+        #region Aufbau Bestellzeile
+        /*
+        Zeile aus neuer NF-DAT-Datei:            
+        0 ;1   ;2   ;3     ;4     ;5;6   ;7;8 ;9;10
+        NF;1050;1050;200924;200925;;20000;;209;;10
+        0  NF               Kennzeichen neues Format
+        1  KdNr             BHM Filialnummer
+        2  KdNr             BHM Kundennummer der Filiale
+        3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen
+        4  Lieferdatum      Lieferdatum
+        5  -leer-           BHM ArtikelKey
+        6  20000            Menge*1000, echte Menge=Menge/1000> 20000=20
+        7  -leer-           Preis (Bsp. 2.00), Dezimal = .
+        8  ArtNummer        BHM ArtikelNummer
+        9  -leer-           VPE
+        10 10               Anzahl Bestellpositionen in Datei
+        */
+        #endregion
+
+        public string NFKennzeichen { get; set; }
+        public string BHMFilialNummer { get; set; }
+        public string BHMKundenNummer { get; set; }
+        public string BestellDatum { get; set; }
+        public string LieferDatum { get; set; }
+        public string BHMArtikelKey { get; set; }
+        public string BestellMenge { get; set; }
+        public string Preis { get; set; }
+        public string BHMArtikelNummer { get; set; }
+        public string Verpackungseinheit { get; set; }
+        public string AnzahlBestellPositionen { get; set; }
+    }
+
+}
 
