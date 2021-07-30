@@ -15,13 +15,11 @@ namespace Dat2Sedas_Neu
 
         private static void OnInitFailed(string message)
         {
-            InitFailed("Fehler bei der Initialisierung: " + message);
+            InitFailed?.Invoke("Fehler bei der Initialisierung: " + message);
         }
 
         public static bool Init()
         {
-            
-
             #region Initialisierung
             
             LogMessage.LogOnly("Initialisierung des Programms erfolgreich.");

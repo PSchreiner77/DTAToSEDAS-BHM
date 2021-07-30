@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 namespace Dat2Sedas_Neu
 {
     static class Help
-    {
+    {   
         public static void handlertest()
         {
             ProgramInit.InitFailed += ProgramInit_InitFailed;
-
         }
 
         private static void ProgramInit_InitFailed(string message)
