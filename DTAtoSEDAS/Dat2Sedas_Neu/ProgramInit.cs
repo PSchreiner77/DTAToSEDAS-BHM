@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace Dat2Sedas_Neu
 {
+    //Delegate zum Senden einer Nachricht einrichten
+    public Action<string> MessageEventHandler;
+
     class ProgramInit
     {
 
         public static bool Init()
         {   
+            
             #region Initialisierung
             
             LogMessage.LogOnly("Initialisierung des Programms erfolgreich.");
@@ -283,6 +287,7 @@ namespace Dat2Sedas_Neu
                 }
                 return flag;
             }
+            return true;
         }
 
         private static void ShowErrorMessage(string message)
