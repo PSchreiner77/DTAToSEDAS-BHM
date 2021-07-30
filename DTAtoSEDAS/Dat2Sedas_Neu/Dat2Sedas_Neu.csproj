@@ -44,7 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConvertDatToSedas.cs" />
+    <Compile Include="Help.cs" />
+    <Compile Include="Parameters.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProgramInit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
