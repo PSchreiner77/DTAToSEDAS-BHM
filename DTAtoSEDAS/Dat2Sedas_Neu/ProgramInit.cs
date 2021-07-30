@@ -7,14 +7,21 @@ using System.Threading.Tasks;
 namespace Dat2Sedas_Neu
 {
     //Delegate zum Senden einer Nachricht einrichten
-    public Action<string> MessageEventHandler;
+    public delegate void InitFailedHandler(string message);
 
     class ProgramInit
     {
+        public static event InitFailedHandler InitFailed;
+
+        private static void OnInitFailed(string message)
+        {
+            InitFailed("Fehler bei der Initialisierung: " + message);
+        }
 
         public static bool Init()
-        {   
+        {
             
+
             #region Initialisierung
             
             LogMessage.LogOnly("Initialisierung des Programms erfolgreich.");
@@ -22,6 +29,7 @@ namespace Dat2Sedas_Neu
             //in INIT verschieben
             if (!CheckParmeters())
             {  // flag2 Then
+                OnInitFailed("Prüfung der Parameter fehlgeschlagen.");
                 ShowErrorMessage("Prüfung der Parameter fehlgeschlagen.");
                 return false;
             }
