@@ -202,8 +202,9 @@ namespace Dat2Sedas_Neu
                 Bestellzeilen.Add(bestellzeile);
             }
 
-            Bestellzeilen = this.DeleteEntries1(Bestellzeilen);        //Zu löschende Einträge entfernen
-            Bestellzeilen = this.ChangeArticleNumbers(Bestellzeilen); //zu tauschende Artikelnummern tauschen
+            Bestellzeilen = DeleteCustomers(Bestellzeilen);        //Zu löschende Einträge entfernen
+            Bestellzeilen = DeleteArticles(Bestellzeilen);
+            Bestellzeilen = ChangeArticleNumbers(Bestellzeilen); //zu tauschende Artikelnummern tauschen
 
             return Bestellzeilen;
         }
@@ -229,9 +230,11 @@ namespace Dat2Sedas_Neu
                 Dim enumerator As List(Of String).Enumerator;
                 CType(enumerator, IDisposable).Dispose();
             }
+
+            return bestellzeilen;
         }
 
-        private List<Bestellzeile> DeleteArticles()
+        private List<Bestellzeile> DeleteArticles(List<Bestellzeile> bestellzeilen )
         {
             try
             {
@@ -252,6 +255,53 @@ namespace Dat2Sedas_Neu
                 CType(enumerator2, IDisposable).Dispose();
             }
 
+            return bestellzeilen;
+
+        }
+
+        private List<Bestellzeile> ChangeArticleNumbers(List<Bestellzeile> bestellzeile)
+        {
+            LogMessage.LogOnly("Austauschen von Artikelnummern laut tauscheArtikel.txt.");
+            bool flag = Not Information.IsNothing(Module1.ListChangeArticle);
+
+            //The following expression was wrapped in a checked-statement
+            string[,] result;
+            if (flag)
+            {
+                string[,] array = New String(Module1.ListChangeArticle.Count - 1 + 1 - 1, 1) { };
+                try
+                {
+                    int upperBound = array.GetUpperBound(0);
+                    for (int i = 0; i <= upperBound; i++) // i As Integer = 0 To upperBound
+                    {
+                        Dim array2 As String() = Strings.Split(Module1.ListChangeArticle(i), ";", -1, CompareMethod.Binary);
+                        array(i, 0) = this.MyTRIM(array2(0));
+                        array(i, 1) = this.MyTRIM(array2(1));
+                    }
+                    int upperBound2 = DatSource.GetUpperBound(0);
+                    for (int j = 0; j <= upperBound2; j++) // j As Integer = 0 To upperBound2
+                    {
+                        int upperBound3 = array.GetUpperBound(0);
+                        for (int k = 0; k <= upperBound3; k++) // k As Integer = 0 To upperBound3
+                        {
+                            bool flag2 = Operators.CompareString(DatSource(j, 8), this.Expand(array(k, 0), 10), false) = 0;
+                            if (flag2)
+                            {
+                                DatSource(j, 8) = this.Expand(array(k, 1), 10);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+            else
+            {
+                result = DatSource;
+            }
+
+            return result;
         }
 
         private List<string> LoadDeleteArticlesList(string path)
@@ -380,170 +430,24 @@ namespace Dat2Sedas_Neu
 
 
 
-        private string[,] ChangeArticleNumbers(DatSource As String(,))
-        {
-            LogMessage.LogOnly("Austauschen von Artikelnummern laut tauscheArtikel.txt.");
-            bool flag = Not Information.IsNothing(Module1.ListChangeArticle);
+       
 
-            //The following expression was wrapped in a checked-statement
-            string[,] result;
-            if (flag)
-            {
-                string[,] array = New String(Module1.ListChangeArticle.Count - 1 + 1 - 1, 1) { };
-                try
-                {
-                    int upperBound = array.GetUpperBound(0);
-                    for (int i = 0; i <= upperBound; i++) // i As Integer = 0 To upperBound
-                    {
-                        Dim array2 As String() = Strings.Split(Module1.ListChangeArticle(i), ";", -1, CompareMethod.Binary);
-                        array(i, 0) = this.MyTRIM(array2(0));
-                        array(i, 1) = this.MyTRIM(array2(1));
-                    }
-                    int upperBound2 = DatSource.GetUpperBound(0);
-                    for (int j = 0; j <= upperBound2; j++) // j As Integer = 0 To upperBound2
-                    {
-                        int upperBound3 = array.GetUpperBound(0);
-                        for (int k = 0; k <= upperBound3; k++) // k As Integer = 0 To upperBound3
-                        {
-                            bool flag2 = Operators.CompareString(DatSource(j, 8), this.Expand(array(k, 0), 10), false) = 0;
-                            if (flag2)
-                            {
-                                DatSource(j, 8) = this.Expand(array(k, 1), 10);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                }
-            }
-            else
-            {
-                result = DatSource;
-            }
+        //private string ReverseDate(string str)
+        //{
+        //    string text = "";
+        //    bool flag = Operators.CompareString(str, "", false) <> 0;
 
-            return result;
-        }
-
-        private bool WriteSedasData()
-        {
-            LogMessage.LogOnly("Schreiben der Sedas.dat...");
-            List<string> list = new List<string>();
-            bool result = false;
-            this._SedasHeader = String.Concat(New String() { "010()000377777777777771", this._ErstelldatumSedas, ";,", Conversions.ToString(this._Counter), vbCrLf & ";)0240051310000002"})  ;
-            list.Add(this._SedasHeader);
-            int i = 0;
-            int j = 0;
-            int upperBound = this._DATContent.GetUpperBound(0);
-
-
-            // The following expression was wrapped in a checked-statement
-            try
-            {
-                while (i <= this._DATContent.GetUpperBound(0))
-                {
-                    list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
-                    this._Customers += 1;
-                    Dim text As String = "0";
-
-
-                    while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
-                    {
-                        this._DataSets += 1;
-                        list.Add(String.Concat(New String() { ";040000", this._DATContent(num, 8), ",4", this._DATContent(num, 6), ",,,,02 000000,,"}));
-                        text = Conversions.ToString(Conversions.ToInteger(text) + Conversions.ToInteger(this._DATContent(num, 6)));
-                        num += 1;
-                        Dim flag As Boolean = num > this._DATContent.GetUpperBound(0);
-
-                        if (flag)
-                        {
-                            Exit While;
-                        }
-                    }
-
-                    int num2 = 12 - Strings.Len(text);
-                    for (int j = 0; j <= num; j++) // j As Integer = 1 To num2
-                    {
-                        text = "0" + text;
-                    }
-                    list.Add(";05" + text);
-                    i = num;
-                    this._SummeGes += Conversions.ToInteger(text);
-                }
-
-                this._SedasFooter = String.Concat(New String() { ";06", this.Expand(Conversions.ToString(this._Customers), 3), ",", this.Expand(Conversions.ToString(this._DataSets), 4), vbCrLf & ";07000000,00001,00001,000000,("}) ;
-                list.Add(this._SedasFooter);
-                Dim flag2 As Boolean = Strings.InStr(this._DestinationPath, "\\", CompareMethod.Binary) > 0;
-
-
-                if (flag2)
-                {
-                    Dim flag3 As Boolean = Not File.Exists(this._DestinationPath);
-                    if (flag3)
-                    {
-                        bool flag4 = Not Directory.Exists(Strings.Mid(this._DestinationPath, 1, Strings.InStrRev(this._DestinationPath, "\\", -1, CompareMethod.Binary)));
-
-
-                        if (flag4)
-                        {
-                            Directory.CreateDirectory(Strings.Mid(this._DestinationPath, 1, Strings.InStrRev(this._DestinationPath, "\\", -1, CompareMethod.Binary)));
-                        }
-                    }
-                }
-                else
-                {
-                    this._DestinationPath = Directory.GetCurrentDirectory() + "\\" + this._DestinationPath;
-                }
-
-
-                using (StreamWriter sw = new StreamWriter(this._DestinationPath, false))
-                {
-                    try
-                    {
-                        Dim enumerator As List(Of String).Enumerator = list.GetEnumerator();
-                        while (enumerator.MoveNext())
-                        {
-                            Dim current As String = enumerator.Current;
-                            streamWriter.WriteLine(current);
-                        }
-                    }
-                    finally
-                    {
-                        Dim enumerator As List(Of String).Enumerator;
-                        CType(enumerator, IDisposable).Dispose();
-                    }
-
-                    sw.WriteLine("                                                                                    ");
-                }
-                result = true;
-
-
-            }
-            catch (Exception ex)
-            {
-                LogMessage.LogOnly(ex.ToString());
-                result = false;
-            }
-
-            return result;
-        }
-
-        private string ReverseDate(string str)
-        {
-            string text = "";
-            bool flag = Operators.CompareString(str, "", false) <> 0;
-
-            //The following expression was wrapped in a checked-statement
-            if (flag)
-                str = Strings.Trim(str);
-            int num = Strings.Len(str) - 1;
-            for (int i = 0; i >= num; i = i - 2) //i As Integer = num To 1 Step - 2
-            {
-                Dim str2 As String = Strings.Mid(str, i, 2);
-                text += str2;
-            }
-            return text;
-        }
+        //    //The following expression was wrapped in a checked-statement
+        //    if (flag)
+        //        str = Strings.Trim(str);
+        //    int num = Strings.Len(str) - 1;
+        //    for (int i = 0; i >= num; i = i - 2) //i As Integer = num To 1 Step - 2
+        //    {
+        //        Dim str2 As String = Strings.Mid(str, i, 2);
+        //        text += str2;
+        //    }
+        //    return text;
+        //}
 
         /// <summary>
         /// Gibt ein Datum als String zurück in der Form: 'JJMMTT'
