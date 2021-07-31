@@ -17,29 +17,87 @@ namespace Dat2Sedas_Neu
         }
     }
 
+    public class SedasFooter
+    {
+        public string FooterLine { get; set; }
+
+        public SedasFooter(string Customers, string DataSets)
+        {
+            //SedasFooter = String.Concat(New String() { ";06", this.Expand(Conversions.ToString(this._Customers), 3), ",", this.Expand(Conversions.ToString(this._DataSets), 4), vbCrLf & ";07000000,00001,00001,000000,("}) ;
+            FooterLine = $"; 06{Customers expand to 3},{DataSets expand to 4}\n\r; 07000000,00001,00001,000000,(";
+        }
+    }
+
+    public class SedasOrderHeader
+    {
+        public string OrderHeaderLine { get; private set; }
+
+        public SedasOrderHeader()
+        {
+            //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+            OrderHeaderLine = "";
+        }
+    }
+
+    public class SedasOrderFooter
+    {
+        public string FooterLine { get; private set; }
+
+        public SedasOrderFooter()
+        {
+            //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+            int num2 = 12 - Strings.Len(text);
+            for (int j = 0; j <= num; j++) // j As Integer = 1 To num2
+            {
+                text = "0" + text;
+            }
+
+            list.Add(";05" + text);
+            i = num;
+            this._SummeGes += Conversions.ToInteger(text);
+            FooterLine = "";
+        }
+    }
+
+    public class SedasOrderLine
+    {
+        public string OrderLine { get; private set; }
+
+        public SedasOrderLine()
+        {
+            //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+            OrderLine = "";
+        }
+    }
 
     class SedasFile
     {
+        public string SedasFileContent { get; set; }
+
         public string Erstelldatum { get; set; }
         public string Counter { get; set; }
 
+        public string Customers { get; set; }
+        public string DataSets { get; set; }
 
-        public SedasFile(string Erstelldatum, string Counter)
+
+        public SedasFile(List<Bestellzeile> Bestellzeilen, string Erstelldatum, string Counter)
         {
-            
+            this.Erstelldatum = Erstelldatum;
+            this.Counter = Counter;
         }
 
         private bool WriteSedasData()
         {
             LogMessage.LogOnly("Schreiben der Sedas.dat...");
-            
+
             List<string> list = new List<string>();
-            
+
             //bool result = false;
             //this._SedasHeader = String.Concat(New String() { "010()000377777777777771", this._ErstelldatumSedas, ";,", Conversions.ToString(this._Counter), vbCrLf & ";)0240051310000002"})  ;
-            
-            list.Add(new SedasHeader(Erstelldatum,Counter));
-            
+
+            list.Add(new SedasHeader(Erstelldatum, Counter).Headerline);
+
             int i = 0;
             int j = 0;
             int upperBound = this._DATContent.GetUpperBound(0);
@@ -50,11 +108,14 @@ namespace Dat2Sedas_Neu
             {
                 while (i <= this._DATContent.GetUpperBound(0))
                 {
+                    #region OrderHeader 
                     list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
-                    this._Customers += 1;
+                    list.Add(new SedasOrderHeader().OrderHeaderLine);
+                    #endregion
+
+                    this.Customers += 1;
+
                     Dim text As String = "0";
-
-
                     while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
                     {
                         this._DataSets += 1;
@@ -69,6 +130,7 @@ namespace Dat2Sedas_Neu
                         }
                     }
 
+                    #region OrderFooterLine
                     int num2 = 12 - Strings.Len(text);
                     for (int j = 0; j <= num; j++) // j As Integer = 1 To num2
                     {
@@ -77,13 +139,19 @@ namespace Dat2Sedas_Neu
                     list.Add(";05" + text);
                     i = num;
                     this._SummeGes += Conversions.ToInteger(text);
+
+                    list.Add(new SedasOrderFooter().FooterLine);
+                    #endregion
                 }
 
-                this._SedasFooter = String.Concat(New String() { ";06", this.Expand(Conversions.ToString(this._Customers), 3), ",", this.Expand(Conversions.ToString(this._DataSets), 4), vbCrLf & ";07000000,00001,00001,000000,("}) ;
-                list.Add(this._SedasFooter);
+
+                //this._SedasFooter = String.Concat(New String() { ";06", this.Expand(Conversions.ToString(this._Customers), 3), ",", this.Expand(Conversions.ToString(this._DataSets), 4), vbCrLf & ";07000000,00001,00001,000000,("}) ;
+                list.Add(new SedasFooter(Customers, DataSets).FooterLine);
+
+
+
+                #region Zielverzeichnis erstellen, wenn nicht vorhanden
                 Dim flag2 As Boolean = Strings.InStr(this._DestinationPath, "\\", CompareMethod.Binary) > 0;
-
-
                 if (flag2)
                 {
                     Dim flag3 As Boolean = Not File.Exists(this._DestinationPath);
@@ -102,8 +170,9 @@ namespace Dat2Sedas_Neu
                 {
                     this._DestinationPath = Directory.GetCurrentDirectory() + "\\" + this._DestinationPath;
                 }
+                #endregion
 
-
+                #region Sedas-Datei schreiben
                 using (StreamWriter sw = new StreamWriter(this._DestinationPath, false))
                 {
                     try
@@ -123,6 +192,8 @@ namespace Dat2Sedas_Neu
 
                     sw.WriteLine("                                                                                    ");
                 }
+                #endregion
+
                 result = true;
 
 
