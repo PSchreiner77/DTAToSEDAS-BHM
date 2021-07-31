@@ -66,6 +66,24 @@ namespace Dat2Sedas_Neu
         public SedasOrderLine()
         {
             //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+            string fix1 = ";040000";
+            string fix2 = ",4";
+            string fix3 = ",,,,02 000000,,";
+
+            Dim text As String = "0";
+            while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
+            {
+                this._DataSets += 1;
+                list.Add(String.Concat(New String() { ";040000", this._DATContent(num, 8), ",4", this._DATContent(num, 6), ",,,,02 000000,,"}));
+                text = Conversions.ToString(Conversions.ToInteger(text) + Conversions.ToInteger(this._DATContent(num, 6)));
+                num += 1;
+                Dim flag As Boolean = num > this._DATContent.GetUpperBound(0);
+
+                if (flag)
+                {
+                    Exit While;
+                }
+            }
             OrderLine = "";
         }
     }
@@ -114,6 +132,10 @@ namespace Dat2Sedas_Neu
                     #endregion
 
                     this.Customers += 1;
+
+                    string fix1 = ";040000";
+                    string fix2 = ",4";
+                    string fix3 = ",,,,02 000000,,";
 
                     Dim text As String = "0";
                     while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
