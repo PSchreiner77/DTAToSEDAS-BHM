@@ -16,7 +16,7 @@ namespace Dat2Sedas_Neu
         private string _SedasHeader;
         private string _SedasFooter;
         private string _BlockHeader;
-        private string[,] _DATContent;
+        private List<Bestellzeile> _DATContent;
         private int _DataSets;
         private int _Customers;
         private int _SummeGes;
@@ -37,7 +37,7 @@ namespace Dat2Sedas_Neu
             this._DataSets = 0;
             this._Customers = 0;
             this._SummeGes = 0;
-            this._ErstelldatumSedas = "";
+            this._ErstelldatumSedas = ConvertToSedasDate(DateTime.Now);
             this._SourcePath = SourceFilePath;
             this._DestinationPath = DestinationFilePath;
             this._Counter = CounterEntries;
@@ -49,10 +49,7 @@ namespace Dat2Sedas_Neu
         {
             LogMessage.LogOnly("Beginn der Konvertierung...");
 
-            this._ErstelldatumSedas = ConvertToSedasDate(DateTime.Now);
-
-            _SourceData = ImportSourceFile(_SourcePath);
-            if (_SourceData == null) return false;
+            if (!ImportSourceFile(_SourcePath)) return false;
 
             #region Als Delegate bauen ReadDatData
             if (checkIfNewFileFormat())
@@ -77,9 +74,10 @@ namespace Dat2Sedas_Neu
         }
 
 
-        private List<string> ImportSourceFile(string SourceFilePath)
+        private bool ImportSourceFile(string SourceFilePath)
         {
             List<string> sourceDataList = new List<string>();
+            _SourceData = null;
             try
             {
                 using (StreamReader sr = new StreamReader(_SourcePath))
@@ -87,20 +85,15 @@ namespace Dat2Sedas_Neu
                     while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
-                        if (line != "") sourceDataList.Add(line);
+                        if (line != "") _SourceData.Add(line);
                     }
                 }
-
-                //TODO Prüfen, ob neues Dateiformat "NF" und Delegate zuweisen
-                //ReadDatData += ReadNewNFDATDataFormat
-                //  ODER
-                //ReadDatData += ReadOldDATDataFormat
             }
             catch (Exception ex)
             { //Fehlerausnahme auslösen und Fehler melden}                
+                return false;
             }
-
-            return sourceDataList;
+            return true;
         }
 
         private bool checkIfNewFileFormat()
@@ -109,6 +102,7 @@ namespace Dat2Sedas_Neu
             if (prefix == "NF") return true;
             return false;
         }
+
 
         private string[,] ReadOldDATDataFormat(string[] arrSourceLines, string ErstelldatumTTMMJJ)
         {
@@ -161,7 +155,6 @@ namespace Dat2Sedas_Neu
             return array;
         }
 
-
         private List<Bestellzeile> ReadNewNFDATDataFormat(List<string> NewNFDATData, string ErstelldatumTTMMJJ)
         {
             /*
@@ -209,6 +202,7 @@ namespace Dat2Sedas_Neu
             return Bestellzeilen;
         }
 
+
         private List<Bestellzeile> DeleteCustomers(List<Bestellzeile> bestellzeilen)
         {
             bool flag = false;
@@ -234,7 +228,7 @@ namespace Dat2Sedas_Neu
             return bestellzeilen;
         }
 
-        private List<Bestellzeile> DeleteArticles(List<Bestellzeile> bestellzeilen )
+        private List<Bestellzeile> DeleteArticles(List<Bestellzeile> bestellzeilen)
         {
             try
             {
@@ -338,99 +332,7 @@ namespace Dat2Sedas_Neu
 
         }
 
-        //private string[,] DeleteArticlesAndCustomers(string[,] DATSource)
-        //{
-        //    // The following expression was wrapped in a checked-statement
-        //    string[,] arrDatenarray = New String(DATSource.GetUpperBound(0) + 1 - 1, DATSource.GetUpperBound(1) + 1 - 1) { };
 
-        //    int num = 0;
-        //    LogMessage.LogOnly("Löschen von nicht benötigten Kunden- und Artikeldaten laut loeschKunde.txt & loeschArtikel.txt.");
-
-        //    // ## Customer löschen
-        //    //int upperBound = DATSource.GetUpperBound(0);
-        //    //for ()// i As Integer = 0 To upperBound
-        //    //{
-        //    //    bool flag = false;
-        //    //    try
-        //    //    {
-        //    //        Dim enumerator As List(Of String).Enumerator = Module1.ListDelCustomer.GetEnumerator();
-        //    //        while ()// enumerator.MoveNext()
-        //    //        {
-        //    //            string current = enumerator.Current;
-        //    //            bool flag2 = Operators.CompareString(this.MyTRIM(DATSource(i, 2)), this.MyTRIM(current), false) = 0;
-        //    //            if (flag2)
-        //    //            {
-        //    //                flag = true;
-        //    //            }
-        //    //        }
-        //    //    }
-        //    //    finally
-        //    //    {
-        //    //        Dim enumerator As List(Of String).Enumerator;
-        //    //        CType(enumerator, IDisposable).Dispose();
-        //    //    }
-
-
-        //    //Artikel löschen
-        //    //try
-        //    //{
-        //    //    Dim enumerator2 As List(Of String).Enumerator = Module1.ListDelArticle.GetEnumerator();
-        //    //    while ()// enumerator2.MoveNext()
-        //    //    {
-        //    //        string current2 enumerator2.Current;
-        //    //        bool flag3 = Operators.CompareString(this.MyTRIM(DATSource(i, 8)), this.MyTRIM(current2), false) = 0;
-        //    //        if (flag3)
-        //    //        {
-        //    //            flag = true;
-        //    //        }
-        //    //    }
-        //    //}
-        //    //finally
-        //    //{
-        //    //    Dim enumerator2 As List(Of String).Enumerator;
-        //    //    CType(enumerator2, IDisposable).Dispose();
-        //    //}
-
-
-        //    //Daten übernehmen in neues Array
-        //        bool flag4 = Not flag;
-        //        if (flag4)
-        //        {
-        //            int upperBound2 DATSource.GetUpperBound(1);
-        //            for ()// j As Integer = 0 To upperBound2
-        //            {
-        //                arrDatenarray(num, j) = DATSource(i, j);
-        //            }
-        //            num += 1;
-        //        }
-        //    //}
-
-
-        ////Daten  übernehmen in Ausgabearray
-        //    Dim arrReturn As String(,) = New String(num - 1 + 1 - 1, arrDatenarray.GetUpperBound(1) + 1 - 1) { };
-        //    int num2 = 0;
-        //    int upperBound3 = arrDatenarray.GetUpperBound(0);
-        //    for ()// k As Integer = 0 To upperBound3
-        //    {
-        //        bool flag5 = Not Information.IsNothing(arrDatenarray(k, 2));
-        //        if (flag5)
-        //        {
-        //            int upperBound4 = arrDatenarray.GetUpperBound(1);
-        //            for ()// l As Integer = 0 To upperBound4
-        //            {
-        //                array2(num2, l) = arrDatenarray(k, l);
-        //            }
-        //            num2 += 1;
-        //        }
-        //    }
-
-        //    return array2;
-        //}
-
-
-
-
-       
 
         //private string ReverseDate(string str)
         //{
@@ -448,6 +350,7 @@ namespace Dat2Sedas_Neu
         //    }
         //    return text;
         //}
+
 
         /// <summary>
         /// Gibt ein Datum als String zurück in der Form: 'JJMMTT'
@@ -495,13 +398,6 @@ namespace Dat2Sedas_Neu
             //result = input
             //                    End If
 
-
-
-
-
-
-
-
             return result;
         }
 
@@ -530,7 +426,7 @@ namespace Dat2Sedas_Neu
         }
     }
 
-    class Bestellzeile
+    public class Bestellzeile
     {
         #region Aufbau Bestellzeile
         /*
@@ -564,7 +460,315 @@ namespace Dat2Sedas_Neu
         public string AnzahlBestellPositionen { get; set; }
     }
 
+    class SedasFile
+    {
+
+        private string SedasHeader { get { return $"010()000377777777777771{Erstelldatum};,{Counter}\n\r;)0240051310000002"; } }
+        private string SedasFooter { get { return $"; 06{Customers expand to 3char},{DataSets expand to 4char}\n\r; 07000000,00001,00001,000000,("; } }
 
 
-}
+        public string SedasFileContent { get; set; }
+
+        public string Erstelldatum { get; set; }
+        public string Counter { get; set; }
+
+        public string Customers { get; set; }
+        public string DataSets { get; set; }
+
+        List<Bestellzeile> Bestellzeilen;
+
+
+        public SedasFile(List<Bestellzeile> Bestellzeilen, string Erstelldatum, string Counter)
+        {
+            this.Erstelldatum = Erstelldatum;
+            this.Counter = Counter;
+            this.Bestellzeilen = Bestellzeilen;
+        }
+
+        public void CreateSedasData()
+        {
+            List<string> list = new List<string>();
+
+            //this._SedasHeader = String.Concat(New String() { "010()000377777777777771", this._ErstelldatumSedas, ";,", Conversions.ToString(this._Counter), vbCrLf & ";)0240051310000002"})  ;
+            list.Add(SedasHeader);
+
+            list.Add(SedasOrderBody);
+
+            //this._SedasFooter = String.Concat(New String() { ";06", this.Expand(Conversions.ToString(this._Customers), 3), ",", this.Expand(Conversions.ToString(this._DataSets), 4), vbCrLf & ";07000000,00001,00001,000000,("}) ;
+            list.Add(SedasFooter);
+
+        }
+
+        public bool WriteSedasData()
+        {
+            LogMessage.LogOnly("Schreiben der Sedas.dat...");
+
+            List<string> list = new List<string>();
+
+            //bool result = false;
+
+
+            int i = 0;
+            int j = 0;
+            int upperBound = this._DATContent.GetUpperBound(0);
+
+
+            // The following expression was wrapped in a checked-statement
+            try
+            {
+                while (i <= this._DATContent.GetUpperBound(0))
+                {
+                    #region OrderHeader 
+                    list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+                    list.Add(new SedasOrderHeader().OrderHeaderLine);
+                    #endregion
+
+                    this.Customers += 1;
+
+                    string fix1 = ";040000";
+                    string fix2 = ",4";
+                    string fix3 = ",,,,02 000000,,";
+
+                    Dim text As String = "0";
+                    while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
+                    {
+                        this._DataSets += 1;
+                        list.Add(String.Concat(New String() { ";040000", this._DATContent(num, 8), ",4", this._DATContent(num, 6), ",,,,02 000000,,"}));
+                        text = Conversions.ToString(Conversions.ToInteger(text) + Conversions.ToInteger(this._DATContent(num, 6)));
+                        num += 1;
+                        Dim flag As Boolean = num > this._DATContent.GetUpperBound(0);
+
+                        if (flag)
+                        {
+                            Exit While;
+                        }
+                    }
+
+                    #region OrderFooterLine
+                    int num2 = 12 - Strings.Len(text);
+                    for (int j = 0; j <= num; j++) // j As Integer = 1 To num2
+                    {
+                        text = "0" + text;
+                    }
+                    list.Add(";05" + text);
+                    i = num;
+                    this._SummeGes += Conversions.ToInteger(text);
+
+                    list.Add(new SedasOrderFooter().FooterLine);
+                    #endregion
+                }
+
+
+                //this._SedasFooter = String.Concat(New String() { ";06", this.Expand(Conversions.ToString(this._Customers), 3), ",", this.Expand(Conversions.ToString(this._DataSets), 4), vbCrLf & ";07000000,00001,00001,000000,("}) ;
+                list.Add(new SedasFooter(Customers, DataSets).FooterLine);
+
+
+
+                #region Zielverzeichnis erstellen, wenn nicht vorhanden
+                Dim flag2 As Boolean = Strings.InStr(this._DestinationPath, "\\", CompareMethod.Binary) > 0;
+                if (flag2)
+                {
+                    Dim flag3 As Boolean = Not File.Exists(this._DestinationPath);
+                    if (flag3)
+                    {
+                        bool flag4 = Not Directory.Exists(Strings.Mid(this._DestinationPath, 1, Strings.InStrRev(this._DestinationPath, "\\", -1, CompareMethod.Binary)));
+
+
+                        if (flag4)
+                        {
+                            Directory.CreateDirectory(Strings.Mid(this._DestinationPath, 1, Strings.InStrRev(this._DestinationPath, "\\", -1, CompareMethod.Binary)));
+                        }
+                    }
+                }
+                else
+                {
+                    this._DestinationPath = Directory.GetCurrentDirectory() + "\\" + this._DestinationPath;
+                }
+                #endregion
+
+                #region Sedas-Datei schreiben
+                using (StreamWriter sw = new StreamWriter(this._DestinationPath, false))
+                {
+                    try
+                    {
+                        Dim enumerator As List(Of String).Enumerator = list.GetEnumerator();
+                        while (enumerator.MoveNext())
+                        {
+                            Dim current As String = enumerator.Current;
+                            streamWriter.WriteLine(current);
+                        }
+                    }
+                    finally
+                    {
+                        Dim enumerator As List(Of String).Enumerator;
+                        CType(enumerator, IDisposable).Dispose();
+                    }
+
+                    sw.WriteLine("                                                                                    ");
+                }
+                #endregion
+
+                result = true;
+
+
+            }
+            catch (Exception ex)
+            {
+                LogMessage.LogOnly(ex.ToString());
+                result = false;
+            }
+
+            return result;
+        }
+
+
+
+        public class SedasOrderHeader
+        {
+            public string OrderHeaderLine { get; private set; }
+
+            public SedasOrderHeader(string )
+            {
+                //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+                OrderHeaderLine = "";
+            }
+        }
+
+        public class SedasOrderBody
+        {
+            private List<Bestellzeile> Bestellzeilen;
+            public string OrderBody { get; private set; }
+
+
+            public SedasOrderBody(List<Bestellzeile> Bestellzeilen)
+            {
+                CreadeSedasOrderBody();
+                this.Bestellzeilen = Bestellzeilen;
+            }
+
+            // The following expression was wrapped in a checked-statement
+            public void CreadeSedasOrderBodies()
+            {
+                string actualCustomer = "";
+                string lastCustomer = "";
+
+                List<string> SingleCustomerOrderBody = new List<string>();
+
+                int pointer1 = 0;
+                int pointer2 = 0;
+
+                while (pointer1 < Bestellzeilen.Count())
+                {
+                    actualCustomer = Bestellzeilen[pointer1].BHMKundenNummer;
+                    Customers
+                        //TODO Customers : woher? whohin? was damit machen/wie zählen?
+                    pointer2 = pointer1;
+
+                    while (Bestellzeilen[pointer2].BHMKundenNummer == actualCustomer)
+                    {
+
+                        pointer2++;
+                    }
+
+                    pointer1 = pointer2;
+                }
+
+
+
+                while (i <= this._DATContent.GetUpperBound(0))
+                {
+                    #region OrderHeader 
+                    //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+                    list.Add(new SedasOrderHeader().OrderHeaderLine);
+                    #endregion
+
+                    this.Customers += 1;
+
+                    string OrderBodyfix1 = ";040000";
+                    string OrderBodyfix2 = ",4";
+                    string OderBodyfix3 = ",,,,02 000000,,";
+
+                    Dim text As String = "0";
+                    while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
+                    {
+                        this._DataSets += 1;
+                        list.Add(String.Concat(New String() { ";040000", this._DATContent(num, 8), ",4", this._DATContent(num, 6), ",,,,02 000000,,"}));
+                        text = Conversions.ToString(Conversions.ToInteger(text) + Conversions.ToInteger(this._DATContent(num, 6)));
+                        num += 1;
+                        Dim flag As Boolean = num > this._DATContent.GetUpperBound(0);
+
+                        if (flag)
+                        {
+                            Exit While;
+                        }
+                    }
+
+                    #region OrderFooterLine
+                    int num2 = 12 - Strings.Len(text);
+                    for (int j = 0; j <= num; j++) // j As Integer = 1 To num2
+                    {
+                        text = "0" + text;
+                    }
+                    list.Add(";05" + text);
+                    i = num;
+                    this._SummeGes += Conversions.ToInteger(text);
+
+                    list.Add(new SedasOrderFooter().FooterLine);
+                    #endregion
+                }
+            }
+
+            public class SedasOrderFooter
+            {
+                public string FooterLine { get; private set; }
+
+                public SedasOrderFooter()
+                {
+                    //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+                    int num2 = 12 - Strings.Len(text);
+                    for (int j = 0; j <= num; j++) // j As Integer = 1 To num2
+                    {
+                        text = "0" + text;
+                    }
+
+                    list.Add(";05" + text);
+                    i = num;
+                    this._SummeGes += Conversions.ToInteger(text);
+                    FooterLine = "";
+                }
+            }
+
+
+            public class SedasOrderLine
+            {
+                public string OrderLine { get; private set; }
+
+                public SedasOrderLine()
+                {
+                    //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+                    string fix1 = ";040000";
+                    string fix2 = ",4";
+                    string fix3 = ",,,,02 000000,,";
+
+                    Dim text As String = "0";
+                    while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
+                    {
+                        this._DataSets += 1;
+                        list.Add(String.Concat(New String() { ";040000", this._DATContent(num, 8), ",4", this._DATContent(num, 6), ",,,,02 000000,,"}));
+                        text = Conversions.ToString(Conversions.ToInteger(text) + Conversions.ToInteger(this._DATContent(num, 6)));
+                        num += 1;
+                        Dim flag As Boolean = num > this._DATContent.GetUpperBound(0);
+
+                        if (flag)
+                        {
+                            Exit While;
+                        }
+                    }
+                    OrderLine = "";
+                }
+            }
+
+
+        }
+    }
 
