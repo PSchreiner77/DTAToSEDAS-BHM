@@ -74,6 +74,9 @@ namespace Dat2Sedas_Neu
         }
 
 
+
+
+
         //TODO in Klasse Datenverarbeitung auslagern?
         private bool ImportSourceFile(string SourceFilePath)
         {
@@ -431,40 +434,75 @@ namespace Dat2Sedas_Neu
 
     public class SedasFile
     {
+        private List<Bestellzeile> _DatContent;
+        private string _Erstelldatum;
+        private string _SedasHeader;
+        private string _SedasFooter;
+        private int _CustomerOrdersCount = 0;
+        private int _OrderLinesCount = 0;
+        private string _SedasFileContent = "";
 
-        private string SedasHeader { get { return $"010()000377777777777771{Erstelldatum};,{OrderLinesCounter}\n\r;)0240051310000002"; } }
-        private string SedasFooter { get { return $"; 06{CustomersCount expand to 3char},{DataSets expand to 4char}\n\r; 07000000,00001,00001,000000,("; } }
-
-
-        public string SedasFileContent { get; set; }
-
-        public string Erstelldatum { get; set; }
-        public string OrderLinesCounter { get; set; }
-
-        public string CustomersCount { get; set; }
-        public string DataSets { get; set; }
-
-        List<Bestellzeile> Bestellzeilen;
+        public string SedasFileContent { get { return _SedasFileContent; } }
+        public string OrderLinesCount { get { return _CustomerOrdersCount.ToString(); } }
+        public string CustomerOrdersCount { get { return _CustomerOrdersCount.ToString(); } }
 
 
-        public SedasFile(List<Bestellzeile> Bestellzeilen, string Erstelldatum, string ActualCounter)
+        public SedasFile(List<Bestellzeile> Bestellzeilen, string Erstelldatum, int ActualCounter)
         {
-            this.Erstelldatum = Erstelldatum;
-            this.OrderLinesCounter = ActualCounter;
-            this.Bestellzeilen = Bestellzeilen;
+            this._Erstelldatum = Erstelldatum;
+            this._OrderLinesCount = ActualCounter;
+            this._DatContent = Bestellzeilen;
+        }
+
+        private string SedasHeader()
+        {
+            return $"010()000377777777777771{_Erstelldatum};,{_OrderLinesCount}\n\r;)0240051310000002";
+        }
+
+        private string SedasFooter()
+        {
+            return $"; 06{_OrderLinesCount expand to 3char},{_CustomerOrdersCount expand to 4char}\n\r; 07000000,00001,00001,000000,(";
         }
 
         public void CreateSedasData()
         {
+            List<SedasOrderLine> SedasOrderLines = new List<SedasOrderLine>();
+            string actualCustomer = "";
+            string lastCustomer = "";
+            int CustomersCount = 0;
+            int OrderLinesCount = 0;
+
+            int pointer1 = 0;
+            int pointer2 = 0;
+
+            //Bestellzeilen der DAT-Datei durchgehen
+
+            while (pointer1 < _DatContent.Count())
+            {
+                actualCustomer = _DatContent[pointer1].BHMKundenNummer;
+                CustomersCount++;
+
+                //TODO Customers : woher? whohin? was damit machen/wie zählen?
+                pointer2 = pointer1;
+                while (_DatContent[pointer2].BHMKundenNummer == actualCustomer)
+                {
+                    SedasOrderLines.Add(new SedasOrderLine(_DatContent[pointer2].BHMArtikelNummer,_DatContent[pointer2].BestellMenge));
+                    OrderLinesCount++;
+                    pointer2++;
+                }
+
+                pointer1 = pointer2;
+            }
+
             List<string> list = new List<string>();
 
             //this._SedasHeader = String.Concat(New String() { "010()000377777777777771", this._ErstelldatumSedas, ";,", Conversions.ToString(this._Counter), vbCrLf & ";)0240051310000002"})  ;
-            list.Add(SedasHeader);
+            list.Add(_SedasHeader);
 
             list.Add(SedasOrderBody.CreateSedasOrderBodies());
 
             //this._SedasFooter = String.Concat(New String() { ";06", this.Expand(Conversions.ToString(this._Customers), 3), ",", this.Expand(Conversions.ToString(this._DataSets), 4), vbCrLf & ";07000000,00001,00001,000000,("}) ;
-            list.Add(SedasFooter);
+            list.Add(_SedasFooter);
 
         }
 
@@ -492,7 +530,7 @@ namespace Dat2Sedas_Neu
                     list.Add(new SedasOrderHeader().OrderHeaderLine);
                     #endregion
 
-                    this.CustomersCount += 1;
+                    this.CustomerDataSetsCount += 1;
 
                     string fix1 = ";040000";
                     string fix2 = ",4";
@@ -529,7 +567,7 @@ namespace Dat2Sedas_Neu
 
 
                 //this._SedasFooter = String.Concat(New String() { ";06", this.Expand(Conversions.ToString(this._Customers), 3), ",", this.Expand(Conversions.ToString(this._DataSets), 4), vbCrLf & ";07000000,00001,00001,000000,("}) ;
-                list.Add(new SedasFooter(CustomersCount, DataSets).FooterLine);
+                list.Add(new SedasFooter(CustomerDataSetsCount, CustomerDataSetsCount).FooterLine);
 
 
 
@@ -597,202 +635,202 @@ namespace Dat2Sedas_Neu
             public string OrderHeaderLine { get; private set; }
 
             public SedasOrderHeader()
-            {                   
+            {
                 //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
                 OrderHeaderLine = "";
-                 
+
             }
         }
 
-        public class SedasOrderBody
+        public class SedasOrderLine
         {
-            private List<Bestellzeile> Bestellzeilen;
-            public string OrderBody { get; private set; }
+            /* ;0400000000000317,40002000,,,,02 000000,,
+             *      ;040000          = Kennung Zeile BestellPosition
+             *      0000000317       = Artikelnummer
+             *      ,4               = fix
+             *      0002000          = Menge (Wert/1000)
+             *      ,,,,02 000000,,  = fix
+            */
 
-            public SedasOrderBody(List<Bestellzeile> Bestellzeilen)
+            private string _ZeileAnfang = ";040000";
+            private string _ZeileMitte = ",4";
+            private string _ZeileEnde = ",,,,02 000000,,";
+
+            public string BHMArtikelNummer { private get; set; }
+            public string ArtikelMenge { private get; set; }
+            public string OrderLine
             {
-                CreadeSedasOrderBody();
-                this.Bestellzeilen = Bestellzeilen;
+                get { return _ZeileAnfang + BHMArtikelNummer + _ZeileMitte + ArtikelMenge + _ZeileEnde; }
             }
 
-            // The following expression was wrapped in a checked-statement
-            public static void CreateSedasOrderBodies()
+            public SedasOrderLine()
+            { }
+
+            public SedasOrderLine(string BHMArtikelNummer, string ArtikelMenge)
             {
-                string actualCustomer = "";
-                string lastCustomer = "";
-
-                List<string> SingleCustomerOrderBody = new List<string>();
-
-                int pointer1 = 0;
-                int pointer2 = 0;
-
-                while (pointer1 < Bestellzeilen.Count())
-                {
-                    actualCustomer = Bestellzeilen[pointer1].BHMKundenNummer;
-                    
-                    //TODO Customers : woher? whohin? was damit machen/wie zählen?
-                    pointer2 = pointer1;
-
-                    while (Bestellzeilen[pointer2].BHMKundenNummer == actualCustomer)
-                    {
-
-                        pointer2++;
-                    }
-
-                    pointer1 = pointer2;
-                }
-
-
-
-                while (i <= this._DATContent.GetUpperBound(0))
-                {
-                    #region OrderHeader 
-                    //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
-                    list.Add(new SedasOrderHeader().OrderHeaderLine);
-
-                    //    'If Pos1 = 1129 Then Stop
-                    //'Begin Kundenblock
-                    //';030,14,00000000000000000,180529,180530,,,,9175         ,,      
-                    //ListBodyText.Add(";030,14,00000000000000000," & ReverseDate(_FileDate) & "," & ReverseDate(DTAContent(Pos1, 2)) & ",,,," & DTAContent(Pos1, 3) & "         ,," &
-                    //"                          ")
-
-                    #endregion
-
-                    this.Customers += 1;
-
-                    string OrderBodyfix1 = ";040000";
-                    string OrderBodyfix2 = ",4";
-                    string OderBodyfix3 = ",,,,02 000000,,";
-
-                    Dim text As String = "0";
-                    while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
-                    {
-                        this._DataSets += 1;
-                        list.Add(String.Concat(New String() { ";040000", this._DATContent(num, 8), ",4", this._DATContent(num, 6), ",,,,02 000000,,"}));
-                        text = Conversions.ToString(Conversions.ToInteger(text) + Conversions.ToInteger(this._DATContent(num, 6)));
-                        num += 1;
-                        Dim flag As Boolean = num > this._DATContent.GetUpperBound(0);
-
-                        if (flag)
-                        {
-                            Exit While;
-                        }
-                    }
-
-                    #region OrderFooterLine
-                    int num2 = 12 - Strings.Len(text);
-                    for (int j = 0; j <= num; j++) // j As Integer = 1 To num2
-                    {
-                        text = "0" + text;
-                    }
-                    list.Add(";05" + text);
-                    i = num;
-                    this._SummeGes += Conversions.ToInteger(text);
-
-                    list.Add(new SedasOrderFooter().FooterLine);
-                    #endregion
-                }
+                this.BHMArtikelNummer = BHMArtikelNummer;
+                this.ArtikelMenge = ArtikelMenge;
             }
-
-            public class SedasOrderFooter
-            {
-                #region Aufbau FooterLine
-                //--FOOTER der Zieldatei
-                //; 06100,1178
-                //; 07000000,00001,00001,000000,(
-                //
-                //;06108,1178 
-                //  ;06    = Kennung Zusammenfassung Einträge
-                //  108,   = Anzahl Kunden in Datei (Blöcke)
-                //  1178   = Anzahl einzelner Datensätze/Artikelzeilen
-                #endregion
-                public string FooterLine { get; private set; }
-
-                public SedasOrderFooter(string CustomersCount, string OrderEntriesCount)
-                {   
-                    string FooterLine1 = "";
-                    string FooterLine2 = "";
-
-                    FooterLine1 = $":06{CustomersCount};{OrderEntriesCount}";
-                    FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
-
-                    FooterLine = FooterLine1 + "\n\r" + FooterLine2;                            
-                }
-            }
-
-            public class SedasOrderLine
-            {
-                public string OrderLine { get; private set; }
-
-                public SedasOrderLine()
-                {
-                    //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
-                    string fix1 = ";040000";
-                    string fix2 = ",4";
-                    string fix3 = ",,,,02 000000,,";
-
-                    Dim text As String = "0";
-                    while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
-                    {
-                        this._DataSets += 1;
-                        list.Add(String.Concat(New String() { ";040000", this._DATContent(num, 8), ",4", this._DATContent(num, 6), ",,,,02 000000,,"}));
-                        text = Conversions.ToString(Conversions.ToInteger(text) + Conversions.ToInteger(this._DATContent(num, 6)));
-                        num += 1;
-                        Dim flag As Boolean = num > this._DATContent.GetUpperBound(0);
-
-                        if (flag)
-                        {
-                            Exit While;
-                        }
-                    }
-                    OrderLine = "";
-                }
-            }
-
-
         }
 
-
-        static class Datenverarbeitung
+        public class SedasOrderFooter
         {
-            //TODO in Klasse Datenverarbeitung?
-            private static List<string> LoadDeleteArticlesList(string path)
-            {
-                List<string> delArticles = new List<string>();
-                try
-                {
-                    delArticles = File.ReadAllText("Pfad").Split('\n').ToList<string>();
-                }
-                catch (Exception ex)
-                { }
-                return delArticles;
-            }
+            #region OrderFooterLine
+            //int num2 = 12 - Strings.Len(text);
+            //for (int j = 0; j <= num; j++) // j As Integer = 1 To num2
+            //{
+            //    text = "0" + text;
+            //}
+            //list.Add(";05" + text);
+            //i = num;
+            //this._SummeGes += Conversions.ToInteger(text);
 
-            //TODO in Klasse Datenverarbeitung?
-            private static void LoadDeleteCustomersList()
-            {
-
-            }
-
-            //TODO in Klasse Datenverarbeitung?
-            private static List<string> LoadDeleteItemsList(string path)
-            {
-                List<string> delItems = new List<string>();
-                try
-                {
-                    delItems = File.ReadAllText("Pfad").Split('\n').ToList<string>();
-                }
-                catch (Exception ex)
-                { }
-                return delItems;
-            }
-
-            //TODO in Klasse Datenverarbeitung?
-            private static void LoadChangeArticlesList()
-            {
-
-            }
+            //list.Add(new SedasOrderFooter().FooterLine);
+            #endregion
         }
+    }
+
+
+
+    // The following expression was wrapped in a checked-statement
+    public static void CreateSedasOrderBodies()
+    {
+        string actualCustomer = "";
+        string lastCustomer = "";
+
+        List<string> SingleCustomerOrderBody = new List<string>();
+
+        int pointer1 = 0;
+        int pointer2 = 0;
+
+        while (pointer1 < Bestellzeilen.Count())
+        {
+            actualCustomer = Bestellzeilen[pointer1].BHMKundenNummer;
+
+            //TODO Customers : woher? whohin? was damit machen/wie zählen?
+            pointer2 = pointer1;
+
+            while (Bestellzeilen[pointer2].BHMKundenNummer == actualCustomer)
+            {
+
+                pointer2++;
+            }
+
+            pointer1 = pointer2;
+        }
+
+
+
+        while (i <= this._DATContent.GetUpperBound(0))
+        {
+            #region OrderHeader 
+            //list.Add(String.Concat(New String() { ";030,14,00000000000000000,", this._DATContent(i, 3), ",", this.ReverseDate(this._DATContent(i, 4)), ",,,,", this._DATContent(i, 2), "         ,,"}));
+            list.Add(new SedasOrderHeader().OrderHeaderLine);
+
+            //    'If Pos1 = 1129 Then Stop
+            //'Begin Kundenblock
+            //';030,14,00000000000000000,180529,180530,,,,9175         ,,      
+            //ListBodyText.Add(";030,14,00000000000000000," & ReverseDate(_FileDate) & "," & ReverseDate(DTAContent(Pos1, 2)) & ",,,," & DTAContent(Pos1, 3) & "         ,," &
+            //"                          ")
+
+            #endregion
+
+            this.Customers += 1;
+
+            string OrderBodyfix1 = ";040000";
+            string OrderBodyfix2 = ",4";
+            string OderBodyfix3 = ",,,,02 000000,,";
+
+            Dim text As String = "0";
+            while (Operators.CompareString(this._DATContent(i, 2), this._DATContent(num, 2), false) = 0)
+            {
+                this._DataSets += 1;
+                list.Add(String.Concat(New String() { ";040000", this._DATContent(num, 8), ",4", this._DATContent(num, 6), ",,,,02 000000,,"}));
+                text = Conversions.ToString(Conversions.ToInteger(text) + Conversions.ToInteger(this._DATContent(num, 6)));
+                num += 1;
+                Dim flag As Boolean = num > this._DATContent.GetUpperBound(0);
+
+                if (flag)
+                {
+                    Exit While;
+                }
+            }
+
+
+        }
+    }
+
+    public class SedasFooter
+    {
+        #region Aufbau FooterLine
+        //--FOOTER der Zieldatei
+        //; 06100,1178
+        //; 07000000,00001,00001,000000,(
+        //
+        //;06108,1178 
+        //  ;06    = Kennung Zusammenfassung Einträge
+        //  108,   = Anzahl Kunden in Datei (Blöcke)
+        //  1178   = Anzahl einzelner Datensätze/Artikelzeilen
+        #endregion
+        public string FooterLine { get; private set; }
+
+        public SedasFooter(string CustomersCount, string OrderEntriesCount)
+        {
+            string FooterLine1 = "";
+            string FooterLine2 = "";
+
+            FooterLine1 = $":06{CustomersCount};{OrderEntriesCount}";
+            FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
+
+            FooterLine = FooterLine1 + "\n\r" + FooterLine2;
+        }
+
+       
+    }
+
+}
+
+
+static class Datenverarbeitung
+{
+    //TODO in Klasse Datenverarbeitung?
+    private static List<string> LoadDeleteArticlesList(string path)
+    {
+        List<string> delArticles = new List<string>();
+        try
+        {
+            delArticles = File.ReadAllText("Pfad").Split('\n').ToList<string>();
+        }
+        catch (Exception ex)
+        { }
+        return delArticles;
+    }
+
+    //TODO in Klasse Datenverarbeitung?
+    private static void LoadDeleteCustomersList()
+    {
+
+    }
+
+    //TODO in Klasse Datenverarbeitung?
+    private static List<string> LoadDeleteItemsList(string path)
+    {
+        List<string> delItems = new List<string>();
+        try
+        {
+            delItems = File.ReadAllText("Pfad").Split('\n').ToList<string>();
+        }
+        catch (Exception ex)
+        { }
+        return delItems;
+    }
+
+    //TODO in Klasse Datenverarbeitung?
+    private static void LoadChangeArticlesList()
+    {
+
+    }
+}
     }
 }
 
