@@ -454,19 +454,12 @@ namespace Dat2Sedas_Neu
             this._DatContent = Bestellzeilen;
         }
 
-        private string SedasHeader()
-        {
-            return $"010()000377777777777771{_Erstelldatum};,{_OrderLinesCount}\n\r;)0240051310000002";
-        }
 
-        private string SedasFooter()
-        {
-            return $"; 06{_OrderLinesCount expand to 3char},{_CustomerOrdersCount expand to 4char}\n\r; 07000000,00001,00001,000000,(";
-        }
 
         public void CreateSedasData()
         {
             List<SedasOrderLine> SedasOrderLines = new List<SedasOrderLine>();
+            string SedasFileContent = "";
             string actualCustomer = "";
             string lastCustomer = "";
             int CustomersCount = 0;
@@ -476,6 +469,9 @@ namespace Dat2Sedas_Neu
             int pointer2 = 0;
 
             //Bestellzeilen der DAT-Datei durchgehen
+            SedasFile.Erstelldatum(_Erstelldatum);
+            SedasFile.AnzahlBestellzeilen(_DatContent.Count());
+           
 
             while (pointer1 < _DatContent.Count())
             {
@@ -486,7 +482,7 @@ namespace Dat2Sedas_Neu
                 pointer2 = pointer1;
                 while (_DatContent[pointer2].BHMKundenNummer == actualCustomer)
                 {
-                    SedasOrderLines.Add(new SedasOrderLine(_DatContent[pointer2].BHMArtikelNummer,_DatContent[pointer2].BestellMenge));
+                    SedasOrderLines.Add(new SedasOrderLine(_DatContent[pointer2].BHMArtikelNummer, _DatContent[pointer2].BestellMenge));
                     OrderLinesCount++;
                     pointer2++;
                 }
@@ -628,6 +624,22 @@ namespace Dat2Sedas_Neu
             return result;
         }
 
+
+        public static class SedasHeader
+        {
+            public static string Get(string Erstelldatum, string AnzahlBestellzeilen)
+            {
+                return $"010()000377777777777771{Erstelldatum};,{AnzahlBestellzeilen}\n\r;)0240051310000002";
+            }
+        }
+
+        public static class SedasFooter
+        {
+            public static string Get(string AnzahlBestellzeilen, string AnzahlKundenBestellungen)
+            {
+                return $"; 06{AnzahlBestellzeilen expand to 3char},{AnzahlKundenBestellungen expand to 4char}\n\r; 07000000,00001,00001,000000,(";
+            }
+        }
 
 
         public class SedasOrderHeader
@@ -785,7 +797,7 @@ namespace Dat2Sedas_Neu
             FooterLine = FooterLine1 + "\n\r" + FooterLine2;
         }
 
-       
+
     }
 
 }
