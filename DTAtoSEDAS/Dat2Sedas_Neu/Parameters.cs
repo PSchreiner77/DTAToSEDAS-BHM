@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dat2Sedas_Neu
 {
-    static class Parameters
+    static class Parameters                 //TODO Prüfen der Parameter auf Notwendigkeit
     {
         //private string _Arguments;
         //private string _SourceFileName;

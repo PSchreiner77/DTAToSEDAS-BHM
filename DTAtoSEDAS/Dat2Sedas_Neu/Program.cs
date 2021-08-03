@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dat2Sedas_Neu
 {
-    class Program
+    class Program       //TODO Fehler bereinigen
     {
 
         private string[] Arguments = new Environment.GetCommandLineArgs(); //CommandlineArgs besorgen
@@ -42,7 +42,7 @@ namespace Dat2Sedas_Neu
             #region Konvertierung der Daten
             LogMessage.LogOnly("Start der Konvertierung der Bestelldatei in eine Sedas.dat...");
             ConvertDatToSedas convertDATtoSEDAS = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter, ListDelCustomer, ListDelArticle);
-            if (convertDATtoSEDAS.ConvertFile())
+            if (convertDATtoSEDAS.ReadDatFileContent())
             {
                 LogMessage.Show("Datei " + Param.SourceFullPath + " erstellt.");
             }

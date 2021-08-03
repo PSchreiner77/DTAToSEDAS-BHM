@@ -21,7 +21,7 @@ namespace Dat2Sedas_Neu
         public static void Show()
         {
             Console.WriteLine();
-            Console.WriteLine("DATtoSEDAS-Converter, Version " + MyProject.Application.Info.Version.ToString());
+            Console.WriteLine("DATtoSEDAS-Converter, Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
             Console.WriteLine("Wandelt eine Bestell.dat in eine SEDAS.dat um, für den Import in CSB.");
             Console.WriteLine("Wird das Programm ohne Parameter gestartet, werden Pfad und Dateiinformationen");
             Console.WriteLine("aus der Datei Config.ini übernommen.");
@@ -44,11 +44,11 @@ namespace Dat2Sedas_Neu
             Console.WriteLine(" /?          Ruft diese Hilfeseite auf.");
             Console.WriteLine();
             Console.WriteLine("Beispiel:");
-            Console.WriteLine(">> DATtoSEDAS.exe /Q=C:\Daten\Bestell.dat /Z=D:\Import\Sedas.dat /D /I");
+            Console.WriteLine(@">> DATtoSEDAS.exe /Q=C:\Daten\Bestell.dat /Z=D:\Import\Sedas.dat /D /I");
             Console.WriteLine(" - Quelldatei wird in Zieldatei eingelesen, die Quelldatei wird anschließend gelöscht.");
             Console.WriteLine("   Statusmeldungen werden nicht ausgegeben.");
             Console.WriteLine();
-            Console.WriteLine(">> DATtoSEDAS.exe /Q=C:\Daten\Bestell.dat /I");
+            Console.WriteLine(@">> DATtoSEDAS.exe /Q=C:\Daten\Bestell.dat /I");
             Console.WriteLine(" - Quelldatei wird in Zieldatei eingelesen. Statusmeldungen werden nicht ausgegeben.");
             Console.WriteLine();
             Console.Write("<Enter> drücken...");

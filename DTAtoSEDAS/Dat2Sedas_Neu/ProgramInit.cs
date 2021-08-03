@@ -9,7 +9,7 @@ namespace Dat2Sedas_Neu
     //Delegate zum Senden einer Nachricht einrichten
     public delegate void InitFailedHandler(string message);
 
-    class ProgramInit
+    class ProgramInit     //TODO Fehler bereinigen
     {
         public static event InitFailedHandler InitFailed;
 
