@@ -1,2 +1,2 @@
-alteArtNr;neueArtNr
+alteArtNr;neueArtNr;Beschreibung
 540;534

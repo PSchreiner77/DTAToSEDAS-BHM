@@ -9,78 +9,29 @@ namespace Dat2Sedas_Neu
 {
     class ConvertDatToSedas
     {
-        private string _PathLoescheKunde;
         private string _SourcePath;
         private List<string> _SourceData;
         private string _DestinationPath;
-        private string _DestinationData;
 
         private List<DatBestellzeile> _DatContent;
-        private int _Counter;
         private string _SedasErstellDatumJJMMTT;
         private SedasFile _SedasFile;
 
-        private List<string> _ListDelCustomer = new List<string>();
-        private List<string> _ListDelArticle = new List<string>();
-
-
         //KONSTRUKTOR
-        public ConvertDatToSedas(string SourceFilePath, string DestinationFilePath, int CounterEntries, List<string> CustomersToDelete = null, List<string> ArticlesToDelete = null)
+        public ConvertDatToSedas(string SourceFilePath, string DestinationFilePath)
         {
-            this._DestinationData = "";
-            //this._SedasHeader = "";
-            //this._SedasFooter = "";
-            //this._BlockHeader = "";
-            //this._DataSets = 0;
-            //this._Customers = 0;
-            //this._SummeGes = 0;
-            this._SedasErstellDatumJJMMTT = ConvertToSedasDate(DateTime.Now);
+            this._SedasErstellDatumJJMMTT = ConvertToSedasDateJJMMTT(DateTime.Now);
             this._SourcePath = SourceFilePath;
             this._DestinationPath = DestinationFilePath;
-            this._Counter = CounterEntries;
-            this._ListDelArticle = ArticlesToDelete;
-            this._ListDelCustomer = CustomersToDelete;
         }
 
         //METHODEN
-
-
-        //TODO in Klasse Datenverarbeitung auslagern?
-        /// <summary>
-        /// Liest die Dat-Quelldatei ein ohne Leerzeilen und gibt sie als List<string> zurück.</string>
-        /// </summary>
-        /// <param name="SourceFilePath"></param>
-        /// <returns></returns>
-        private bool ImportSourceFile(string SourceFilePath)
-        {
-            List<string> sourceDataList = new List<string>();
-            _SourceData = null;
-            try
-            {
-                using (StreamReader sr = new StreamReader(_SourcePath))
-                {
-                    while (!sr.EndOfStream)
-                    {
-                        string line = sr.ReadLine();
-                        if (line != "") _SourceData.Add(line);
-                    }
-                }
-            }
-            catch (Exception ex)
-            { //Fehlerausnahme auslösen und Fehler melden}                
-                return false;
-            }
-            return true;
-        }
-
         private bool checkIfNFFileFormat()
         {
             string prefix = _SourceData[0].Substring(0, 2);
             if (prefix == "NF") return true;
             return false;
         }
-
-
 
         //TODO ReadOldDatDataFormat
         private List<DatBestellzeile> ReadOldDATDataFormat(List<string> arrSourceLines, string ErstelldatumTTMMJJ)
@@ -141,7 +92,7 @@ namespace Dat2Sedas_Neu
         /// <param name="NewNFDATData"></param>
         /// <param name="ErstelldatumTTMMJJ"></param>
         /// <returns></returns>
-        private List<DatBestellzeile> ReadNewNFDATDataFormat(List<string> NewNFDATData, string ErstelldatumTTMMJJ)
+        private List<DatBestellzeile> ReadNewNFDATDataFormat(List<string> NewNFDATData)
         {
             /*
             Zeile aus neuer NF-DAT-Datei:            
@@ -191,13 +142,13 @@ namespace Dat2Sedas_Neu
         }
 
 
-
         //TODO Löschen und Ändern über Delegaten steuern lassen (Items löschen, welche kommt nach Auswahl).
         private List<DatBestellzeile> DeleteCustomers(List<DatBestellzeile> DatBestellzeilen)
         {
+            #region über Delegaten steuern lassen
             string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
-
             List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);
+            #endregion
 
             foreach (string kundennummer in customersToDelete)
             {
@@ -208,14 +159,13 @@ namespace Dat2Sedas_Neu
                         DatBestellzeilen.Remove(datBestellzeile);
                     }
                 }
-            }     
+            }
             return DatBestellzeilen;
         }
 
         private List<DatBestellzeile> DeleteArticles(List<DatBestellzeile> DatBestellzeilen)
         {
             string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
-
             List<string> articlesToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheArtikel);
 
             foreach (string kundennummer in articlesToDelete)
@@ -231,89 +181,43 @@ namespace Dat2Sedas_Neu
             return DatBestellzeilen;
         }
 
-        private List<DatBestellzeile> ChangeArticleNumbers(List<DatBestellzeile> bestellzeile)
+        private List<DatBestellzeile> ChangeArticleNumbers(List<DatBestellzeile> DatBestellzeilen)
         {
+            if (DatBestellzeilen == null) { return null; }
+
             ////LogMessage.LogOnly("Austauschen von Artikelnummern laut tauscheArtikel.txt.");
-            bool flag = Not Information.IsNothing(Module1.ListChangeArticle);
+            string pathTauscheArtikel = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
+            Dictionary<string, string> ArticlesDict = Datenverarbeitung.LoadChangeArticlesList(pathTauscheArtikel);
 
-            //The following expression was wrapped in a checked-statement
-            string[,] result;
-            if (flag)
+            foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
             {
-                string[,] array = New String(Module1.ListChangeArticle.Count - 1 + 1 - 1, 1) { };
-                try
+                if (ArticlesDict.ContainsKey(datBestellzeile.BHMArtikelNummer))
                 {
-                    int upperBound = array.GetUpperBound(0);
-                    for (int i = 0; i <= upperBound; i++) // i As Integer = 0 To upperBound
-                    {
-                        Dim array2 As String() = Strings.Split(Module1.ListChangeArticle(i), ";", -1, CompareMethod.Binary);
-                        array(i, 0) = this.MyTRIM(array2(0));
-                        array(i, 1) = this.MyTRIM(array2(1));
-                    }
-                    int upperBound2 = DatSource.GetUpperBound(0);
-                    for (int j = 0; j <= upperBound2; j++) // j As Integer = 0 To upperBound2
-                    {
-                        int upperBound3 = array.GetUpperBound(0);
-                        for (int k = 0; k <= upperBound3; k++) // k As Integer = 0 To upperBound3
-                        {
-                            bool flag2 = Operators.CompareString(DatSource(j, 8), this.Expand(array(k, 0), 10), false) = 0;
-                            if (flag2)
-                            {
-                                DatSource(j, 8) = this.Expand(array(k, 1), 10);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
+                    datBestellzeile.BHMKundenNummer = ArticlesDict[datBestellzeile.BHMKundenNummer];
                 }
             }
-            else
-            {
-                result = DatSource;
-            }
-
-            return result;
+            return DatBestellzeilen;
         }
 
-
-
-        private string ReverseXXYYZZDate(string str)
-        {
-            string reversedDate = "";
-
-            //The following expression was wrapped in a checked-statement
-            if (str != "")
-            {
-                str = str.Trim();
-                int num = Strings.Len(str) - 1;
-                for (int i = 0; i < str.Length; i += 2) //i As Integer = num To 1 Step - 2
-                {
-                    string str2 = str.Substring(i, 2);
-                    reversedDate += str2;
-                }
-            }
-            return reversedDate;
-        }
 
         /// <summary>
         /// Gibt ein Datum als String zurück in der Form: 'JJMMTT'
         /// </summary>
         /// <param name="date">Datum</param>
         /// <returns>String: 'JJMMTT'</returns>
-        private string ConvertToSedasDate(DateTime date)
+        private string ConvertToSedasDateJJMMTT(DateTime date)
         {
             string JJ = date.Year.ToString().Substring(2, 2);
             string MM = date.Month.ToString();
             string TT = date.Day.ToString();
             return JJ + MM + TT;
         }
-        private string ConvertToSedasDate(string DateTTMMJJ)
+        private string ConvertToSedasDateJJMMTT(string DateTTMMJJ)
         {
             string returnString = "";
-            for (int i = DateTTMMJJ.Length - 1; i >= 0; i -= 2) //i As Integer = num To 1 Step - 2
+            for (int i = 0; i < DateTTMMJJ.Length; i += 2)
             {
-                returnString += DateTTMMJJ.Substring(i - 1, 2);
+                returnString += DateTTMMJJ.Substring(i, 2);
             }
             return returnString;
         }
@@ -360,25 +264,23 @@ namespace Dat2Sedas_Neu
             return input;
         }
 
-
-
-
-        public bool ReadDatFileContent()
+        private bool ReadDatFileContent()
         {
             ////LogMessage.LogOnly("Beginn der Konvertierung...");
 
-            if (!ImportSourceFile(_SourcePath)) return false;
+            _SourceData = Datenverarbeitung.ImportSourceFile(_SourcePath);
+            if (_SourceData == null) return false;
 
             #region Als Delegate bauen ReadDatData
             if (checkIfNFFileFormat())
             {
                 //////LogMessage.LogOnly("Einlesen neues Dateiformat...");
-                this._DatContent = ReadNewNFDATDataFormat(_SourceData, this._SedasErstellDatumJJMMTT);
+                this._DatContent = ReadNewNFDATDataFormat(_SourceData);
             }
             else
             {
                 //////LogMessage.LogOnly("Einlesen neues Dateiformat...");
-                this._DatContent = ReadOldDATDataFormat(_SourceData, this._SedasErstellDatumJJMMTT);
+                this._DatContent = ReadOldDATDataFormat(_SourceData, _SedasErstellDatumJJMMTT);
             }
             #endregion
 
@@ -396,9 +298,7 @@ namespace Dat2Sedas_Neu
         public void CreateSedasData()
         {
             //Bestellungen filtern
-            string actualCustomer = "";
-            int customersCount = 0;
-            int mengeCount = 0;
+            string actualCustomer;
             int pointer1 = 0;
             int pointer2 = 0;
 
@@ -663,6 +563,34 @@ class DatBestellzeile
 
 static class Datenverarbeitung
 {
+    //TODO in Klasse Datenverarbeitung auslagern?
+    /// <summary>
+    /// Liest die Dat-Quelldatei ein ohne Leerzeilen und gibt sie als List<string> zurück.</string>
+    /// </summary>
+    /// <param name="SourceFilePath"></param>
+    /// <returns></returns>
+    public static List<string> ImportSourceFile(string SourcePath)
+    {
+        List<string> data = new List<string>();
+        try
+        {
+            using (StreamReader sr = new StreamReader(SourcePath))
+            {
+                while (!sr.EndOfStream)
+                {
+                    string line = sr.ReadLine();
+                    if (line != "") data.Add(line);
+                }
+            }
+        }
+        catch (Exception ex)
+        { //Fehlerausnahme auslösen und Fehler melden}                
+            return null;
+        }
+        return data;
+    }
+
+
     public static List<string> LoadDeleteItemsList(string Path)
     {
         List<string> delItems = new List<string>();
@@ -673,7 +601,7 @@ static class Datenverarbeitung
         catch (Exception ex)
         { }
 
-        foreach(string entry in delItems)
+        foreach (string entry in delItems)
         {
             entry.Trim();
         }
@@ -681,9 +609,24 @@ static class Datenverarbeitung
         return delItems;
     }
 
-    public static void LoadChangeArticlesList()
+    public static Dictionary<string, string> LoadChangeArticlesList(string Path)
     {
+        Dictionary<string, string> DictChangeArticles = new Dictionary<string, string>();
+        List<string> changeArticleFileContent = new List<string>();
+        try
+        {
+            changeArticleFileContent = File.ReadAllText(Path).Split('\n').ToList<string>();
+        }
+        catch (Exception ex)
+        { }
 
+        foreach (string line in changeArticleFileContent)
+        {
+            string[] elements = line.Split(';');
+            DictChangeArticles.Add(elements[0].Trim(), elements[1].Trim());
+        }
+        return DictChangeArticles;
     }
 }
+
 
