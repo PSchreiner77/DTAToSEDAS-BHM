@@ -73,7 +73,7 @@ namespace Dat2Sedas_Neu
             return true;
         }
 
-        private bool checkIfNewFileFormat()
+        private bool checkIfNFFileFormat()
         {
             string prefix = _SourceData[0].Substring(0, 2);
             if (prefix == "NF") return true;
@@ -370,7 +370,7 @@ namespace Dat2Sedas_Neu
             if (!ImportSourceFile(_SourcePath)) return false;
 
             #region Als Delegate bauen ReadDatData
-            if (checkIfNewFileFormat())
+            if (checkIfNFFileFormat())
             {
                 //////LogMessage.LogOnly("Einlesen neues Dateiformat...");
                 this._DatContent = ReadNewNFDATDataFormat(_SourceData, this._SedasErstellDatumJJMMTT);
