@@ -22,7 +22,7 @@ namespace Dat2Sedas_Neu
         {
             #region Initialisierung
             
-            LogMessage.LogOnly("Initialisierung des Programms erfolgreich.");
+            //LogMessage.LogOnly("Initialisierung des Programms erfolgreich.");
 
             //in INIT verschieben
             if (!CheckParmeters())
@@ -31,7 +31,7 @@ namespace Dat2Sedas_Neu
                 ShowErrorMessage("Prüfung der Parameter fehlgeschlagen.");
                 return false;
             }
-            LogMessage.LogOnly("Prüfung der Parameter erfolgreich.");
+            //LogMessage.LogOnly("Prüfung der Parameter erfolgreich.");
 
             //in INIT verschieben
             if (!CheckSource())
@@ -39,7 +39,7 @@ namespace Dat2Sedas_Neu
                 ShowErrorMessage("Prüfung des Quellpfades fehlgeschlagen.");
                 return false;
             }
-            LogMessage.LogOnly("Prüfung des Quellpfades erfolgreich.");
+            //LogMessage.LogOnly("Prüfung des Quellpfades erfolgreich.");
 
 
             Param.SetDestinationFullPath(Param.DestinationFilePath, Param.DestinationFileName);
@@ -98,7 +98,7 @@ namespace Dat2Sedas_Neu
             }
             catch (Exception ex)
             {
-                LogMessage.LogOnly("Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString());
+                //LogMessage.LogOnly("Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString());
                 result = false;
             }
 
@@ -108,7 +108,7 @@ namespace Dat2Sedas_Neu
         public static bool CreateNewConfigIni()
         {
             bool flag = true;
-            LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini...");
+            //LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini...");
             string value = "-----------------------" + "\n\r" + "DATtoSEDAS Config-Datei" + "\n\r" + "-----------------------" + "\n\r" + "Quell- und Zielpfad müssen mit Laufwerksbuchstabe angegeben werden (vollständig), jedoch ohne Dateiname." + "\n\r" + "Der Dateiname der Quell- und Zieldatei wird separat eingetragen." + "\n\r" + "Werden Quell- und Zieldateiname beim Programmstart per Schalter übergeben (/Q=, /Z=), werden die Einträge" + "\n\r" + "in der Config.ini übergangen." + "\n\r" + "Dies gilt auch für alle weiteren Schalter (z.B. QuelleLöschen, /D)" + "\n\r" + "\n\r" + "[Setup]" + "\n\r" + "Counter=" + "\n\r" + "Quelldateipfad=" + "\n\r" + "Quelldateiname=1.txt" + "\n\r" + "Zieldateipfad=C:\\Temp" + "\n\r" + "Zieldateiname=Sedas.dat" + "\n\r" + "\n\r" + "QuelleLöschen=0" + "\n\r" + "IgnoriereMeldungen=0" + "\n\r" + "DatenAnhängen=0";
             try
             {
@@ -119,7 +119,7 @@ namespace Dat2Sedas_Neu
             }
             catch (Exception ex)
             {
-                LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini fehlgeschlagen: " + "\n\r" + ex.ToString());
+                //LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini fehlgeschlagen: " + "\n\r" + ex.ToString());
                 flag = false;
             }
             return flag;
@@ -271,12 +271,12 @@ namespace Dat2Sedas_Neu
             {
                 Param.SetSourceFullPath(Param.SourceFilePath, Param.SourceFileName);
 
-                LogMessage.LogOnly("Prüfen des Quellpfades: " + Param.SourceFullPath);
+                //LogMessage.LogOnly("Prüfen des Quellpfades: " + Param.SourceFullPath);
                 if (Param.SourceFullPath != "")
                 {
 
                     flag = false;
-                    LogMessage.Show("Es wurde keine Quelldatei angegeben.", LogMessage.MsgType.Critical);
+                    //LogMessage.Show("Es wurde keine Quelldatei angegeben.", //LogMessage.MsgType.Critical);
                 }
             }
             else
@@ -285,7 +285,7 @@ namespace Dat2Sedas_Neu
                 if (flag3)
                 {
                     flag = false;
-                    LogMessage.Show("Die Quelldatei existiert nicht oder ist nicht erreichbar.", LogMessage.MsgType.Critical);
+                    //LogMessage.Show("Die Quelldatei existiert nicht oder ist nicht erreichbar.", //LogMessage.MsgType.Critical);
                 }
                 else
                 {
@@ -299,7 +299,7 @@ namespace Dat2Sedas_Neu
         private static void ShowErrorMessage(string message)
         {
             string msgText = "Fehler bei der Initialisierung: " + message;
-            LogMessage.LogOnly(message);
+            //LogMessage.LogOnly(message);
         }
 
     }

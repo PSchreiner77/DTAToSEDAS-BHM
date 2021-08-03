@@ -244,7 +244,7 @@ namespace Dat2Sedas_Neu
 
         private List<DatBestellzeile> ChangeArticleNumbers(List<DatBestellzeile> bestellzeile)
         {
-            //LogMessage.LogOnly("Austauschen von Artikelnummern laut tauscheArtikel.txt.");
+            ////LogMessage.LogOnly("Austauschen von Artikelnummern laut tauscheArtikel.txt.");
             bool flag = Not Information.IsNothing(Module1.ListChangeArticle);
 
             //The following expression was wrapped in a checked-statement
@@ -376,19 +376,19 @@ namespace Dat2Sedas_Neu
 
         public bool ReadDatFileContent()
         {
-            //LogMessage.LogOnly("Beginn der Konvertierung...");
+            ////LogMessage.LogOnly("Beginn der Konvertierung...");
 
             if (!ImportSourceFile(_SourcePath)) return false;
 
             #region Als Delegate bauen ReadDatData
             if (checkIfNewFileFormat())
             {
-                ////LogMessage.LogOnly("Einlesen neues Dateiformat...");
+                //////LogMessage.LogOnly("Einlesen neues Dateiformat...");
                 this._DatContent = ReadNewNFDATDataFormat(_SourceData, this._SedasErstellDatumJJMMTT);
             }
             else
             {
-                ////LogMessage.LogOnly("Einlesen neues Dateiformat...");
+                //////LogMessage.LogOnly("Einlesen neues Dateiformat...");
                 this._DatContent = ReadOldDATDataFormat(_SourceData, this._SedasErstellDatumJJMMTT);
             }
             #endregion
@@ -397,8 +397,8 @@ namespace Dat2Sedas_Neu
             CreateSedasData();
 
             // ...
-            // //LogMessage.LogOnly("Konvertierung in SEDAS.DAT abgeschlossen.");
-            // //LogMessage.LogOnly("Fehler beim Konvertieren in Sedas.dat." & vbCrLf + ex.ToString());
+            // ////LogMessage.LogOnly("Konvertierung in SEDAS.DAT abgeschlossen.");
+            // ////LogMessage.LogOnly("Fehler beim Konvertieren in Sedas.dat." & vbCrLf + ex.ToString());
 
 
             return false;
@@ -434,7 +434,7 @@ namespace Dat2Sedas_Neu
 
         public bool WriteSedasData()
         {
-            //LogMessage.LogOnly("Schreiben der Sedas.dat...");
+            ////LogMessage.LogOnly("Schreiben der Sedas.dat...");
 
             try
             {
@@ -467,7 +467,7 @@ namespace Dat2Sedas_Neu
             }
             catch (Exception ex)
             {
-                //LogMessage.LogOnly(ex.ToString());
+                ////LogMessage.LogOnly(ex.ToString());
                 return false;
             }
         }

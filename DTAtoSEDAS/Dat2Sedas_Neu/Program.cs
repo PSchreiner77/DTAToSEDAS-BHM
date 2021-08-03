@@ -10,9 +10,9 @@ namespace Dat2Sedas_Neu
     class Program       //TODO Fehler bereinigen
     {
 
-        private string[] Arguments = new Environment.GetCommandLineArgs(); //CommandlineArgs besorgen
+        private string[] Arguments = new Environment.GetCommandLineArgs(); //TODO CommandlineArgs besorgen
         public string FileDate = "";
-        private INIFile INI;
+        private INIFile INI;          //TODO INI-DLL implementieren
         public Parameter Param = new Parameter();
         public List<string> ListDelCustomer;
         public List<string> ListDelArticle;
@@ -21,12 +21,12 @@ namespace Dat2Sedas_Neu
         //TODO ??
         //< STAThread() >   ??? Objekte Klonen. Nötig?
         static void Main()
-        {
-            LogMessage.GlobalLog = true;
-            LogMessage.GlobalOutputToConsole = true;
-            LogMessage.LogOnly("**********************************");
-            LogMessage.LogOnly("--------- PROGRAMMSTART ----------");
-            LogMessage.CheckLogFile(100);
+        {   //Log-Messages ausgeben, DLL implementieren
+            //LogMessage.GlobalLog = true;    
+            //LogMessage.GlobalOutputToConsole = true;
+            //LogMessage.LogOnly("**********************************");
+            //LogMessage.LogOnly("--------- PROGRAMMSTART ----------");
+            //LogMessage.CheckLogFile(100);
 
            
 
@@ -40,40 +40,40 @@ namespace Dat2Sedas_Neu
             #endregion
 
             #region Konvertierung der Daten
-            LogMessage.LogOnly("Start der Konvertierung der Bestelldatei in eine Sedas.dat...");
+            //LogMessage.LogOnly("Start der Konvertierung der Bestelldatei in eine Sedas.dat...");
             ConvertDatToSedas convertDATtoSEDAS = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter, ListDelCustomer, ListDelArticle);
             if (convertDATtoSEDAS.ReadDatFileContent())
             {
-                LogMessage.Show("Datei " + Param.SourceFullPath + " erstellt.");
+                //LogMessage.Show("Datei " + Param.SourceFullPath + " erstellt.");
             }
             else
             {
-                LogMessage.Show("Fehler beim Konvertieren/Erstellen der Sedas.dat.", LogMessage.MsgType.Critical);
+                //LogMessage.Show("Fehler beim Konvertieren/Erstellen der Sedas.dat.", //LogMessage.MsgType.Critical);
                 ExitProgram();
             }
             #endregion 
 
             #region Abschließende Arbeiten, Rückspeichern
-            LogMessage.LogOnly("Counter in Config.ini zurückschreiben...");
+            //LogMessage.LogOnly("Counter in Config.ini zurückschreiben...");
 
             bool flag5 = Not INI.Write("Setup", "Counter", Conversions.ToString(Param.Counter));
             if (flag5)
             {
-                LogMessage.Show("Zähler konnte nicht in Config.ini zurückgeschrieben werden!" + "\n\r" + "Weitere Programmausführung nicht möglich!", LogMessage.MsgType.Critical);
+                //LogMessage.Show("Zähler konnte nicht in Config.ini zurückgeschrieben werden!" + "\n\r" + "Weitere Programmausführung nicht möglich!", //LogMessage.MsgType.Critical);
                 ExitProgram();
             }
 
             bool deleteSourceFile = Param.DeleteSourceFile;
             if (deleteSourceFile)
             {
-                LogMessage.LogOnly("Quelldatei wird gelöscht.");
+                //LogMessage.LogOnly("Quelldatei wird gelöscht.");
                 File.Delete(Param.SourceFullPath);
             }
             #endregion
 
-            LogMessage.LogOnly("--- Programm normal beendet. ---");
-            LogMessage.LogOnly("********************************");
-            LogMessage.LogOnly(""); ;
+            //LogMessage.LogOnly("--- Programm normal beendet. ---");
+            //LogMessage.LogOnly("********************************");
+            //LogMessage.LogOnly(""); ;
         }
 
 
@@ -81,8 +81,8 @@ namespace Dat2Sedas_Neu
         public static bool InitProgram()
         {
             bool flag = true;
-            LogMessage.LogOnly("Initialisierung des Programms...");
-            LogMessage.LogOnly("Einlesen der Config.ini Datei...");
+            //LogMessage.LogOnly("Initialisierung des Programms...");
+            //LogMessage.LogOnly("Einlesen der Config.ini Datei...");
 
             bool flag2 = File.Exists(Directory.GetCurrentDirectory() + "\\config.ini");
             if (flag2)
@@ -91,13 +91,13 @@ namespace Dat2Sedas_Neu
 
                 if (!ReadIniValues())
                 {
-                    LogMessage.Show("Fehler beim Auslesen der Config.ini. Bitte Einstellungen prüfen. Programm wird beendet.", LogMessage.MsgType.Critical);
+                    //LogMessage.Show("Fehler beim Auslesen der Config.ini. Bitte Einstellungen prüfen. Programm wird beendet.", //LogMessage.MsgType.Critical);
                     flag = !flag;
                 }
                 else
                 {
-                    LogMessage.LogOnly("Einlesen der Config.ini Datei erfolgreich.");
-                    LogMessage.LogOnly("Einlesen der Datei loeschKunde.txt...");
+                    //LogMessage.LogOnly("Einlesen der Config.ini Datei erfolgreich.");
+                    //LogMessage.LogOnly("Einlesen der Datei loeschKunde.txt...");
                     bool flag4 = File.Exists(Directory.GetCurrentDirectory() + "\\loeschKunde.txt");
                     if (flag4)
                     {
@@ -122,7 +122,7 @@ namespace Dat2Sedas_Neu
                         { // expr_157 As Exception
 
 
-                            LogMessage.LogOnly(ex.ToString());
+                            //LogMessage.LogOnly(ex.ToString());
 
                             return flag;
                         }
@@ -135,16 +135,16 @@ namespace Dat2Sedas_Neu
                         }
                         catch (Exception ex)
                         {
-                            LogMessage.Show("Die Datei 'loeschKunde.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." + "\n\r" + "Das Programm wird beendet", LogMessage.MsgType.Critical);
-                            LogMessage.LogOnly(ex.ToString());
+                            //LogMessage.Show("Die Datei 'loeschKunde.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." + "\n\r" + "Das Programm wird beendet", //LogMessage.MsgType.Critical);
+                            //LogMessage.LogOnly(ex.ToString());
 
                             return flag;
                         }
 
                     }
-                    LogMessage.LogOnly("Einlesen der Datei loeschKunde.txt erfolgreich.");
+                    //LogMessage.LogOnly("Einlesen der Datei loeschKunde.txt erfolgreich.");
 
-                    LogMessage.LogOnly("Einlesen der Datei loeschArtikel.txt...");
+                    //LogMessage.LogOnly("Einlesen der Datei loeschArtikel.txt...");
                     bool flag6 = File.Exists(Directory.GetCurrentDirectory() + "\\loeschArtikel.txt");
                     if (flag6)
                     {
@@ -167,7 +167,7 @@ namespace Dat2Sedas_Neu
                         }
                         catch (Exception ex)
                         {
-                            LogMessage.LogOnly(ex.ToString());
+                            //LogMessage.LogOnly(ex.ToString());
                             return flag;
                         }
                     }
@@ -179,12 +179,12 @@ namespace Dat2Sedas_Neu
                         }
                         catch (Exception ex)
                         {
-                            LogMessage.Show("Die Datei 'loeschArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." + "\n\r" + "Das Programm wird beendet", LogMessage.MsgType.Critical);
-                            LogMessage.LogOnly(ex.ToString());
+                            //LogMessage.Show("Die Datei 'loeschArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." + "\n\r" + "Das Programm wird beendet", //LogMessage.MsgType.Critical);
+                            //LogMessage.LogOnly(ex.ToString());
                             return flag;
                         }
-                        LogMessage.LogOnly("Einlesen der Datei loeschArtikel.txt erfolgreich.");
-                        LogMessage.LogOnly("Einlesen der Datei tauscheArtikel.txt...");
+                        //LogMessage.LogOnly("Einlesen der Datei loeschArtikel.txt erfolgreich.");
+                        //LogMessage.LogOnly("Einlesen der Datei tauscheArtikel.txt...");
 
                         bool flag8 = File.Exists(Directory.GetCurrentDirectory() + "\\tauscheArtikel.txt");
                         if (flag8)
@@ -207,8 +207,8 @@ namespace Dat2Sedas_Neu
                             }
                             catch (Exception ex)
                             {
-                                LogMessage.Show("Fehler beim Einlesen der tauscheArtikel.txt." + "\n\r" + "Programm wird beendet.", LogMessage.MsgType.Critical);
-                                LogMessage.LogOnly(ex.ToString());
+                                //LogMessage.Show("Fehler beim Einlesen der tauscheArtikel.txt." + "\n\r" + "Programm wird beendet.", //LogMessage.MsgType.Critical);
+                                //LogMessage.LogOnly(ex.ToString());
                                 return flag;
                             }
                         }
@@ -220,27 +220,27 @@ namespace Dat2Sedas_Neu
                             }
                             catch (Exception ex)
                             {
-                                LogMessage.Show("Die Datei 'tauscheArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." + "\n\r" + "Das Programm wird beendet", LogMessage.MsgType.Critical);
-                                LogMessage.LogOnly(ex.ToString());
+                                //LogMessage.Show("Die Datei 'tauscheArtikel.txt' hat nicht existiert und eine Neuanlage ist fehlgeschlagen." + "\n\r" + "Das Programm wird beendet", //LogMessage.MsgType.Critical);
+                                //LogMessage.LogOnly(ex.ToString());
                                 return flag;
 
                             }
 
-                            LogMessage.LogOnly("Einlesen der Datei tauscheArtikel.txt erfolgreich.");
+                            //LogMessage.LogOnly("Einlesen der Datei tauscheArtikel.txt erfolgreich.");
                         }
                     }
                 }
             }
             else
             {
-                LogMessage.Show("! Es wurde keine Config.ini Datei gefunden. Es wird eine neue Config.ini mit " + "\n\r" + "  Standardeinstellungen erstellt.", LogMessage.MsgType.Warning);
+                //LogMessage.Show("! Es wurde keine Config.ini Datei gefunden. Es wird eine neue Config.ini mit " + "\n\r" + "  Standardeinstellungen erstellt.", //LogMessage.MsgType.Warning);
                 if (!CreateNewConfigIni())
                 {
-                    LogMessage.Show("Eine neue Config.ini konnte nicht erstellt werden. Programm wird beendet.", LogMessage.MsgType.Critical);
+                    //LogMessage.Show("Eine neue Config.ini konnte nicht erstellt werden. Programm wird beendet.", //LogMessage.MsgType.Critical);
                 }
                 else
                 {
-                    LogMessage.Show("Die Datei 'Config.ini' hat nicht existiert und wurde neu angelegt." + "\n\r" + "  Bitte die Einstellungen kontrollieren, bevor das Programm erneut ausgeführt wird.", LogMessage.MsgType.Critical);
+                    //LogMessage.Show("Die Datei 'Config.ini' hat nicht existiert und wurde neu angelegt." + "\n\r" + "  Bitte die Einstellungen kontrollieren, bevor das Programm erneut ausgeführt wird.", //LogMessage.MsgType.Critical);
                 }
                 flag = !flag;
             }
@@ -296,7 +296,7 @@ namespace Dat2Sedas_Neu
         //    }
         //    catch (Exception ex)
         //    {
-        //        LogMessage.LogOnly("Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString());
+        //        //LogMessage.LogOnly("Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString());
         //        result = false;
         //    }
 
@@ -306,7 +306,7 @@ namespace Dat2Sedas_Neu
         //public static bool CreateNewConfigIni()
         //{
         //    bool flag = true;
-        //    LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini...");
+        //    //LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini...");
         //    string value = "-----------------------" + "\n\r" + "DATtoSEDAS Config-Datei" + "\n\r" + "-----------------------" + "\n\r" + "Quell- und Zielpfad müssen mit Laufwerksbuchstabe angegeben werden (vollständig), jedoch ohne Dateiname." + "\n\r" + "Der Dateiname der Quell- und Zieldatei wird separat eingetragen." + "\n\r" + "Werden Quell- und Zieldateiname beim Programmstart per Schalter übergeben (/Q=, /Z=), werden die Einträge" + "\n\r" + "in der Config.ini übergangen." + "\n\r" + "Dies gilt auch für alle weiteren Schalter (z.B. QuelleLöschen, /D)" + "\n\r" + "\n\r" + "[Setup]" + "\n\r" + "Counter=" + "\n\r" + "Quelldateipfad=" + "\n\r" + "Quelldateiname=1.txt" + "\n\r" + "Zieldateipfad=C:\\Temp" + "\n\r" + "Zieldateiname=Sedas.dat" + "\n\r" + "\n\r" + "QuelleLöschen=0" + "\n\r" + "IgnoriereMeldungen=0" + "\n\r" + "DatenAnhängen=0";
         //    try
         //    {
@@ -317,7 +317,7 @@ namespace Dat2Sedas_Neu
         //    }
         //    catch (Exception ex)
         //    {
-        //        LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini fehlgeschlagen: " + "\n\r" + ex.ToString());
+        //        //LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini fehlgeschlagen: " + "\n\r" + ex.ToString());
         //        flag = false;
         //    }
         //    return flag;
@@ -469,12 +469,12 @@ namespace Dat2Sedas_Neu
         //    {
         //        Param.SetSourceFullPath(Param.SourceFilePath, Param.SourceFileName);
 
-        //        LogMessage.LogOnly("Prüfen des Quellpfades: " + Param.SourceFullPath);
+        //        //LogMessage.LogOnly("Prüfen des Quellpfades: " + Param.SourceFullPath);
         //        if (Param.SourceFullPath != "")
         //        {
 
         //            flag = false;
-        //            LogMessage.Show("Es wurde keine Quelldatei angegeben.", LogMessage.MsgType.Critical);
+        //            //LogMessage.Show("Es wurde keine Quelldatei angegeben.", //LogMessage.MsgType.Critical);
         //        }
         //    }
         //    else
@@ -483,7 +483,7 @@ namespace Dat2Sedas_Neu
         //        if (flag3)
         //        {
         //            flag = false;
-        //            LogMessage.Show("Die Quelldatei existiert nicht oder ist nicht erreichbar.", LogMessage.MsgType.Critical);
+        //            //LogMessage.Show("Die Quelldatei existiert nicht oder ist nicht erreichbar.", //LogMessage.MsgType.Critical);
         //        }
         //        else
         //        {
@@ -514,7 +514,7 @@ namespace Dat2Sedas_Neu
 
         public static void ExitProgram()
         {
-            LogMessage.Show("Programm wird nach Fehler beendet.")
+            //LogMessage.Show("Programm wird nach Fehler beendet.")
                                                                                                     Environment.[Exit](0);
         }
     }
