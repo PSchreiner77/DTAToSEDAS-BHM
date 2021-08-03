@@ -9,6 +9,7 @@ namespace Dat2Sedas_Neu
 {
     class ConvertDatToSedas
     {
+        private string _PathLoescheKunde;
         private string _SourcePath;
         private List<string> _SourceData;
         private string _DestinationPath;
@@ -189,57 +190,45 @@ namespace Dat2Sedas_Neu
             return Bestellzeilen;
         }
 
-        
-        
-         //TODO Löschen und Ändern korrigieren.
-        private List<DatBestellzeile> DeleteCustomers(List<DatBestellzeile> bestellzeilen)
+
+
+        //TODO Löschen und Ändern über Delegaten steuern lassen (Items löschen, welche kommt nach Auswahl).
+        private List<DatBestellzeile> DeleteCustomers(List<DatBestellzeile> DatBestellzeilen)
         {
-            bool flag = false;
-            try
+            string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
+
+            List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);
+
+            foreach (string kundennummer in customersToDelete)
             {
-                Dim enumerator As List(Of String).Enumerator = Module1.ListDelCustomer.GetEnumerator();
-                while ()// enumerator.MoveNext()
+                foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
                 {
-                    string current = enumerator.Current;
-                    bool flag2 = Operators.CompareString(this.MyTRIM(DATSource(i, 2)), this.MyTRIM(current), false) = 0;
-                    if (flag2)
+                    if (kundennummer == datBestellzeile.BHMKundenNummer)
                     {
-                        flag = true;
+                        DatBestellzeilen.Remove(datBestellzeile);
                     }
                 }
-            }
-            finally
-            {
-                Dim enumerator As List(Of String).Enumerator;
-                CType(enumerator, IDisposable).Dispose();
-            }
-
-            return bestellzeilen;
+            }     
+            return DatBestellzeilen;
         }
 
-        private List<DatBestellzeile> DeleteArticles(List<DatBestellzeile> bestellzeilen)
+        private List<DatBestellzeile> DeleteArticles(List<DatBestellzeile> DatBestellzeilen)
         {
-            try
+            string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
+
+            List<string> articlesToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheArtikel);
+
+            foreach (string kundennummer in articlesToDelete)
             {
-                Dim enumerator2 As List(Of String).Enumerator = Module1.ListDelArticle.GetEnumerator();
-                while ()// enumerator2.MoveNext()
+                foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
                 {
-                    string current2 enumerator2.Current;
-                    bool flag3 = Operators.CompareString(this.MyTRIM(DATSource(i, 8)), this.MyTRIM(current2), false) = 0;
-                    if (flag3)
+                    if (kundennummer == datBestellzeile.BHMKundenNummer)
                     {
-                        flag = true;
+                        DatBestellzeilen.Remove(datBestellzeile);
                     }
                 }
             }
-            finally
-            {
-                Dim enumerator2 As List(Of String).Enumerator;
-                CType(enumerator2, IDisposable).Dispose();
-            }
-
-            return bestellzeilen;
-
+            return DatBestellzeilen;
         }
 
         private List<DatBestellzeile> ChangeArticleNumbers(List<DatBestellzeile> bestellzeile)
@@ -603,7 +592,7 @@ class SedasOrder
     }
 }
 
- class SedasOrderLine
+class SedasOrderLine
 {
     /* ;0400000000000317,40002000,,,,02 000000,,
      *      ;040000          = Kennung Zeile BestellPosition
@@ -634,7 +623,7 @@ class SedasOrder
     }
 }
 
- class DatBestellzeile
+class DatBestellzeile
 {
     #region Aufbau Bestellzeile
     /*
@@ -673,37 +662,26 @@ class SedasOrder
 
 
 static class Datenverarbeitung
-{                                      
-    private static List<string> LoadDeleteArticlesList(string path)
-    {
-        List<string> delArticles = new List<string>();
-        try
-        {
-            delArticles = File.ReadAllText("Pfad").Split('\n').ToList<string>();
-        }
-        catch (Exception ex)
-        { }
-        return delArticles;
-    }
-
-    private static void LoadDeleteCustomersList()
-    {
-
-    }
-
-    private static List<string> LoadDeleteItemsList(string path)
+{
+    public static List<string> LoadDeleteItemsList(string Path)
     {
         List<string> delItems = new List<string>();
         try
         {
-            delItems = File.ReadAllText("Pfad").Split('\n').ToList<string>();
+            delItems = File.ReadAllText(Path).Split('\n').ToList<string>();
         }
         catch (Exception ex)
         { }
+
+        foreach(string entry in delItems)
+        {
+            entry.Trim();
+        }
+
         return delItems;
     }
 
-    private static void LoadChangeArticlesList()
+    public static void LoadChangeArticlesList()
     {
 
     }

@@ -67,8 +67,8 @@
     <Folder Include="bin\Release\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\loeschArtikel.txt" />
-    <Content Include="bin\Debug\loeschKunde.txt" />
+    <Content Include="bin\Debug\loescheArtikel.txt" />
+    <Content Include="bin\Debug\loescheKunde.txt" />
     <Content Include="bin\Debug\tauscheArtikel.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
