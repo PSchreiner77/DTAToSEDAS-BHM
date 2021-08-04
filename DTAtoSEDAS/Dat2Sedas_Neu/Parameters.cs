@@ -31,7 +31,7 @@ namespace Dat2Sedas_Neu
         public string SourceFullPath { get { return SourceFileFolder + SourceFileName; } }
         public string DestinationFileName { get;  set; }
         public string DestinationFileFolder { get; private set; }
-        public string DestinationFullPath { get { return DestinationFileFolder + DestinationFileFolder; } }
+        public string DestinationFullPath { get { return Path.Combine(DestinationFileFolder , DestinationFileFolder); } }
         public string INIFilePath { get; } = Directory.GetCurrentDirectory() + @"\config.ini";
 
         public bool DeleteSourceFile { get; set; } = false;
@@ -43,35 +43,30 @@ namespace Dat2Sedas_Neu
 
 
         //METHODEN
-        public void SetSourceFullPath(string SourceFileFolder, string SourceFileName)
+
+        private string FolderPathCorrection(string folderPath)
         {
-            if (SourceFileFolder != "")
+            if (folderPath != "")
             {
-                if (SourceFileFolder.Substring(SourceFileFolder.Length, 1) != "\\")
+                if (folderPath.Substring(folderPath.Length, 1) != "\\")
                 {
-                    SourceFileFolder += "\\";
+                    folderPath += "\\";
                 }
             }
-            this.SourceFileFolder = SourceFileFolder;
+            return folderPath;
+        }
+
+        public void SetSourceFullPath(string SourceFileFolder, string SourceFileName)
+        {
+            
+            this.SourceFileFolder = FolderPathCorrection(SourceFileFolder);
             this.SourceFileName = SourceFileName;
         }
 
         public void SetDestinationFullPath(string DestinationFileFolder, string DestinationFileName)
         {
-            if (DestinationFileName == "") DestinationFileName = "Sedas.dat";
-
-            if (DestinationFileFolder == "")
-            {
-                DestinationFileFolder = Directory.GetCurrentDirectory() + "\\";    
-            }
-            else
-            {
-                if (DestinationFileFolder.Substring(SourceFileFolder.Length, 1) != "\\")
-                {
-                    DestinationFileFolder += "\\";
-                }
-            }
-            this.DestinationFileFolder = DestinationFileFolder;
+            this.DestinationFileFolder = FolderPathCorrection(DestinationFileFolder);
+            if (DestinationFileName == "") DestinationFileName = "Sedas.dat"; 
             this.DestinationFileName = DestinationFileName;
         }
 
