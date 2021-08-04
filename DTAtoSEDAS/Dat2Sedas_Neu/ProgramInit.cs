@@ -46,26 +46,38 @@ namespace Dat2Sedas_Neu
                 Param.Help = true;
                 Help.Show();
                 return false;
-            }                            
+            }
 
             //'-----------------------------------------------------------------------------------------
             //'## Parameter auswerten.
-            foreach(string arg in Arguments)
+            foreach (string arg in Arguments)
             {
                 string S = arg.Split('=')[0];
 
-                switch(S.ToUpper())
+                switch (S.ToUpper())
                 {
                     case "/Q":
+                        try
+                        {
+                            Param.SourceFileFolder = Path.GetDirectoryName(S[1].ToString());
+                            Param.SourceFileFolder = Path.GetFileName(S[1].ToString());
+                        }
+                        catch (Exception ex)
+                        { }
                         break;
+
                     case "/Z":
                         break;
+
                     case "/D":
                         break;
+
                     case "/I":
                         break;
+
                     case "/A":
                         break;
+
                     default:
                         InitError("Mindestens ein falscher Startparameter angegeben!");
                         break;
@@ -145,7 +157,7 @@ namespace Dat2Sedas_Neu
                         break;
 
                     default:
-                        
+
                         return false; ;
                         break;
                 }
