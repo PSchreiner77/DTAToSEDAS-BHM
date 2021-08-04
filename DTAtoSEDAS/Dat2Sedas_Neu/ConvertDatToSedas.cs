@@ -283,13 +283,6 @@ namespace Dat2Sedas_Neu
             }
             #endregion
 
-            //Sedas erstellen
-            CreateSedasData();
-
-            // ...
-            // ////LogMessage.LogOnly("Konvertierung in SEDAS.DAT abgeschlossen.");
-            // ////LogMessage.LogOnly("Fehler beim Konvertieren in Sedas.dat." & vbCrLf + ex.ToString());
-
 
             return false;
         }
@@ -312,7 +305,7 @@ namespace Dat2Sedas_Neu
 
                 SedasOrder CustomerOrder = new SedasOrder(_SedasErstellDatumJJMMTT, Bestellposition.LieferDatumJJMMTT, Bestellposition.BHMKundenNummer);
                 pointer2 = pointer1;
-                while (_DatContent[pointer2].BHMKundenNummer == actualCustomer)
+                while (pointer2 < _DatContent.Count() & _DatContent[pointer2].BHMKundenNummer == actualCustomer)
                 {
                     Bestellposition = _DatContent[pointer2];
                     CustomerOrder.OrderLines.Add(new SedasOrderLine(Bestellposition.BHMArtikelNummer, Bestellposition.BestellMenge));
