@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using INIManager;
 
 namespace Dat2Sedas_Neu
 {
@@ -180,25 +181,27 @@ namespace Dat2Sedas_Neu
 
         private static bool ReadIniValues()
         {
+            IniManager INI = new IniManager(Param.INIFilePath);
+            
             bool result = true;
             try
             {
-                Param.SourceFileName = INI.Read("Setup", "Quelldateiname");
-                Param.SourceFileFolder = INI.Read("Setup", "Quelldateipfad");
+                Param.SourceFileName = INI.GetParameterValue("Setup", "Quelldateiname");
+                Param.SourceFileFolder = INI.GetParameterValue("Setup", "Quelldateipfad");
                 Dim flag As Boolean = Operators.CompareString(Param.SourceFileFolder, "", false) <> 0;
                 if (Param.SourceFileFolder != "")
                 {  // flag Then
                     bool flag2 = Operators.CompareString(Strings.Mid(Param.SourceFileFolder, Strings.Len(Param.SourceFileFolder), 1), "\\", false) <> 0;
                     if (flag2)
                     {
-                        Param.SourceFilePath = Param.SourceFileFolder + "\\";
+                        Param.SetSourceFullPath( Param.SourceFileFolder + "\\");
                     }
                     else
                     {
-                        Param.SourceFilePath = Directory.GetCurrentDirectory() + "\\";
+                        Param.SetSourceFullPath(Directory.GetCurrentDirectory() + "\\");
                     }
-                    Param.DestinationFileName = INI.Read("Setup", "Zieldateiname");
-                    Param.DestinationFileFolder = INI.Read("Setup", "Zieldateipfad");
+                    Param.DestinationFileName = INI.GetParameterValue("Setup", "Zieldateiname");
+                    Param.DestinationFileFolder = INI.GetParameterValue("Setup", "Zieldateipfad");
                     bool flag3 = Operators.CompareString(Param.DestinationFileFolder, "", false) <> 0;
                     if (Param.DestinationFileFolder != "")
                     {
@@ -218,9 +221,9 @@ namespace Dat2Sedas_Neu
                             Param.DestinationFileName = "SEDAS.DAT";
                         }
 
-                        Param.DeleteSourceFile = Conversions.ToBoolean(INI.Read("Setup", "QuelleLöschen"));
-                        Param.IgnoreMessages = Conversions.ToBoolean(INI.Read("Setup", "IgnoriereMeldungen"));
-                        Param.Counter = Conversions.ToInteger(INI.Read("Setup", "Counter"));
+                        Param.DeleteSourceFile = Conversions.ToBoolean(INI.GetParameterValue("Setup", "QuelleLöschen"));
+                        Param.IgnoreMessages = Conversions.ToBoolean(INI.GetParameterValue("Setup", "IgnoriereMeldungen"));
+                        Param.Counter = Conversions.ToInteger(INI.GetParameterValue("Setup", "Counter"));
                     }
                 }
             }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using INIManager;
 
 namespace Dat2Sedas_Neu
 {
@@ -11,8 +12,7 @@ namespace Dat2Sedas_Neu
     {
         //TODO ShowMessage Einträge gegen LogMessage austauschen
 
-        //private string[] Arguments = Environment.GetCommandLineArgs(); //TODO CommandlineArgs besorgen
-        private INIFile INI;  //TODO INI-DLL implementieren
+        //private string[] Arguments = Environment.GetCommandLineArgs(); //TODO CommandlineArgs besorgen       
 
         public Parameters Param = Parameters.GetInstance;
 

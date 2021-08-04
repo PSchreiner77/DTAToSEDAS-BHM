@@ -30,7 +30,7 @@ namespace Dat2Sedas_Neu
         public string SourceFileFolder { get;  set; }
         public string SourceFullPath { get { return SourceFileFolder + SourceFileName; } }
         public string DestinationFileName { get;  set; }
-        public string DestinationFileFolder { get; private set; }
+        public string DestinationFileFolder { get;  set; }
         public string DestinationFullPath { get { return Path.Combine(DestinationFileFolder , DestinationFileFolder); } }
         public string INIFilePath { get; } = Directory.GetCurrentDirectory() + @"\config.ini";
 
@@ -56,11 +56,21 @@ namespace Dat2Sedas_Neu
             return folderPath;
         }
 
+        public void SetSourceFullPath(string SourceFilePath)
+        {
+            SetSourceFullPath(Path.GetDirectoryName(SourceFilePath), Path.GetDirectoryName(SourceFilePath));
+        }
+
         public void SetSourceFullPath(string SourceFileFolder, string SourceFileName)
         {
             
             this.SourceFileFolder = FolderPathCorrection(SourceFileFolder);
             this.SourceFileName = SourceFileName;
+        }
+
+        public void SetDestinationFullPath(string DestinationFilePath)
+        {
+            SetDestinationFullPath(Path.GetDirectoryName(DestinationFilePath), Path.GetDirectoryName(DestinationFilePath));
         }
 
         public void SetDestinationFullPath(string DestinationFileFolder, string DestinationFileName)
