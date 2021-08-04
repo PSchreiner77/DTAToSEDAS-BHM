@@ -132,7 +132,6 @@ namespace Dat2Sedas_Neu
                 Bestellzeilen.Add(bestellzeile);
             }
 
-            //TODO Funktionen bearbeiten
             Bestellzeilen = DeleteCustomers(Bestellzeilen);        //Zu löschende Einträge entfernen
             Bestellzeilen = DeleteArticles(Bestellzeilen);
             Bestellzeilen = ChangeArticleNumbers(Bestellzeilen); //zu tauschende Artikelnummern tauschen
@@ -563,7 +562,6 @@ class DatBestellzeile
 
 static class Datenverarbeitung
 {
-    //TODO in Klasse Datenverarbeitung auslagern?
     /// <summary>
     /// Liest die Dat-Quelldatei ein ohne Leerzeilen und gibt sie als List<string> zurück.</string>
     /// </summary>

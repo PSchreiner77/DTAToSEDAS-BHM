@@ -10,7 +10,7 @@ namespace Dat2Sedas_Neu
     //Delegate zum Senden einer Nachricht einrichten
     public delegate void InitMessageHandler(string message);
 
-    class ProgramInit     //TODO Fehler bereinigen
+    class ProgramInit
     {
         public static event InitMessageHandler InitNotification;
         public static event InitMessageHandler InitError;
@@ -46,8 +46,7 @@ namespace Dat2Sedas_Neu
                 Param.Help = true;
                 Help.Show();
                 return false;
-            }
-            
+            }                            
 
             //'-----------------------------------------------------------------------------------------
             //'## Parameter auswerten.
@@ -68,24 +67,13 @@ namespace Dat2Sedas_Neu
                     case "/A":
                         break;
                     default:
+                        InitError("Mindestens ein falscher Startparameter angegeben!");
                         break;
                 }
             }
 
             for (int i = 0; i < Arguments.GetUpperBound(0); i++) // i = 1 To Arguments.GetUpperBound(0)
             {
-                string Switch = Arguments(i);
-
-                //'Parameter ermitteln
-                if (InStr(Arguments(i), "=") > 0)
-                {
-                    'Prüfen, ob der Parameter ein = enthält
-                    Switch = Mid(Arguments(i), 1, InStr(Arguments(i), "="));
-                }
-                else
-                {
-                    Switch = Arguments(i);
-                }
 
                 //'Parameter prüfen und Parameterwert setzen
 
@@ -157,7 +145,7 @@ namespace Dat2Sedas_Neu
                         break;
 
                     default:
-                        InitError("FEHLER! Falsche Startparameter angegeben.");
+                        
                         return false; ;
                         break;
                 }

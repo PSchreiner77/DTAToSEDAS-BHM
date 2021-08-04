@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dat2Sedas_Neu
 {
-    class Parameters                 //TODO Prüfen der Parameter auf Notwendigkeit
+    class Parameters
     {
         //SINGLETON Definition
         private static Parameters instance;

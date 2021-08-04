@@ -7,17 +7,15 @@ using System.Threading.Tasks;
 
 namespace Dat2Sedas_Neu
 {
-    class Program       //TODO Fehler bereinigen
+    class Program
     {
+        //TODO ShowMessage Einträge gegen LogMessage austauschen
 
-        private string[] Arguments = new Environment.GetCommandLineArgs(); //TODO CommandlineArgs besorgen
-        public string FileDate = "";
+        //private string[] Arguments = Environment.GetCommandLineArgs(); //TODO CommandlineArgs besorgen
         private INIFile INI;  //TODO INI-DLL implementieren
 
         public Parameters Param = Parameters.GetInstance;
 
-        //TODO ??
-        //< STAThread() >   ??? Objekte Klonen. Nötig?
         static void Main()
         {
             Program prog = new Program();
@@ -33,7 +31,8 @@ namespace Dat2Sedas_Neu
             //LogMessage.LogOnly("--------- PROGRAMMSTART ----------");
             //LogMessage.CheckLogFile(100);
 
-            ProgramInit.InitNotification += ProgramInit_InitFailed;
+            ProgramInit.InitError += ProgramInit_InitFailed;
+            ProgramInit.InitNotification += ProgramInit_InitNotification;
 
             if (!ProgramInit.Init()) { ExitProgram(); }
 
@@ -48,6 +47,11 @@ namespace Dat2Sedas_Neu
             //LogMessage.LogOnly("--- Programm normal beendet. ---");
             //LogMessage.LogOnly("********************************");
             //LogMessage.LogOnly(""); ;
+        }
+
+        private void ProgramInit_InitNotification(string message)
+        {
+            ShowMessage(message, Pause: false);
         }
 
         private void ProgramInit_InitFailed(string message)
