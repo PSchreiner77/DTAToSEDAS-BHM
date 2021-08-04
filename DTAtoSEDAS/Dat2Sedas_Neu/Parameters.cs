@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,87 +7,96 @@ using System.Threading.Tasks;
 
 namespace Dat2Sedas_Neu
 {
-    static class Parameters                 //TODO Prüfen der Parameter auf Notwendigkeit
+    class Parameters                 //TODO Prüfen der Parameter auf Notwendigkeit
     {
-        //private string _Arguments;
-        //private string _SourceFileName;
-        //private string _SourceFilePath;
-        //private string _SourceFullPath;
-        //private string _DestinationFileName;
-        //private string _DestinationFilePath;
-        //private string _DestinationFullPath;
-        //private bool _DeleteSourceFile;
-        //private bool _IgnoreMessages;
-        //private bool _Help;
-        //private bool _AppendToSedas;
-        //private int _Counter;
-
-        public static string[] Arguments { get; set; }
-        public static string SourceFileName { get; set; }
-        public static string SourceFilePath { get; set; }
-        public static string SourceFullPath { get; set; }
-        public static string DestinationFileName { get; set; }
-        public static string DestinationFilePath { get; set; }
-        public static string DestinationFullPath { get; set; }
-        public static bool DeleteSourceFile { get; set; }
-        public static bool IgnoreMessages { get; set; }
-        public static bool Help { get; set; }
-        public static bool AppendToSedas { get; set; }
-        public static int Counter { get; set; }
-
-        public static void New()
+        //SINGLETON Definition
+        private static Parameters instance;
+        private Parameters() { }
+        public static Parameters GetInstance
         {
-            Arguments = new string[] { };
-            SourceFullPath = "";
-            DestinationFullPath = "";
-            DeleteSourceFile = false;
-            IgnoreMessages = false;
-            AppendToSedas = false;
-        }
-
-        public static void SetSourceFullPath(string SrcFullPath)
-        {
-            if (SrcFullPath != "")
+            get
             {
-                SourceFullPath = SrcFullPath;
+                if (instance != null)
+                {
+                    instance = new Parameters();
+                }
+                return instance;
             }
         }
 
-        public static void SetSourceFullPath(string SrcPath, string SrcName)
+        //EIGENSCHAFTEN
+        public string[] Arguments = new string[] { };
+        public string SourceFileName { get;  set; }
+        public string SourceFileFolder { get;  set; }
+        public string SourceFullPath { get { return SourceFileFolder + SourceFileName; } }
+        public string DestinationFileName { get;  set; }
+        public string DestinationFileFolder { get; private set; }
+        public string DestinationFullPath { get { return DestinationFileFolder + DestinationFileFolder; } }
+        public string INIFilePath { get; } = Directory.GetCurrentDirectory() + @"\config.ini";
+
+        public bool DeleteSourceFile { get; set; } = false;
+        public bool IgnoreMessages { get; set; } = false;
+        public bool Help { get; set; } = false;
+        public bool AppendToSedas { get; set; } = false;
+
+        public int Counter { get; set; }
+
+
+        //METHODEN
+        public void SetSourceFullPath(string SourceFileFolder, string SourceFileName)
         {
-            if (SrcPath != "")
+            if (SourceFileFolder != "")
             {
-                if (SrcPath.Substring(SrcPath.Length, 1) != "\\")
+                if (SourceFileFolder.Substring(SourceFileFolder.Length, 1) != "\\")
                 {
-                    SrcPath += "\\";
+                    SourceFileFolder += "\\";
                 }
             }
-            SourceFullPath = SourceFilePath + SourceFileName;
+            this.SourceFileFolder = SourceFileFolder;
+            this.SourceFileName = SourceFileName;
         }
 
-        public static void SetDestinationFullPath(string DestFullPath)
+        public void SetDestinationFullPath(string DestinationFileFolder, string DestinationFileName)
         {
-            if (DestFullPath != "")
-            {
+            if (DestinationFileName == "") DestinationFileName = "Sedas.dat";
 
-                if (DestFullPath.Substring(DestFullPath.Length, 1) != "\\")
+            if (DestinationFileFolder == "")
+            {
+                DestinationFileFolder = Directory.GetCurrentDirectory() + "\\";    
+            }
+            else
+            {
+                if (DestinationFileFolder.Substring(SourceFileFolder.Length, 1) != "\\")
                 {
-                    DestFullPath += "\\";
+                    DestinationFileFolder += "\\";
                 }
             }
-            DestinationFullPath = DestFullPath;
+            this.DestinationFileFolder = DestinationFileFolder;
+            this.DestinationFileName = DestinationFileName;
         }
 
-        public static void SetDestinationFullPath(string DestPath, string DestName)
-        {
-            if (DestPath != "")
-            {
-                if (DestPath.Substring(DestPath.Length, 1) != "\\")
-                {
-                    DestPath += "\\";
-                }
-            }
-            DestinationFullPath = DestinationFilePath + DestinationFileName;
-        }
+        //DELETE
+        //public void SetSourceFullPath(string SrcFullPath)
+        //{
+        //    if (SrcFullPath != "")
+        //    {
+        //        SourceFullPath = SrcFullPath;
+        //    }
+        //}
+
+        //DELETE
+        //public void SetDestinationFullPath(string DestFullPath)
+        //{
+        //    if (DestFullPath != "")
+        //    {
+
+        //        if (DestFullPath.Substring(DestFullPath.Length, 1) != "\\")
+        //        {
+        //            DestFullPath += "\\";
+        //        }
+        //    }
+        //    DestinationFullPath = DestFullPath;
+        //
+        //}
     }
 }
