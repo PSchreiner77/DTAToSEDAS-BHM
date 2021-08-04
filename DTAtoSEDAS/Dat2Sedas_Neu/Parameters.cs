@@ -16,7 +16,7 @@ namespace Dat2Sedas_Neu
         {
             get
             {
-                if (instance != null)
+                if (instance == null)
                 {
                     instance = new Parameters();
                 }
@@ -31,7 +31,7 @@ namespace Dat2Sedas_Neu
         public string SourceFullPath { get { return SourceFileFolder + SourceFileName; } }
         public string DestinationFileName { get;  set; }
         public string DestinationFileFolder { get;  set; }
-        public string DestinationFullPath { get { return Path.Combine(DestinationFileFolder , DestinationFileFolder); } }
+        public string DestinationFullPath { get { return Path.Combine(DestinationFileFolder , DestinationFileName); } }
         public string INIFilePath { get; } = Directory.GetCurrentDirectory() + @"\config.ini";
 
         public bool DeleteSourceFile { get; set; } = false;
@@ -58,7 +58,7 @@ namespace Dat2Sedas_Neu
 
         public void SetSourceFullPath(string SourceFilePath)
         {
-            SetSourceFullPath(Path.GetDirectoryName(SourceFilePath), Path.GetDirectoryName(SourceFilePath));
+            SetSourceFullPath(Path.GetDirectoryName(SourceFilePath), Path.GetDirectoryName(SourceFileName));
         }
 
         public void SetSourceFullPath(string SourceFileFolder, string SourceFileName)

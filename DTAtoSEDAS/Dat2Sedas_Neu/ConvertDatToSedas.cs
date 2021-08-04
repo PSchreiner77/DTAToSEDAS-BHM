@@ -301,6 +301,8 @@ namespace Dat2Sedas_Neu
             int pointer1 = 0;
             int pointer2 = 0;
 
+            ReadDatFileContent();
+
             _SedasFile = new SedasFile();
             while (pointer1 < _DatContent.Count())
             {

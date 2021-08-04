@@ -13,15 +13,17 @@ namespace Dat2Sedas_Neu
 
     class ProgramInit
     {
+        private static Parameters Param;
+        
         public static event InitMessageHandler InitNotification;
         public static event InitMessageHandler InitError;
-        private static Parameters Param = Parameters.GetInstance;
 
         //METHODEN
         private static void InitErrorMessage(string message)
         {
             InitError?.Invoke($"Initialisierung: FEHLER  {message}");
         }
+        
         private static void InitMessage(string message)
         {
             InitNotification?.Invoke($"Initialisierung: {message}");
@@ -32,16 +34,12 @@ namespace Dat2Sedas_Neu
             bool CheckParameters = true;
 
             string[] Arguments = Environment.GetCommandLineArgs();
-            //-----------------------------------------------------------------------------------------
-            //Keine Parameter übergeben. Funktion Ende.
-            if (Arguments.GetUpperBound(0) < 1)
+            if (Arguments.Count() < 2)
             {
                 InitError("Es wurden keine Startparameter übergeben. Bitte Hilfe aufrufen mit Parametr /?");
                 return false;
             }
 
-            //-----------------------------------------------------------------------------------------
-            //Wenn /? enthalten ist.
             if (Arguments.Contains("/?"))
             {
                 Param.Help = true;
@@ -49,104 +47,34 @@ namespace Dat2Sedas_Neu
                 return false;
             }
 
-            //'-----------------------------------------------------------------------------------------
-            //'## Parameter auswerten.
-            foreach (string arg in Arguments)
+            for(int i=1;i<Arguments.Count();i++)
             {
-                string S = arg.Split('=')[0];
+                string[] S = Arguments[i].Split('=');
 
-                switch (S.ToUpper())
+                switch (S[0].ToUpper())
                 {
                     case "/Q":
                         try
                         {
                             Param.SourceFileFolder = Path.GetDirectoryName(S[1].ToString());
-                            Param.SourceFileFolder = Path.GetFileName(S[1].ToString());
+                            Param.SourceFileName = Path.GetFileName(S[1].ToString());
                         }
                         catch (Exception ex)
                         { }
                         break;
 
                     case "/Z":
+                        try
+                        {
+                            Param.DestinationFileFolder = Path.GetDirectoryName(S[1].ToString());
+                            Param.DestinationFileName = Path.GetFileName(S[1].ToString());
+                        }
+                        catch (Exception ex)
+                        { }
                         break;
 
                     case "/D":
-                        break;
-
-                    case "/I":
-                        break;
-
-                    case "/A":
-                        break;
-
-                    default:
-                        InitError("Mindestens ein falscher Startparameter angegeben!");
-                        break;
-                }
-            }
-
-            for (int i = 0; i < Arguments.GetUpperBound(0); i++) // i = 1 To Arguments.GetUpperBound(0)
-            {
-
-                //'Parameter prüfen und Parameterwert setzen
-
-                switch (Switch.ToUpper())
-                {
-                    case "/Q=":
-                        //'Prüfen, ob Eintrag aus Pfad und/oder Dateiname besteht
-                        if (InStr(Mid(Arguments(i), InStr(Arguments(i), "=") + 1), "\\") > 0)
-                        {
-                            //'Pfad enthalten.
-                            if (InStr(Mid(Arguments(i), InStrRev(Arguments(i), "\\") + 1), ".") > 0)
-                            {
-                                //'Dateiname enthalten: Eintrag als kompletten Pfad übernehmen.
-                                Param.SetSourceFullPath(Mid(Arguments(i), InStr(Arguments(i), "=") + 1));
-                            }
-                            else
-                            {
-                                //'Kein Dateiname enthalten: Eintrag als nur Pfad übernehmen.
-                                Param.SourceFilePath = Mid(Arguments(i), InStr(Arguments(i), "=") + 1);
-                            }
-                        }
-                        else
-                        {
-                            //'Kein Pfad enthalten
-                            if (InStr(Mid(Arguments(i), InStrRev(Arguments(i), "\\") + 1), ".") > 0)
-                            {
-                                //'Dateiname enthalten: Eintrag als Dateiname übernehmen.
-                                Param.SourceFileName = Mid(Arguments(i), InStr(Arguments(i), "=") + 1);
-                            }
-                        }
-                        break;
-
-                    case "/Z=":
-                        if (InStr(Mid(Arguments(i), InStr(Arguments(i), "=") + 1), "\\") > 0)
-                        {
-                            //'Pfad enthalten.
-                            if (InStr(Mid(Arguments(i), InStrRev(Arguments(i), "\\") + 1), ".") > 0)
-                            {
-                                //'Dateiname enthalten: Eintrag als kompletten Pfad übernehmen.
-                                Param.SetDestinationFullPath(Mid(Arguments(i), InStr(Arguments(i), "=") + 1));
-                            }
-                            else
-                            {
-                                //'Kein Dateiname enthalten: Eintrag als nur Pfad übernehmen.
-                                Param.DestinationFileFolder = Mid(Arguments(i), InStr(Arguments(i), "=") + 1);
-                            }
-                        }
-                        else
-                        {
-                            //'Kein Pfad enthalten
-                            if (InStr(Mid(Arguments(i), InStrRev(Arguments(i), "\\") + 1), ".") > 0)
-                            {
-                                //'Dateiname enthalten: Eintrag als Dateiname übernehmen.
-                                Param.DestinationFileName = Mid(Arguments(i), InStr(Arguments(i), "=") + 1);
-                            }
-                        }
-                        break;
-
-                    case "/D":
-                        Param.DeleteSourceFile = true;  //Quelldatei nach Programmende löschen.                        
+                        Param.DeleteSourceFile = true;  //Quelldatei nach Programmende löschen.        
                         break;
 
                     case "/I":
@@ -158,11 +86,10 @@ namespace Dat2Sedas_Neu
                         break;
 
                     default:
-
-                        return false; ;
-                        break;
+                        InitError("Mindestens ein falscher Startparameter angegeben!");
+                        return false;                        
                 }
-            }
+            }                
             return true;
         }
 
@@ -183,57 +110,23 @@ namespace Dat2Sedas_Neu
         {
             IniManager INI = new IniManager(Param.INIFilePath);
             
-            bool result = true;
             try
             {
                 Param.SourceFileName = INI.GetParameterValue("Setup", "Quelldateiname");
                 Param.SourceFileFolder = INI.GetParameterValue("Setup", "Quelldateipfad");
-                Dim flag As Boolean = Operators.CompareString(Param.SourceFileFolder, "", false) <> 0;
-                if (Param.SourceFileFolder != "")
-                {  // flag Then
-                    bool flag2 = Operators.CompareString(Strings.Mid(Param.SourceFileFolder, Strings.Len(Param.SourceFileFolder), 1), "\\", false) <> 0;
-                    if (flag2)
-                    {
-                        Param.SetSourceFullPath( Param.SourceFileFolder + "\\");
-                    }
-                    else
-                    {
-                        Param.SetSourceFullPath(Directory.GetCurrentDirectory() + "\\");
-                    }
-                    Param.DestinationFileName = INI.GetParameterValue("Setup", "Zieldateiname");
-                    Param.DestinationFileFolder = INI.GetParameterValue("Setup", "Zieldateipfad");
-                    bool flag3 = Operators.CompareString(Param.DestinationFileFolder, "", false) <> 0;
-                    if (Param.DestinationFileFolder != "")
-                    {
-                        bool flag4 = Operators.CompareString(Strings.Mid(Param.DestinationFileFolder, Strings.Len(Param.DestinationFileFolder), 1), "\\", false) <> 0;
-                        if (flag4)
-                        {
-                            Param.DestinationFileFolder = Param.DestinationFileFolder + "\\";
-                        }
-                        else
-                        {
-                            Param.DestinationFileFolder = Directory.GetCurrentDirectory() + "\\";
-                        }
+                Param.DestinationFileName = INI.GetParameterValue("Setup", "Zieldateiname");
+                Param.DestinationFileFolder = INI.GetParameterValue("Setup", "Zieldateipfad");
 
-                        bool flag5 = Operators.CompareString(Param.DestinationFileName, "", false) = 0 And Operators.CompareString(Param.DestinationFileFolder, "", false) <> 0;
-                        if (flag5)
-                        {
-                            Param.DestinationFileName = "SEDAS.DAT";
-                        }
-
-                        Param.DeleteSourceFile = Conversions.ToBoolean(INI.GetParameterValue("Setup", "QuelleLöschen"));
-                        Param.IgnoreMessages = Conversions.ToBoolean(INI.GetParameterValue("Setup", "IgnoriereMeldungen"));
-                        Param.Counter = Conversions.ToInteger(INI.GetParameterValue("Setup", "Counter"));
-                    }
-                }
+                Param.DeleteSourceFile = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "QuelleLöschen")));
+                Param.IgnoreMessages = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "IgnoriereMeldungen")));
+                Param.Counter = Convert.ToInt32(INI.GetParameterValue("Setup", "Counter"));
             }
             catch (Exception ex)
             {
-                //LogMessage.LogOnly("Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString());
-                result = false;
+                InitError("Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString());
+                return false;
             }
-
-            return result;
+            return true;
         }
 
         private static bool CheckSource()
@@ -303,19 +196,17 @@ namespace Dat2Sedas_Neu
             Param.SetDestinationFullPath(Param.DestinationFileFolder, Param.DestinationFileName);
         }
 
+        
         public static bool Init()
         {
-            #region Initialisierung
-
             InitMessage("Initialisieren der Programmparameter...");
+            Param = Parameters.GetInstance;
 
-            if (!CheckStartArguments()) return false;
+            if (!CheckIniFile()) return false;
             if (!ReadIniValues()) return false;
+            if (!CheckStartArguments()) return false;
             if (!CheckSource()) return false;
             SetDestinationPath();
-
-            // The following expression was wrapped in a checked-expression
-            #endregion
 
             InitMessage("Initialisierung der Parameter OK.");
             return true;

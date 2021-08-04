@@ -14,39 +14,12 @@ namespace Dat2Sedas_Neu
 
         //private string[] Arguments = Environment.GetCommandLineArgs(); //TODO CommandlineArgs besorgen       
 
-        public Parameters Param = Parameters.GetInstance;
+        public Parameters Param;
 
         static void Main()
         {
             Program prog = new Program();
             prog.ProgramLoop();
-        }
-
-        public void ProgramLoop()
-        {
-            //Log-Messages ausgeben, DLL implementieren
-            //LogMessage.GlobalLog = true;    
-            //LogMessage.GlobalOutputToConsole = true;
-            //LogMessage.LogOnly("**********************************");
-            //LogMessage.LogOnly("--------- PROGRAMMSTART ----------");
-            //LogMessage.CheckLogFile(100);
-
-            ProgramInit.InitError += ProgramInit_InitFailed;
-            ProgramInit.InitNotification += ProgramInit_InitNotification;
-
-            if (!ProgramInit.Init()) { ExitProgram(); }
-
-            Param.Counter = SetCounter(Param.Counter);
-
-            ConvertDatToSedas D2S = new ConvertDatToSedas(Param.SourceFileFolder, Param.DestinationFileFolder);
-            D2S.CreateSedasData();
-            D2S.WriteSedasData();
-
-            RewriteSettings();
-
-            //LogMessage.LogOnly("--- Programm normal beendet. ---");
-            //LogMessage.LogOnly("********************************");
-            //LogMessage.LogOnly(""); ;
         }
 
         private void ProgramInit_InitNotification(string message)
@@ -59,7 +32,7 @@ namespace Dat2Sedas_Neu
             ShowMessage(message, Pause: true);
         }
 
-        public int SetCounter(int counter)
+        private int SetCounter(int counter)
         {
             if (counter >= 999)
             {
@@ -68,13 +41,17 @@ namespace Dat2Sedas_Neu
             return ++counter;
         }
 
-        public void RewriteSettings()
+        private void RewriteSettings()
         {
-            //TODO Save settings back to INI-File
+            ShowMessage("Zurückschreiben der Einstellungen...", false);
+            ShowMessage("...Counter aktualisieren...");
+            IniManager INI = new IniManager(Param.INIFilePath);
+            INI.UpdateParameterValue("Setup", "Counter", Param.Counter.ToString());
 
+            ShowMessage("...zurückschreiben beendet.");
         }
 
-        public void ShowMessage(string Message, bool Pause = false)
+        private void ShowMessage(string Message, bool Pause = false)
         {
             if (!Param.IgnoreMessages)
             {
@@ -87,10 +64,38 @@ namespace Dat2Sedas_Neu
             }
         }
 
-        public static void ExitProgram()
+        private static void ExitProgram()
         {
             //LogMessage.Show("Programm wird nach Fehler beendet.")
             Environment.Exit(0);
+        }
+
+        public void ProgramLoop()
+        {
+            //Log-Messages ausgeben, DLL implementieren
+            //LogMessage.GlobalLog = true;    
+            //LogMessage.GlobalOutputToConsole = true;
+            //LogMessage.LogOnly("**********************************");
+            //LogMessage.LogOnly("--------- PROGRAMMSTART ----------");
+            //LogMessage.CheckLogFile(100);
+
+            Param = Parameters.GetInstance;
+            ProgramInit.InitError += ProgramInit_InitFailed;
+            ProgramInit.InitNotification += ProgramInit_InitNotification;
+
+            if (!ProgramInit.Init()) { ExitProgram(); }
+
+            Param.Counter = SetCounter(Param.Counter);
+
+            ConvertDatToSedas D2S = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath);
+            D2S.CreateSedasData();
+            D2S.WriteSedasData();
+
+            RewriteSettings();
+
+            //LogMessage.LogOnly("--- Programm normal beendet. ---");
+            //LogMessage.LogOnly("********************************");
+            //LogMessage.LogOnly(""); ;
         }
     }
 }
