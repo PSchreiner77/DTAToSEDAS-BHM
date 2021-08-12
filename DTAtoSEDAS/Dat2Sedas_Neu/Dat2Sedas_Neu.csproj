@@ -54,9 +54,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="bin\Debug\20201022_2.dat" />
+    <None Include="bin\Debug\Config.ini" />
     <None Include="bin\Debug\Config - Kopieren.ini" />
     <None Include="bin\Debug\Config - original.ini" />
-    <None Include="bin\Debug\Config.ini" />
     <None Include="Testdaten\20201022.dat" />
     <None Include="Testdaten\20201022_2.dat" />
     <None Include="Testdaten\BestellNF.DAT" />

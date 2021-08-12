@@ -118,7 +118,7 @@ namespace INIManager
                         if (_iniImportedTextLines[j].Contains("="))
                         {
                             string[] parameterLine = _iniImportedTextLines[j].Split('=');
-                            string parameterName = parameterLine[0].Trim().ToUpper();
+                            string parameterName = parameterLine[0].Trim();
                             string ParameterValue = parameterLine[1].Trim();
                             addNewParameterToSectionList(sectionName, parameterName, ParameterValue);
                         }
