@@ -210,6 +210,8 @@ namespace Dat2Sedas_Neu
             string JJ = date.Year.ToString().Substring(2, 2);
             string MM = date.Month.ToString();
             string TT = date.Day.ToString();
+            if (MM.Length < 2) MM = "0" + MM;
+            if (TT.Length < 2) TT = "0" + TT;
             return JJ + MM + TT;
         }
         private string ConvertToSedasDateJJMMTT(string DateTTMMJJ)
@@ -312,6 +314,7 @@ namespace Dat2Sedas_Neu
                     CustomerOrder.OrderLines.Add(new SedasOrderLine(Bestellposition.BHMArtikelNummer, Bestellposition.BestellMenge));
                     pointer2++;
                 }
+                _SedasFile.SedasOrders.Add(CustomerOrder);
                 pointer1 = pointer2; //next Customer Block
             }
         }
@@ -365,9 +368,9 @@ class SedasFile
 
     public string Header { get { return CreateHeader(); } }
     public string Footer { get { return CreateFooter(); } }
-    public List<SedasOrder> Orders = new List<SedasOrder>();
+    public List<SedasOrder> SedasOrders = new List<SedasOrder>();
 
-    public int CustomerOrdersCount { get { return Orders.Count; } }
+    public int CustomerOrdersCount { get { return SedasOrders.Count; } }
     public int OverallOrderLineEntriesCount { get { return GetTotalNumberOfOrderLines(); } }
 
     //KONSTRUKTOR
@@ -383,7 +386,7 @@ class SedasFile
     private int GetTotalNumberOfOrderLines()
     {
         int count = 0;
-        foreach (SedasOrder order in Orders)
+        foreach (SedasOrder order in SedasOrders)
         {
             count += order.OrderLines.Count;
         }
@@ -416,10 +419,10 @@ class SedasFile
     public string Get()
     {
         string returnString = "";
-        string cr = "\n\r";
+        string cr = "\r\n";
 
         returnString += CreateHeader() + cr;
-        foreach (SedasOrder order in Orders)
+        foreach (SedasOrder order in SedasOrders)
         {
             returnString += order.Header + cr;
             foreach (SedasOrderLine orderLine in order.OrderLines)
@@ -464,15 +467,18 @@ class SedasOrder
     private string CreateFooter()
     {
         //;05000000039000
+        //;05               Kennung Footer
+        //   000000039      9 Stellen für Summe bestellter Artikelmengen
+        //            0000  1000er Stelle für Artikelmenge
 
-        string text = "";
+        string articleQuantity = OrderArticleQuantity.ToString();
         int maxNumberOfCharacters = 9;
-        int zerosToAdd = maxNumberOfCharacters - GetArticleQuantity();
+        int zerosToAdd = maxNumberOfCharacters - GetArticleQuantity().ToString().Length;
         for (int i = 0; i < zerosToAdd; i++)
         {
-            text = "0" + text;
+            articleQuantity = "0" + articleQuantity;
         }
-        return $";5{text}0000";
+        return $";5{articleQuantity}000";
     }
 
     public int GetArticleQuantity()
@@ -480,7 +486,7 @@ class SedasOrder
         int count = 0;
         foreach (SedasOrderLine orderLine in OrderLines)
         {
-            count += Convert.ToInt32(orderLine.ArtikelMenge);
+            count += Convert.ToInt32(orderLine.ArtikelMenge.Substring(0,orderLine.ArtikelMenge.Length-3));
         }
 
         return count;
