@@ -356,7 +356,7 @@ class SedasFile
     public SedasFile(string Erstelldatum, int IniSedasRunThroughCounter)
     {
         _ErstellDatumSedas = Erstelldatum;
-        _IniSedasRunThroughCounter = IniSedasRunThroughCounter;
+        _IniSedasRunThroughCounter = IniSedasRunThroughCounter;  //TODO prüfen, woher der Counter kommt oder gesetzt wird.
     }
 
     //METHODEN
@@ -372,7 +372,7 @@ class SedasFile
 
     private string CreateHeader()
     {
-        return $"010()000377777777777771{_ErstellDatumSedas};,{_IniSedasRunThroughCounter}\n\r;)0240051310000002";
+        return $"010()000377777777777771{_ErstellDatumSedas};,{_IniSedasRunThroughCounter}\r\n;)0240051310000002";
     }
 
     private string CreateFooter()
@@ -387,10 +387,10 @@ class SedasFile
         //  108,   = Anzahl Kunden in Datei (Blöcke)
         //  1178   = Anzahl einzelner Datensätze/Artikelzeilen
         #endregion
-        string FooterLine1 = $":06{CustomerOrdersCount};{OverallOrderLineEntriesCount}";
+        string FooterLine1 = $":06{Tools.ExpandLeftStringSide(CustomerOrdersCount.ToString(),3)};{OverallOrderLineEntriesCount}";
         string FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
 
-        return FooterLine1 + "\n\r" + FooterLine2;
+        return FooterLine1 + "\r\n" + FooterLine2;
     }
 
     public string Get()
@@ -493,7 +493,7 @@ class SedasOrderLine
     {
         //TODO BHMArtikelnummer auf 10 Stellen aufgefüllt  Siehe 
         //TODO Artikelmenge auf 5 Stellen aufgefüllt
-        return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer,10)},4{Tools.ExpandLeftStringSide(ArtikelMenge,5)},,,,02 000000,,";
+        return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer,10)},4{Tools.ExpandLeftStringSide(ArtikelMenge,7)},,,,02 000000,,";
     }
 }
 

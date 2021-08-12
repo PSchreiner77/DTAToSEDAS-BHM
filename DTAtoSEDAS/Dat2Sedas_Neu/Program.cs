@@ -35,9 +35,11 @@ namespace Dat2Sedas_Neu
 
         private int SetCounter(int counter)
         {
-            if (counter >= 999)
+            if (counter >= 990)
             {
+                //TODO Meldung Counter zurückgesetzt von Counter auf 1
                 counter = 0;
+                
             }
             return ++counter;
         }
