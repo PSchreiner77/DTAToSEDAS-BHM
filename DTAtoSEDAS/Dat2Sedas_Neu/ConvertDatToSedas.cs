@@ -478,6 +478,7 @@ class SedasOrder
         {
             articleQuantity = "0" + articleQuantity;
         }
+        articleQuantity = ExpandLeftString
         return $";5{articleQuantity}000";
     }
 
@@ -499,7 +500,7 @@ class SedasOrderLine
      *      ;040000          = Kennung Zeile BestellPosition
      *      0000000317       = Artikelnummer
      *      ,4               = fix
-     *      0002000          = Menge (Wert/1000)
+     *      00002000         = Menge (Wert/1000)
      *      ,,,,02 000000,,  = fix
     */
 
@@ -520,6 +521,8 @@ class SedasOrderLine
     //METHODEN
     public string Get()
     {
+        //TODO BHMArtikelnummer auf 10 Stellen aufgefüllt  Siehe 
+        //TODO Artikelmenge auf 5 Stellen aufgefüllt
         return $";040000{BHMArtikelNummer},4{ArtikelMenge},,,,02 000000,,";
     }
 }
