@@ -243,29 +243,6 @@ namespace Dat2Sedas_Neu
             return TrimText;
         }
 
-        private string CutLeftStringSide(string input, int limit)
-        {
-            //Kürzt einen String vorne auf die angegebene Länge            
-            string returnString = "";
-            if (input.Length > limit)
-            {
-                returnString = input.Substring(input.Length - limit);
-            }
-            return returnString;
-        }
-
-        private string ExpandLeftStringSide(string input, int limit)
-        {
-            //Erweitert einen String links um "0" bis zur angegebenen Länge
-
-            while (input.Length < limit)
-            {
-                input = "0" + input;
-            }
-
-            return input;
-        }
-
         private bool ReadDatFileContent()
         {
             ////LogMessage.LogOnly("Beginn der Konvertierung...");
@@ -471,15 +448,8 @@ class SedasOrder
         //   000000039      9 Stellen für Summe bestellter Artikelmengen
         //            0000  1000er Stelle für Artikelmenge
 
-        string articleQuantity = OrderArticleQuantity.ToString();
-        int maxNumberOfCharacters = 9;
-        int zerosToAdd = maxNumberOfCharacters - GetArticleQuantity().ToString().Length;
-        for (int i = 0; i < zerosToAdd; i++)
-        {
-            articleQuantity = "0" + articleQuantity;
-        }
-        articleQuantity = ExpandLeftString
-        return $";5{articleQuantity}000";
+        string articleQuantity = Tools.ExpandLeftStringSide(OrderArticleQuantity.ToString(),9);
+        return $";05{articleQuantity}000";
     }
 
     public int GetArticleQuantity()
@@ -487,7 +457,7 @@ class SedasOrder
         int count = 0;
         foreach (SedasOrderLine orderLine in OrderLines)
         {
-            count += Convert.ToInt32(orderLine.ArtikelMenge.Substring(0,orderLine.ArtikelMenge.Length-3));
+            count += Convert.ToInt32(orderLine.ArtikelMenge.Substring(0, orderLine.ArtikelMenge.Length - 3));
         }
 
         return count;
@@ -523,7 +493,7 @@ class SedasOrderLine
     {
         //TODO BHMArtikelnummer auf 10 Stellen aufgefüllt  Siehe 
         //TODO Artikelmenge auf 5 Stellen aufgefüllt
-        return $";040000{BHMArtikelNummer},4{ArtikelMenge},,,,02 000000,,";
+        return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer,10)},4{Tools.ExpandLeftStringSide(ArtikelMenge,5)},,,,02 000000,,";
     }
 }
 
@@ -630,6 +600,32 @@ static class Datenverarbeitung
         }
         return DictChangeArticles;
     }
+
+
 }
 
+public class Tools
+{
+    public static string CutLeftStringSide(string Input, int MaxLength)
+    {
+        //Kürzt einen String vorne auf die angegebene Länge            
+        string returnString = "";
+        if (Input.Length > MaxLength)
+        {
+            returnString = Input.Substring(Input.Length - MaxLength);
+        }
+        return returnString;
+    }
 
+    public static string ExpandLeftStringSide(string InputString, int MaxLength)
+    {
+        //Erweitert einen String links um "0" bis zur angegebenen Länge
+
+        while (InputString.Length < MaxLength)
+        {
+            InputString = "0" + InputString;
+        }
+
+        return InputString;
+    }
+}
