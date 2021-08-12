@@ -9,6 +9,7 @@ namespace Dat2Sedas_Neu
 {
     class ConvertDatToSedas
     {
+        //TODO Ablauf Schritt für Schritt prüfen
         private string _SourcePath;
         private List<string> _SourceData;
         private string _DestinationPath;
@@ -305,7 +306,7 @@ namespace Dat2Sedas_Neu
 
                 SedasOrder CustomerOrder = new SedasOrder(_SedasErstellDatumJJMMTT, Bestellposition.LieferDatumJJMMTT, Bestellposition.BHMKundenNummer);
                 pointer2 = pointer1;
-                while (pointer2 < _DatContent.Count() & _DatContent[pointer2].BHMKundenNummer == actualCustomer)
+                while (pointer2 < _DatContent.Count() && _DatContent[pointer2].BHMKundenNummer == actualCustomer)
                 {
                     Bestellposition = _DatContent[pointer2];
                     CustomerOrder.OrderLines.Add(new SedasOrderLine(Bestellposition.BHMArtikelNummer, Bestellposition.BestellMenge));

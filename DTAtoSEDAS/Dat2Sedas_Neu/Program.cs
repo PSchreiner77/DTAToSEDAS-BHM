@@ -20,6 +20,7 @@ namespace Dat2Sedas_Neu
         {
             Program prog = new Program();
             prog.ProgramLoop();
+            Console.ReadKey();
         }
 
         private void ProgramInit_InitNotification(string message)
@@ -43,6 +44,7 @@ namespace Dat2Sedas_Neu
 
         private void RewriteSettings()
         {
+            //TODO Rückschreiben der Config.Datei prüfen.
             ShowMessage("Zurückschreiben der Einstellungen...", false);
             ShowMessage("...Counter aktualisieren...");
             IniManager INI = new IniManager(Param.INIFilePath);

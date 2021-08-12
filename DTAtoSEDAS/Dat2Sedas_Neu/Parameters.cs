@@ -48,7 +48,7 @@ namespace Dat2Sedas_Neu
         {
             if (folderPath != "")
             {
-                if (folderPath.Substring(folderPath.Length, 1) != "\\")
+                if (folderPath.Substring(folderPath.Length-1, 1) != "\\")
                 {
                     folderPath += "\\";
                 }
