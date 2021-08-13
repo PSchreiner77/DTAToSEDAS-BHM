@@ -273,14 +273,21 @@ namespace INIManager
         public void DeleteSection(string SectionName)
         {
             //TODO Fehler wg. verändertem index beim löschen
-            foreach (Section section in _iniContent)
+
+            for (int i = 0; i < _iniContent.Count; i++)
             {
-                if (section.sectionName == SectionName.ToUpper())
-                {
-                    _iniContent.Remove(section);
-                    break;
-                }
+                if (_iniContent[i].sectionName == SectionName) _iniContent.RemoveAt(i);
+                break;
             }
+            //foreach (Section section in _iniContent)
+            //{
+            //    if (section.sectionName == SectionName.ToUpper())
+            //    {
+            //        deletedSections.Add(section);
+            //        _iniContent.Remove(section);
+            //        break;
+            //    }
+            //}
         }
 
 
