@@ -155,12 +155,12 @@ namespace INIManager
                 {
                     if (section.ParameterDic.ContainsKey(ParameterName.ToUpper()))
                     {
-                        section.ParameterDic[ParameterName.ToUpper()] = ParameterValue;
+                        section.ParameterDic[ParameterName] = ParameterValue;
                         parameterAdded = true;
                     }
                     else
                     {
-                        section.ParameterDic.Add(ParameterName.ToUpper(), ParameterValue);
+                        section.ParameterDic.Add(ParameterName, ParameterValue);
                         parameterAdded = true;
                     }
                 }
@@ -315,7 +315,7 @@ namespace INIManager
                         sw.WriteLine("[{0}]", section.sectionName.ToUpper());
                         foreach (string parameter in section.ParameterDic.Keys)
                         {
-                            sw.WriteLine("{0} = {1}", parameter.ToUpper(), section.ParameterDic[parameter]);
+                            sw.WriteLine("{0} = {1}", parameter, section.ParameterDic[parameter]);
                         }
                         sw.WriteLine();
                     }
