@@ -1,2 +1,1 @@
 alteArtNr;neueArtNr;Beschreibung
-2;111
