@@ -568,20 +568,31 @@ namespace INIManager
         //}
 
 
-        private int getParamererIndex(string SectionName, string ParameterName)
+        private int getEntryIndex(string SectionName)
         {
-            for (int i = 0; i < _iniTextLines.Count; i++)
+            foreach (string line in _iniTextLines)
             {
-                if (_iniTextLines[i].ToUpper().Contains($"[{SectionName.ToUpper()}]"))
+                if (line.ToUpper().Contains($"[{SectionName.ToUpper()}]"))
                 {
-                    int j = ++i;
-                    while (!_iniTextLines[j].Contains("["))
-                    {
-                        if (_iniTextLines[j].ToUpper().Contains(ParameterName.ToUpper()))
-                            return j;
-                        j++;
-                    }
+                    return _iniTextLines.IndexOf(line);
                 }
+            }
+            return 0;
+        }
+
+        private int getEntryIndex(string SectionName, string ParameterName)
+        {
+            int index = getEntryIndex(SectionName);
+            if (index == 0) return 0;
+
+            index++;
+            for (int i = index; i < _iniTextLines.Count; i++)
+            {
+                if (_iniTextLines[index].Contains("[") || _iniTextLines[index] == "")
+                    return 0;
+
+                if (_iniTextLines[index].ToUpper().Contains(ParameterName.ToUpper()))
+                    return index;
             }
             return 0;
         }
@@ -589,58 +600,38 @@ namespace INIManager
 
         public string GetParameterValue(string SectionName, string ParameterName)
         {
-            int index = getParamererIndex(SectionName, ParameterName);
+            int index = getEntryIndex(SectionName, ParameterName);
+            if (index == 0)
+                return "";
+
             string[] parameter = _iniTextLines[index].Split('=');
             return parameter[1].Trim();
         }
 
-        //public void UpdateParameterValue(string SectionName, string ParameterName, string ParameterValue)
-        //{
-        //    bool valueUpdated = false;
-        //    foreach (Section section in _iniContent)
-        //    {
-        //        if (section.sectionName == SectionName.ToUpper())
-        //        {
-        //            if (section.ParameterDic.ContainsKey(ParameterName.ToUpper()))
-        //            {
-        //                section.ParameterDic[ParameterName.ToUpper()] = ParameterValue;
-        //                valueUpdated = true;
-        //                break;
-        //            }
-        //        }
-        //    }
-
-        //    if (valueUpdated)
-        //    {
-        //        writeToFile();
-        //    }
-        //}
 
         public void UpdateParameterValue(string SectionName, string ParameterName, string NewParameterValue)
         {
             bool valueUpdated = false;
-            int index = getParamererIndex(SectionName, ParameterName);
-            string[] parameter = _iniTextLines[index].Split('=');
-            parameter[1] = NewParameterValue;
-            _iniTextLines[index] = parameter[0] + "=" + parameter[1];
+            int index = getEntryIndex(SectionName, ParameterName);
+            if (index != 0)
+            {
+                string[] parameter = _iniTextLines[index].Split('=');
+                parameter[1] = NewParameterValue;
+                _iniTextLines[index] = parameter[0] + "=" + parameter[1];
 
-            writeToFile();
+                writeToFile();
+            }
         }
 
         public void AddNewSection(string SectionName)
         {
-            bool isNewSection = true;
-            foreach (Section section in this._iniContent)
-            {
-                if (section.sectionName == SectionName.ToUpper())
-                {
-                    isNewSection = false;
-                }
-            }
+            bool isNewSection = false;
+            if (getEntryIndex(SectionName) == 0)
+                isNewSection = false;
 
             if (isNewSection)
             {
-                addNewSectionToSectionList(SectionName);
+                _iniTextLines.Add($"[{SectionName.ToUpper()}");
                 writeToFile();
             }
         }
@@ -650,11 +641,10 @@ namespace INIManager
         {
             bool parameterAdded = addNewParameterToSectionList(SectionName, ParameterName, ParameterValue);
 
-            if (!parameterAdded)
-            {
-                addNewSectionToSectionList(SectionName);
-                addNewParameterToSectionList(SectionName, ParameterName, ParameterValue);
-            }
+            if (getEntryIndex(SectionName) == 0) AddNewSection(SectionName);
+
+            int index = getEntryIndex(SectionName);
+            _iniTextLines.Insert(++index, $"{ParameterName}={ParameterValue}");
 
             writeToFile();
         }
@@ -662,8 +652,8 @@ namespace INIManager
 
         public void DeleteParameter(string SectionName, string ParameterName)
         {
-            int index = getParamererIndex(SectionName, ParameterName);
-            _iniTextLines[index].Remove();
+            int index = getEntryIndex(SectionName, ParameterName);
+            if (index != 0) _iniTextLines.RemoveAt(index);
         }
 
 
