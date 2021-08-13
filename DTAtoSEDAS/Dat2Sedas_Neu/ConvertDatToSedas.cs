@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace Dat2Sedas_Neu
 {
     class ConvertDatToSedas
-    {
-        //TODO Ablauf Schritt für Schritt prüfen
+    {              
         private string _SourcePath;
         private List<string> _SourceData;
         private string _DestinationPath;
@@ -135,6 +134,7 @@ namespace Dat2Sedas_Neu
                 Bestellzeilen.Add(bestellzeile);
             }
 
+            //TODO Auslagern in eigene Metode für beide Formate.
             Bestellzeilen = DeleteCustomers(Bestellzeilen);        //Zu löschende Einträge entfernen
             Bestellzeilen = DeleteArticles(Bestellzeilen);
             Bestellzeilen = ChangeArticleNumbers(Bestellzeilen); //zu tauschende Artikelnummern tauschen
@@ -149,7 +149,7 @@ namespace Dat2Sedas_Neu
         {
             #region über Delegaten steuern lassen
             string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
-            List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);              
+            List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);
             List<DatBestellzeile> deletedCustomers = new List<DatBestellzeile>();
             #endregion
             foreach (string kundennummer in customersToDelete)
@@ -361,7 +361,7 @@ class SedasFile
     public SedasFile(string Erstelldatum, int IniSedasRunThroughCounter)
     {
         _ErstellDatumSedas = Erstelldatum;
-        _IniSedasRunThroughCounter = IniSedasRunThroughCounter;  //TODO prüfen, woher der Counter kommt oder gesetzt wird.
+        _IniSedasRunThroughCounter = IniSedasRunThroughCounter;
     }
 
     //METHODEN
@@ -496,8 +496,6 @@ class SedasOrderLine
     //METHODEN
     public string Get()
     {
-        //TODO BHMArtikelnummer auf 10 Stellen aufgefüllt  Siehe 
-        //TODO Artikelmenge auf 5 Stellen aufgefüllt
         return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer, 10)},4{Tools.ExpandLeftStringSide(ArtikelMenge, 7)},,,,02 000000,,";
     }
 }
@@ -574,7 +572,7 @@ static class Datenverarbeitung
         List<string> delItems = new List<string>();
         try
         {
-            delItems = File.ReadAllText(Path).Split(new string[] { "\r\n" },StringSplitOptions.None).ToList<string>();
+            delItems = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();
         }
         catch (Exception ex)
         { }
@@ -593,20 +591,21 @@ static class Datenverarbeitung
         List<string> changeArticleFileContent = new List<string>();
         try
         {
-            changeArticleFileContent = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();             
+            changeArticleFileContent = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();
         }
         catch (Exception ex)
         { }
 
         foreach (string line in changeArticleFileContent)
         {
-            string[] elements = line.Split(';');
-            DictChangeArticles.Add(elements[0].Trim(), elements[1].Trim());
+            if (line != "")
+            {
+                string[] elements = line.Split(';');
+                DictChangeArticles.Add(elements[0].Trim(), elements[1].Trim());
+            }
         }
         return DictChangeArticles;
     }
-
-
 }
 
 public class Tools
