@@ -16,14 +16,16 @@ namespace Dat2Sedas_Neu
 
         private List<DatBestellzeile> _DatContent;
         private string _SedasErstellDatumJJMMTT;
+        private int _counter;
         private SedasFile _SedasFile;
 
         //KONSTRUKTOR
-        public ConvertDatToSedas(string SourceFilePath, string DestinationFilePath)
+        public ConvertDatToSedas(string SourceFilePath, string DestinationFilePath, int Counter)
         {
             this._SedasErstellDatumJJMMTT = ConvertToSedasDateJJMMTT(DateTime.Now);
             this._SourcePath = SourceFilePath;
             this._DestinationPath = DestinationFilePath;
+            this._counter = Counter;
         }
 
         //METHODEN
