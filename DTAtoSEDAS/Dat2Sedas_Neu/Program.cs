@@ -91,7 +91,7 @@ namespace Dat2Sedas_Neu
 
             Param.Counter = SetCounter(Param.Counter);
 
-            ConvertDatToSedas D2S = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath);
+            ConvertDatToSedas D2S = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath,Param.Counter);
             D2S.CreateSedasData();
             D2S.WriteSedasData();
 

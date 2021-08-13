@@ -1,2 +1,2 @@
 alteArtNr;neueArtNr;Beschreibung
-540;534
+2;111

@@ -149,37 +149,40 @@ namespace Dat2Sedas_Neu
         {
             #region über Delegaten steuern lassen
             string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
-            List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);
+            List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);              
+            List<DatBestellzeile> deletedCustomers = new List<DatBestellzeile>();
             #endregion
-
             foreach (string kundennummer in customersToDelete)
             {
                 foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
                 {
                     if (kundennummer == datBestellzeile.BHMKundenNummer)
                     {
-                        DatBestellzeilen.Remove(datBestellzeile);
+                        deletedCustomers.Add(datBestellzeile);
                     }
                 }
             }
+            DatBestellzeilen = DatBestellzeilen.Except(deletedCustomers).ToList();
             return DatBestellzeilen;
         }
 
         private List<DatBestellzeile> DeleteArticles(List<DatBestellzeile> DatBestellzeilen)
         {
-            string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
+            string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
             List<string> articlesToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheArtikel);
+            List<DatBestellzeile> deletedArticles = new List<DatBestellzeile>();
 
-            foreach (string kundennummer in articlesToDelete)
+            foreach (string artikelnummer in articlesToDelete)
             {
                 foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
                 {
-                    if (kundennummer == datBestellzeile.BHMKundenNummer)
+                    if (artikelnummer == datBestellzeile.BHMArtikelNummer)
                     {
-                        DatBestellzeilen.Remove(datBestellzeile);
+                        deletedArticles.Add(datBestellzeile);
                     }
                 }
             }
+            DatBestellzeilen = DatBestellzeilen.Except(deletedArticles).ToList();
             return DatBestellzeilen;
         }
 
@@ -195,7 +198,7 @@ namespace Dat2Sedas_Neu
             {
                 if (ArticlesDict.ContainsKey(datBestellzeile.BHMArtikelNummer))
                 {
-                    datBestellzeile.BHMKundenNummer = ArticlesDict[datBestellzeile.BHMKundenNummer];
+                    datBestellzeile.BHMArtikelNummer = ArticlesDict[datBestellzeile.BHMArtikelNummer];
                 }
             }
             return DatBestellzeilen;
@@ -278,7 +281,7 @@ namespace Dat2Sedas_Neu
 
             ReadDatFileContent();
 
-            _SedasFile = new SedasFile();
+            _SedasFile = new SedasFile(_SedasErstellDatumJJMMTT, _counter);
             while (pointer1 < _DatContent.Count())
             {
                 //Kundenbestellung erzeugen/beginnen
@@ -353,7 +356,7 @@ class SedasFile
     public int OverallOrderLineEntriesCount { get { return GetTotalNumberOfOrderLines(); } }
 
     //KONSTRUKTOR
-    public SedasFile() { }
+    //public SedasFile() { }
 
     public SedasFile(string Erstelldatum, int IniSedasRunThroughCounter)
     {
@@ -389,7 +392,7 @@ class SedasFile
         //  108,   = Anzahl Kunden in Datei (Blöcke)
         //  1178   = Anzahl einzelner Datensätze/Artikelzeilen
         #endregion
-        string FooterLine1 = $":06{Tools.ExpandLeftStringSide(CustomerOrdersCount.ToString(),3)};{OverallOrderLineEntriesCount}";
+        string FooterLine1 = $":06{Tools.ExpandLeftStringSide(CustomerOrdersCount.ToString(), 3)};{OverallOrderLineEntriesCount}";
         string FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
 
         return FooterLine1 + "\r\n" + FooterLine2;
@@ -450,7 +453,7 @@ class SedasOrder
         //   000000039      9 Stellen für Summe bestellter Artikelmengen
         //            0000  1000er Stelle für Artikelmenge
 
-        string articleQuantity = Tools.ExpandLeftStringSide(OrderArticleQuantity.ToString(),9);
+        string articleQuantity = Tools.ExpandLeftStringSide(OrderArticleQuantity.ToString(), 9);
         return $";05{articleQuantity}000";
     }
 
@@ -495,7 +498,7 @@ class SedasOrderLine
     {
         //TODO BHMArtikelnummer auf 10 Stellen aufgefüllt  Siehe 
         //TODO Artikelmenge auf 5 Stellen aufgefüllt
-        return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer,10)},4{Tools.ExpandLeftStringSide(ArtikelMenge,7)},,,,02 000000,,";
+        return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer, 10)},4{Tools.ExpandLeftStringSide(ArtikelMenge, 7)},,,,02 000000,,";
     }
 }
 
@@ -571,7 +574,7 @@ static class Datenverarbeitung
         List<string> delItems = new List<string>();
         try
         {
-            delItems = File.ReadAllText(Path).Split('\n').ToList<string>();
+            delItems = File.ReadAllText(Path).Split(new string[] { "\r\n" },StringSplitOptions.None).ToList<string>();
         }
         catch (Exception ex)
         { }
@@ -590,7 +593,7 @@ static class Datenverarbeitung
         List<string> changeArticleFileContent = new List<string>();
         try
         {
-            changeArticleFileContent = File.ReadAllText(Path).Split('\n').ToList<string>();
+            changeArticleFileContent = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();             
         }
         catch (Exception ex)
         { }
