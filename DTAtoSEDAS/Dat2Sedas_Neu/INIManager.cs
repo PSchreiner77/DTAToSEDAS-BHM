@@ -577,31 +577,31 @@ namespace INIManager
                     return _iniTextLines.IndexOf(line);
                 }
             }
-            return 0;
+            return -1;
         }
 
         private int getEntryIndex(string SectionName, string ParameterName)
         {
             int index = getEntryIndex(SectionName);
-            if (index == 0) return 0;
+            if (index == -1) return -1;
 
             index++;
             for (int i = index; i < _iniTextLines.Count; i++)
             {
                 if (_iniTextLines[index].Contains("[") || _iniTextLines[index] == "")
-                    return 0;
+                    return -1;
 
                 if (_iniTextLines[index].ToUpper().Contains(ParameterName.ToUpper()))
                     return index;
             }
-            return 0;
+            return -1;
         }
 
 
         public string GetParameterValue(string SectionName, string ParameterName)
         {
             int index = getEntryIndex(SectionName, ParameterName);
-            if (index == 0)
+            if (index == -1)
                 return "";
 
             string[] parameter = _iniTextLines[index].Split('=');
@@ -611,9 +611,8 @@ namespace INIManager
 
         public void UpdateParameterValue(string SectionName, string ParameterName, string NewParameterValue)
         {
-            bool valueUpdated = false;
             int index = getEntryIndex(SectionName, ParameterName);
-            if (index != 0)
+            if (index >= 0)
             {
                 string[] parameter = _iniTextLines[index].Split('=');
                 parameter[1] = NewParameterValue;
@@ -624,33 +623,40 @@ namespace INIManager
         }
 
         //TODO Erweitern und löschen von Einträgen und Sektionen überarbeiten!!!
-        //public void AddNewSection(string SectionName)
-        //{
-        //    bool isNewSection = false;
-        //    if (getEntryIndex(SectionName) == 0)
-        //        isNewSection = false;
+        public void AddNewSection(string SectionName)
+        {
+            bool isNewSection = false;
 
-        //    if (isNewSection)
-        //    {
-        //        _iniTextLines.Add($"[{SectionName.ToUpper()}");
-        //        writeToFile();
-        //    }
-        //}
+            if (getEntryIndex(SectionName) == -1)
+                isNewSection = false;
 
-
-        //public void AddNewParameter(string SectionName, string ParameterName, string ParameterValue = "")
-        //{
-        //    bool parameterAdded = addNewParameterToSectionList(SectionName, ParameterName, ParameterValue);
-
-        //    if (getEntryIndex(SectionName) == 0) AddNewSection(SectionName);
-
-        //    int index = getEntryIndex(SectionName);
-        //    _iniTextLines.Insert(++index, $"{ParameterName}={ParameterValue}");
-
-        //    writeToFile();
-        //}
+            if (getEntryIndex(SectionName) == -1)
+            {
+                _iniTextLines.Insert(_iniTextLines.Count - 1,$"[{SectionName.ToUpper()}]"); ;
+                writeToFile();
+            }
+        }
 
 
+        public void AddNewParameter(string SectionName, string ParameterName, string ParameterValue = "")
+        {
+            bool sectionFound = getEntryIndex(SectionName) > 0; 
+
+            if (!sectionFound) AddNewSection(SectionName);
+
+            bool parameterFound = getEntryIndex(SectionName, ParameterName) >= 0;
+            if (!parameterFound)
+            {
+                _iniTextLines.Insert(getEntryIndex(SectionName), ParameterName);
+            }                
+
+            UpdateParameterValue(SectionName, ParameterName, ParameterValue););
+
+            writeToFile();
+        }
+
+
+        //TODO HIER WEITER!!
         //public void DeleteParameter(string SectionName, string ParameterName)
         //{
         //    int index = getEntryIndex(SectionName, ParameterName);
