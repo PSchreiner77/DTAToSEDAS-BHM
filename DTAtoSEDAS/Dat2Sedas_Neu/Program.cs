@@ -37,7 +37,7 @@ namespace Dat2Sedas_Neu
         {
             if (counter >= 990)
             {
-                //TODO Meldung Counter zurückgesetzt von Counter auf 1
+                //TODO Meldung: Counter zurückgesetzt von Counter auf 1
                 counter = 0;
                 
             }

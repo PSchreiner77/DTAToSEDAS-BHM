@@ -388,6 +388,7 @@ namespace INIManager
         private string _INIPath = System.IO.Directory.GetCurrentDirectory() + "\\Settings.ini";
         private List<Section> _iniContent = new List<Section>();
         private List<string> _iniTextLines = new List<string>();
+        private string iniHeaderText = "";
 
         private string INIPath
         {
@@ -409,13 +410,11 @@ namespace INIManager
         public IniManagerNew(string Path)
         {
 
-            if (!System.IO.File.Exists(Path))
+            if (checkIniPath(Path) != "")
             {
-                throw new FileLoadException("Ini-Datei kann nicht geladen werden");
+                INIPath = Path;
+                if (readIniFile(_INIPath)) importIniContent(_iniTextLines);
             }
-            INIPath = Path;
-            if (readIniFile(_INIPath)) importIniContent(_iniTextLines);
-
         }
         #endregion
 
@@ -428,10 +427,25 @@ namespace INIManager
             if (!System.IO.File.Exists(path))
             {
                 throw new IOException($"Ini-Datei {path} kann nicht geladen werden");
+                return "";
             }
             return path;
         }
 
+
+
+        private void setIniHeaderText()
+        {
+            iniHeaderText = "-----------------------\n" +
+                            "DATtoSEDAS Config-Datei\n" +
+                            "-----------------------\n" +
+                            "Quell- und Zielpfad müssen mit Laufwerksbuchstabe angegeben werden(vollständig), jedoch ohne Dateiname.\n" +
+                            "Der Dateiname der Quell- und Zieldatei wird separat eingetragen.\n" +
+                            "Werden Quell- und Zieldateiname beim Programmstart per Schalter übergeben(/Q=, /Z=), werden die Einträge\n" +
+                            "in der Config.ini übergangen.\n" +
+                            "Dies gilt auch für alle weiteren Schalter (z.B.QuelleLöschen, /D)     ";
+
+        }
 
         /// <summary>
         /// Liest den Inhalt der INI-Datei in ein List<string> Objekt ein.
@@ -736,6 +750,8 @@ namespace INIManager
             {
                 using (StreamWriter sw = new StreamWriter(INIPath, false))
                 {
+                    sw.WriteLine(iniHeaderText);
+
                     //TODO Sections aufsteigend sortiert (alphabetisch) ausgeben.
                     foreach (Section section in _iniContent)
                     {
@@ -774,7 +790,6 @@ namespace INIManager
             }
 
         }
-
         #endregion
     }
 }
