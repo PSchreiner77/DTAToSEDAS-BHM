@@ -78,30 +78,6 @@ namespace Dat2Sedas_Neu
             this.DestinationFileFolder = FolderPathCorrection(DestinationFileFolder);
             if (DestinationFileName == "") DestinationFileName = "Sedas.dat"; 
             this.DestinationFileName = DestinationFileName;
-        }
-
-        //DELETE
-        //public void SetSourceFullPath(string SrcFullPath)
-        //{
-        //    if (SrcFullPath != "")
-        //    {
-        //        SourceFullPath = SrcFullPath;
-        //    }
-        //}
-
-        //DELETE
-        //public void SetDestinationFullPath(string DestFullPath)
-        //{
-        //    if (DestFullPath != "")
-        //    {
-
-        //        if (DestFullPath.Substring(DestFullPath.Length, 1) != "\\")
-        //        {
-        //            DestFullPath += "\\";
-        //        }
-        //    }
-        //    DestinationFullPath = DestFullPath;
-        //
-        //}
+        }         
     }
 }
