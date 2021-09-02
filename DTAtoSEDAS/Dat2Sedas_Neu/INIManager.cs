@@ -386,7 +386,7 @@ namespace INIManager
     {
         #region PROPERTIES
         private string _INIPath = System.IO.Directory.GetCurrentDirectory() + "\\Settings.ini";
-        private List<Section> _iniContent = new List<Section>();
+        private List<Section> _sectionList = new List<Section>();
         private List<string> _iniTextLines = new List<string>();
         private string iniHeaderText = "";
 
@@ -399,6 +399,22 @@ namespace INIManager
             }
         }
 
+        private string GetIniHeaderText
+        {
+            get
+            {
+                return "-----------------------\n" +
+                       "DATtoSEDAS Config-Datei\n" +
+                       "-----------------------\n" +
+                       "Quell- und Zielpfad müssen mit Laufwerksbuchstabe angegeben werden(vollständig), jedoch ohne Dateiname.\n" +
+                       "Der Dateiname der Quell- und Zieldatei wird separat eingetragen.\n" +
+                       "Werden Quell- und Zieldateiname beim Programmstart per Schalter übergeben(/Q=, /Z=), werden die Einträge\n" +
+                       "in der Config.ini übergangen.\n" +
+                       "Dies gilt auch für alle weiteren Schalter (z.B.QuelleLöschen, /D)     ";
+            }
+        }
+
+
         #endregion
 
 
@@ -407,7 +423,7 @@ namespace INIManager
         { }
 
 
-        public IniManagerNew(string Path)
+        public IniManagerNew(string Path) : base()
         {
 
             if (checkIniPath(Path) != "")
@@ -432,20 +448,6 @@ namespace INIManager
             return path;
         }
 
-
-
-        private void setIniHeaderText()
-        {
-            iniHeaderText = "-----------------------\n" +
-                            "DATtoSEDAS Config-Datei\n" +
-                            "-----------------------\n" +
-                            "Quell- und Zielpfad müssen mit Laufwerksbuchstabe angegeben werden(vollständig), jedoch ohne Dateiname.\n" +
-                            "Der Dateiname der Quell- und Zieldatei wird separat eingetragen.\n" +
-                            "Werden Quell- und Zieldateiname beim Programmstart per Schalter übergeben(/Q=, /Z=), werden die Einträge\n" +
-                            "in der Config.ini übergangen.\n" +
-                            "Dies gilt auch für alle weiteren Schalter (z.B.QuelleLöschen, /D)     ";
-
-        }
 
         /// <summary>
         /// Liest den Inhalt der INI-Datei in ein List<string> Objekt ein.
@@ -582,91 +584,88 @@ namespace INIManager
         //}
 
 
-        private int getEntryIndex(string SectionName)
-        {
-            foreach (string line in _iniTextLines)
-            {
-                if (line.ToUpper().Contains($"[{SectionName.ToUpper()}]"))
-                {
-                    return _iniTextLines.IndexOf(line);
-                }
-            }
-            return -1;
-        }
+        //private int getEntryIndex(string SectionName)
+        //{
+        //    foreach (string line in _iniTextLines)
+        //    {
+        //        if (line.ToUpper().Contains($"[{SectionName.ToUpper()}]"))
+        //        {
+        //            return _iniTextLines.IndexOf(line);
+        //        }
+        //    }
+        //    return -1;
+        //}
 
-        private int getEntryIndex(string SectionName, string ParameterName)
-        {
-            int index = getEntryIndex(SectionName);
-            if (index == -1) return -1;
+        //private int getEntryIndex(string SectionName, string ParameterName)
+        //{
+        //    int index = getEntryIndex(SectionName);
+        //    if (index == -1) return -1;
 
-            index++;
-            for (int i = index; i < _iniTextLines.Count; i++)
-            {
-                if (_iniTextLines[index].Contains("[") || _iniTextLines[index] == "")
-                    return -1;
+        //    index++;
+        //    for (int i = index; i < _iniTextLines.Count; i++)
+        //    {
+        //        if (_iniTextLines[index].Contains("[") || _iniTextLines[index] == "")
+        //            return -1;
 
-                if (_iniTextLines[index].ToUpper().Contains(ParameterName.ToUpper()))
-                    return index;
-            }
-            return -1;
-        }
-
-
-        public string GetParameterValue(string SectionName, string ParameterName)
-        {
-            int index = getEntryIndex(SectionName, ParameterName);
-            if (index == -1)
-                return "";
-
-            string[] parameter = _iniTextLines[index].Split('=');
-            return parameter[1].Trim();
-        }
+        //        if (_iniTextLines[index].ToUpper().Contains(ParameterName.ToUpper()))
+        //            return index;
+        //    }
+        //    return -1;
+        //}
 
 
-        public void UpdateParameterValue(string SectionName, string ParameterName, string NewParameterValue)
-        {
-            int index = getEntryIndex(SectionName, ParameterName);
-            if (index >= 0)
-            {
-                string[] parameter = _iniTextLines[index].Split('=');
-                parameter[1] = NewParameterValue;
-                _iniTextLines[index] = parameter[0] + "=" + parameter[1];
 
-                writeToFile();
-            }
-        }
 
         //TODO Erweitern und löschen von Einträgen und Sektionen überarbeiten!!!
         public void AddNewSection(string SectionName)
         {
-            bool isNewSection = false;
-
-            if (getEntryIndex(SectionName) == -1)
-                isNewSection = false;
-
-            if (getEntryIndex(SectionName) == -1)
+            if (!_sectionList.Exists(sec => sec.sectionName.Contains(SectionName)))
             {
-                _iniTextLines.Insert(_iniTextLines.Count - 1,$"[{SectionName.ToUpper()}]"); ;
-                writeToFile();
+                _sectionList.Add(new Section(SectionName));
+                writeToFileNew();
             }
         }
 
 
         public void AddNewParameter(string SectionName, string ParameterName, string ParameterValue = "")
         {
-            bool sectionFound = getEntryIndex(SectionName) > 0; 
-
-            if (!sectionFound) AddNewSection(SectionName);
-
-            bool parameterFound = getEntryIndex(SectionName, ParameterName) >= 0;
-            if (!parameterFound)
+            if (_sectionList.Exists(sec => sec.sectionName.Contains("SectionName")))
             {
-                _iniTextLines.Insert(getEntryIndex(SectionName), ParameterName);
-            }                
+                Section section = _sectionList.Find(sec => sec.sectionName == SectionName);
 
-            UpdateParameterValue(SectionName, ParameterName, ParameterValue););
-
+                if (!section.ParameterDic.ContainsKey("ParameterName"))
+                {
+                    section.ParameterDic.Add(ParameterName, ParameterValue);
+                }
+            }
             writeToFile();
+        }
+
+        public string GetParameterValue(string SectionName, string ParameterName)
+        {
+            if (_sectionList.Exists(sec => sec.sectionName.Contains(SectionName)))
+            {
+                Section section = _sectionList.Find(sec => sec.sectionName == SectionName);
+
+                if (section.ParameterDic.ContainsKey(ParameterName))
+                {
+                    return section.ParameterDic[ParameterName].Trim();
+                }
+            }
+            return "";
+        }
+
+        public void UpdateParameterValue(string SectionName, string ParameterName, string NewParameterValue)
+        {
+            if (_sectionList.Exists(sec => sec.sectionName.Contains(SectionName)))
+            {
+                Section section = _sectionList.Find(sec => sec.sectionName == SectionName);
+                
+                if(section.ParameterDic.ContainsKey(ParameterName))
+                {
+                    section.ParameterDic[ParameterName] = NewParameterValue;
+                }
+            }
         }
 
 
@@ -678,7 +677,7 @@ namespace INIManager
         //}
 
 
-        //public void DeleteSection(string SectionName)
+        //TODO public void DeleteSection(string SectionName)
         //{
         //    //TODO Fehler wg. verändertem index beim löschen
 
@@ -699,7 +698,8 @@ namespace INIManager
         //}
 
 
-        //public void DeleteAllEntries()
+
+        //TODO public void DeleteAllEntries()
         //{
         //    _iniContent.Clear();
         //    writeToFile();
@@ -749,10 +749,10 @@ namespace INIManager
             {
                 using (StreamWriter sw = new StreamWriter(INIPath, false))
                 {
-                    sw.WriteLine(iniHeaderText);
+                    sw.WriteLine(GetIniHeaderText);
 
                     //TODO Sections aufsteigend sortiert (alphabetisch) ausgeben.
-                    foreach (Section section in _iniContent)
+                    foreach (Section section in _sectionList)
                     {
                         sw.WriteLine("[{0}]", section.sectionName.ToUpper());
                         foreach (string parameter in section.ParameterDic.Keys)
