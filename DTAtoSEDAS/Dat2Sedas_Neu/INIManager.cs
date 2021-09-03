@@ -478,79 +478,51 @@ namespace INIManager
         }
 
 
-        ///// <summary>
-        ///// Liest den Inhalt aus der List<string> iniContent in eine List<Section> ein.
-        ///// </summary>
-        ///// <param name="Content">List<string> mit Zeilen der INI-Datei.</string></param>
-        //private void importIniContent(List<string> Content)
-        //{
-        //    List<string> sectionBlock = new List<string>();
+        /// <summary>
+        /// Liest den Inhalt aus der List<string> iniContent in eine List<Section> ein.
+        /// </summary>
+        /// <param name="Content">List<string> mit Zeilen der INI-Datei.</string></param>
+        private void importIniContent(List<string> Content)
+        {
+            List<string> sectionBlock = new List<string>();
 
-        //    for (int i = 0; i < _iniTextLines.Count(); i++)
-        //    {
-        //        if (_iniTextLines[i].Trim().Contains("["))
-        //        {
-        //            //Section gefunden                    
-        //            string sectionName = getSectionNameFromLine(Content[i].Trim());
-        //            addNewSectionToSectionList(sectionName);
+            for (int i = 0; i < _iniTextLines.Count(); i++)
+            {
+                if (_iniTextLines[i].Trim().Contains("["))
+                {
+                    //Section gefunden                    
+                    string sectionName = getSectionNameFromLine(Content[i].Trim());
+                    AddNewSection(sectionName);
 
-        //            int j = i + 1;
-        //            while (j < _iniTextLines.Count())
-        //            {
-        //                if (_iniTextLines[j].Contains("[")) break;
+                    int j = i + 1;
+                    while (j < _iniTextLines.Count())
+                    {
+                        if (_iniTextLines[j].Contains("[")) break;
 
-        //                if (_iniTextLines[j].Contains("="))
-        //                {
-        //                    string[] parameterLine = _iniTextLines[j].Split('=');
-        //                    string parameterName = parameterLine[0].Trim();
-        //                    string ParameterValue = parameterLine[1].Trim();
-        //                    addNewParameterToSectionList(sectionName, parameterName, ParameterValue);
-        //                }
-        //                j++;
-        //            }
-        //            i = j - 1;
-        //        }
-        //    }
-        //}
-
-
-        //private string getSectionNameFromLine(string sectionHeader)
-        //{
-        //    string sectionName = sectionHeader.Trim().ToUpper();
-
-        //    if (sectionName.Substring(0, 1) == "[") sectionName = sectionName.Remove(0, 1);
-        //    if (sectionName.Substring(sectionName.Length - 1, 1) == "]") sectionName = sectionName.Remove(sectionName.Length - 1);
-        //    return sectionName;
-        //}
+                        if (_iniTextLines[j].Contains("="))
+                        {
+                            string[] parameterLine = _iniTextLines[j].Split('=');
+                            string parameterName = parameterLine[0].Trim();
+                            string ParameterValue = parameterLine[1].Trim();
+                            AddNewParameter(sectionName, parameterName, ParameterValue);
+                        }
+                        j++;
+                    }
+                    i = j - 1;
+                }
+            }
+        }
 
 
-        //private void addNewSectionToSectionList(string sectionName)
-        //{
-        //    _iniContent.Add(new Section(sectionName.ToUpper()));
-        //}
+        private string getSectionNameFromLine(string sectionHeader)
+        {
+            string sectionName = sectionHeader.Trim().ToUpper();
 
-
-        //private bool addNewParameterToSectionList(string SectionName, string ParameterName, string ParameterValue = "")
-        //{
-        //    bool parameterAdded = false;
-        //    foreach (Section section in this._iniContent)
-        //    {
-        //        if (section.sectionName == SectionName.ToUpper())
-        //        {
-        //            if (section.ParameterDic.ContainsKey(ParameterName.ToUpper()))
-        //            {
-        //                section.ParameterDic[ParameterName] = ParameterValue;
-        //                parameterAdded = true;
-        //            }
-        //            else
-        //            {
-        //                section.ParameterDic.Add(ParameterName, ParameterValue);
-        //                parameterAdded = true;
-        //            }
-        //        }
-        //    }
-        //    return parameterAdded;
-        //}
+            if (sectionName.Substring(0, 1) == "[") sectionName = sectionName.Remove(0, 1);
+            if (sectionName.Substring(sectionName.Length - 1, 1) == "]") sectionName = sectionName.Remove(sectionName.Length - 1);
+            return sectionName;
+        }
+       
         #endregion
 
 
@@ -622,12 +594,17 @@ namespace INIManager
             if (!_sectionList.Exists(sec => sec.sectionName.Contains(SectionName)))
             {
                 _sectionList.Add(new Section(SectionName));
-                writeToFileNew();
+                writeToFile();
             }
         }
 
 
-        public void AddNewParameter(string SectionName, string ParameterName, string ParameterValue = "")
+        public void AddNewParameter(string SectionName, string ParameterName)
+        {
+            AddNewParameter(SectionName, ParameterName, "");
+        }
+
+        public void AddNewParameter(string SectionName, string ParameterName, string ParameterValue)
         {
             if (_sectionList.Exists(sec => sec.sectionName.Contains("SectionName")))
             {
@@ -636,9 +613,9 @@ namespace INIManager
                 if (!section.ParameterDic.ContainsKey("ParameterName"))
                 {
                     section.ParameterDic.Add(ParameterName, ParameterValue);
+                    writeToFile();
                 }
             }
-            writeToFile();
         }
 
         public string GetParameterValue(string SectionName, string ParameterName)
@@ -664,6 +641,7 @@ namespace INIManager
                 if(section.ParameterDic.ContainsKey(ParameterName))
                 {
                     section.ParameterDic[ParameterName] = NewParameterValue;
+                    writeToFile();
                 }
             }
         }
@@ -706,43 +684,43 @@ namespace INIManager
         //}
 
 
+        ///// <summary>
+        ///// Schreibt die INI-Datei neu mit den geänderten Werten.
+        ///// </summary>
+        ///// <returns></returns>
+        //private bool writeToFile()
+        //{
+        //    bool checkWrite = false;
+        //    try
+        //    {
+        //        using (StreamWriter sw = new StreamWriter(INIPath, false))
+        //        {
+        //            sw.WriteLine(_iniTextLines);
+
+        //            ////TODO Sections aufsteigend sortiert (alphabetisch) ausgeben.
+        //            //foreach (Section section in _iniContent)
+        //            //{
+        //            //    sw.WriteLine("[{0}]", section.sectionName.ToUpper());
+        //            //    foreach (string parameter in section.ParameterDic.Keys)
+        //            //    {
+        //            //        sw.WriteLine("{0} = {1}", parameter, section.ParameterDic[parameter]);
+        //            //    }
+        //            //    sw.WriteLine();
+        //            //}
+        //            sw.Close();
+        //            checkWrite = true;
+        //        }
+        //    }
+        //    catch (IOException ex)
+        //    { return checkWrite; }
+        //    return checkWrite;
+        //}
+
         /// <summary>
         /// Schreibt die INI-Datei neu mit den geänderten Werten.
         /// </summary>
         /// <returns></returns>
         private bool writeToFile()
-        {
-            bool checkWrite = false;
-            try
-            {
-                using (StreamWriter sw = new StreamWriter(INIPath, false))
-                {
-                    sw.WriteLine(_iniTextLines);
-
-                    ////TODO Sections aufsteigend sortiert (alphabetisch) ausgeben.
-                    //foreach (Section section in _iniContent)
-                    //{
-                    //    sw.WriteLine("[{0}]", section.sectionName.ToUpper());
-                    //    foreach (string parameter in section.ParameterDic.Keys)
-                    //    {
-                    //        sw.WriteLine("{0} = {1}", parameter, section.ParameterDic[parameter]);
-                    //    }
-                    //    sw.WriteLine();
-                    //}
-                    sw.Close();
-                    checkWrite = true;
-                }
-            }
-            catch (IOException ex)
-            { return checkWrite; }
-            return checkWrite;
-        }
-
-        /// <summary>
-        /// Schreibt die INI-Datei neu mit den geänderten Werten.
-        /// </summary>
-        /// <returns></returns>
-        private bool writeToFileNew()
         {
             bool checkWrite = false;
             try
