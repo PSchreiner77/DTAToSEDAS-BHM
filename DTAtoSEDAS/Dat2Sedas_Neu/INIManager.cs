@@ -314,7 +314,7 @@ namespace INIManager
             {
                 using (StreamWriter sw = new StreamWriter(INIPath, false))
                 {
-                    sw.WriteLine()
+                    sw.WriteLine();
                     //TODO Sections aufsteigend sortiert (alphabetisch) ausgeben.
                     foreach (Section section in _iniContent)
                     {
