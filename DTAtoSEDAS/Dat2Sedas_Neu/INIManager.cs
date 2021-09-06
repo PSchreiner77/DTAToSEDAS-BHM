@@ -17,7 +17,7 @@ namespace INIManager
     public class IniManager
     {
         #region PROPERTIES
-        private string _INIPath = System.IO.Directory.GetCurrentDirectory() + "\\Settings.ini";
+        private string _INIPath = System.IO.Directory.GetCurrentDirectory() + "\\Config.ini";
         private List<Section> _iniContent = new List<Section>();
         private List<string> _iniImportedTextLines = new List<string>();
 
@@ -189,9 +189,9 @@ namespace INIManager
             {
                 if (section.sectionName == SectionName.ToUpper())
                 {
-                    if (section.ParameterDic.ContainsKey(ParameterName.ToUpper()))
+                    if (section.ParameterDic.ContainsKey(ParameterName))
                     {
-                        return section.ParameterDic[ParameterName.ToUpper()];
+                        return section.ParameterDic[ParameterName];
                     }
                 }
             }
@@ -206,9 +206,9 @@ namespace INIManager
             {
                 if (section.sectionName == SectionName.ToUpper())
                 {
-                    if (section.ParameterDic.ContainsKey(ParameterName.ToUpper()))
+                    if (section.ParameterDic.ContainsKey(ParameterName))
                     {
-                        section.ParameterDic[ParameterName.ToUpper()] = ParameterValue;
+                        section.ParameterDic[ParameterName] = ParameterValue;
                         valueUpdated = true;
                         break;
                     }
@@ -261,9 +261,9 @@ namespace INIManager
             {
                 if (section.sectionName == SectionName.ToUpper())
                 {
-                    if (section.ParameterDic.ContainsKey(ParameterName.ToUpper()))
+                    if (section.ParameterDic.ContainsKey(ParameterName))
                     {
-                        section.ParameterDic.Remove(ParameterName.ToUpper());
+                        section.ParameterDic.Remove(ParameterName);
                     }
                 }
             }
@@ -297,6 +297,11 @@ namespace INIManager
             writeToFile();
         }
 
+        public void WriteINItoFile()
+        {
+            writeToFile();
+        }
+
 
         /// <summary>
         /// Schreibt die INI-Datei neu mit den geänderten Werten.
@@ -309,6 +314,7 @@ namespace INIManager
             {
                 using (StreamWriter sw = new StreamWriter(INIPath, false))
                 {
+                    sw.WriteLine()
                     //TODO Sections aufsteigend sortiert (alphabetisch) ausgeben.
                     foreach (Section section in _iniContent)
                     {
@@ -522,7 +528,7 @@ namespace INIManager
             if (sectionName.Substring(sectionName.Length - 1, 1) == "]") sectionName = sectionName.Remove(sectionName.Length - 1);
             return sectionName;
         }
-       
+
         #endregion
 
 
@@ -637,8 +643,8 @@ namespace INIManager
             if (_sectionList.Exists(sec => sec.sectionName.Contains(SectionName)))
             {
                 Section section = _sectionList.Find(sec => sec.sectionName == SectionName);
-                
-                if(section.ParameterDic.ContainsKey(ParameterName))
+
+                if (section.ParameterDic.ContainsKey(ParameterName))
                 {
                     section.ParameterDic[ParameterName] = NewParameterValue;
                     writeToFile();

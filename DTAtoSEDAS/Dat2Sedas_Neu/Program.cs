@@ -38,9 +38,10 @@ namespace Dat2Sedas_Neu
             if (counter >= 990)
             {
                 //TODO Meldung: Counter zurückgesetzt von Counter auf 1
+                Console.WriteLine("Counter von {0} zurückgesetzt.");
                 counter = 0;
                 
-            }
+            }            
             return ++counter;
         }
 
@@ -51,7 +52,7 @@ namespace Dat2Sedas_Neu
             ShowMessage("...Counter aktualisieren...");
             IniManager INI = new IniManager(Param.INIFilePath);
             INI.UpdateParameterValue("Setup", "Counter", Param.Counter.ToString());
-
+            INI.WriteINItoFile();
             ShowMessage("...zurückschreiben beendet.");
         }
 

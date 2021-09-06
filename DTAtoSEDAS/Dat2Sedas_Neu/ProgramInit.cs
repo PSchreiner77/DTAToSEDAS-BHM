@@ -53,7 +53,7 @@ namespace Dat2Sedas_Neu
                 Param.SourceFileFolder = INI.GetParameterValue("Setup", "Quelldateipfad");
                 Param.DestinationFileName = INI.GetParameterValue("Setup", "Zieldateiname");
                 Param.DestinationFileFolder = INI.GetParameterValue("Setup", "Zieldateipfad");
-
+                var test = INI.GetParameterValue("Setup", "QuelleLöschen");
                 Param.DeleteSourceFile = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "QuelleLöschen")));
                 Param.IgnoreMessages = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "IgnoriereMeldungen")));
                 Param.Counter = Convert.ToInt32(INI.GetParameterValue("Setup", "Counter"));
