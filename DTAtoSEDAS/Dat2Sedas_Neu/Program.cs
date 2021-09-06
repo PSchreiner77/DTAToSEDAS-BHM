@@ -52,7 +52,7 @@ namespace Dat2Sedas_Neu
             ShowMessage("...Counter aktualisieren...");
             IniManager INI = new IniManager(Param.INIFilePath);
             INI.UpdateParameterValue("Setup", "Counter", Param.Counter.ToString());
-            INI.WriteINItoFile();
+            INI.WriteIniFile();
             ShowMessage("...zurückschreiben beendet.");
         }
 
