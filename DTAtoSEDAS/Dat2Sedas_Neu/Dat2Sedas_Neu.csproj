@@ -46,6 +46,7 @@
     <Compile Include="ConvertDatToSedas.cs" />
     <Compile Include="Help.cs" />
     <Compile Include="INIManager.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgramInit.cs" />

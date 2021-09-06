@@ -170,53 +170,6 @@ namespace INIManager
             }
         }
 
-        //public string GetParameterValue(string SectionName, string ParameterName)
-        //{
-        //    foreach (Section section in _iniContent)
-        //    {
-        //        if (section.sectionName == SectionName.ToUpper())
-        //        {
-        //            if (section.ParameterDic.ContainsKey(ParameterName.ToUpper()))
-        //            {
-        //                return section.ParameterDic[ParameterName.ToUpper()];
-        //            }
-        //        }
-        //    }
-        //    return "";
-        //}
-
-
-        //private int getEntryIndex(string SectionName)
-        //{
-        //    foreach (string line in _iniTextLines)
-        //    {
-        //        if (line.ToUpper().Contains($"[{SectionName.ToUpper()}]"))
-        //        {
-        //            return _iniTextLines.IndexOf(line);
-        //        }
-        //    }
-        //    return -1;
-        //}
-
-        //private int getEntryIndex(string SectionName, string ParameterName)
-        //{
-        //    int index = getEntryIndex(SectionName);
-        //    if (index == -1) return -1;
-
-        //    index++;
-        //    for (int i = index; i < _iniTextLines.Count; i++)
-        //    {
-        //        if (_iniTextLines[index].Contains("[") || _iniTextLines[index] == "")
-        //            return -1;
-
-        //        if (_iniTextLines[index].ToUpper().Contains(ParameterName.ToUpper()))
-        //            return index;
-        //    }
-        //    return -1;
-        //}
-
-
-
 
         //TODO Erweitern und löschen von Einträgen und Sektionen überarbeiten!!!
         public void AddNewSection(string SectionName)
