@@ -21,6 +21,7 @@ namespace Dat2Sedas_Neu
         {
             Program prog = new Program();              
             prog.ProgramLoop();
+            Console.WriteLine("Testhalt");Console.ReadKey();
         }
        
         private int SetCounter(int counter)
