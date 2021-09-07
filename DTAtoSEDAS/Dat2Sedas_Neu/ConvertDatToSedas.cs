@@ -281,8 +281,10 @@ namespace Dat2Sedas_Neu
             int pointer1 = 0;
             int pointer2 = 0;
 
+            log.Log("Einlesen der Bestelldatei...", "Einlesen", Logger.MsgType.Message);
             ReadDatFileContent();
 
+            log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
             _SedasFile = new SedasFile(_SedasErstellDatumJJMMTT, _counter);
             while (pointer1 < _DatContent.Count())
             {

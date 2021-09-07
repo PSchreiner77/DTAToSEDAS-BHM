@@ -41,14 +41,15 @@ namespace Dat2Sedas_Neu
                 Param.DestinationFileFolder = INI.GetParameterValue("Setup", "Zieldateipfad");
                 var test = INI.GetParameterValue("Setup", "QuelleLöschen");
                 Param.DeleteSourceFile = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "QuelleLöschen")));
-                Param.IgnoreMessages = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "IgnoriereMeldungen")));
+                Param.IgnoreCriticalMessages = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "IgnoriereMeldungen")));
                 Param.Counter = Convert.ToInt32(INI.GetParameterValue("Setup", "Counter"));
             }
             catch (Exception ex)
-            messageTitle = "Initialisierungsfehler";
-            message = "Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString();
-            log.Log(message, messageTitle, Logger.MsgType.Critical);
-            return false;
+            {
+                messageTitle = "Initialisierungsfehler";
+                message = "Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString();
+                log.Log(message, messageTitle, Logger.MsgType.Critical);
+                return false;
             }
             return true;
         }
@@ -67,15 +68,15 @@ namespace Dat2Sedas_Neu
                                 "Dies gilt auch für alle weiteren Schalter (z.B. QuelleLöschen, /D)\n\r" +
                                 "\n\r" +
                                 "[Setup]\n\r" +
-                                "Counter=\n\r" +
+                                "Counter=0\n\r" +
                                 "Quelldateipfad=\n\r" +
-                                "Quelldateiname=1.txt\n\r" +
-                                "Zieldateipfad=C:\\Temp\n\r" +
+                                "Quelldateiname=\n\r" +
+                                "Zieldateipfad=\n\r" +
                                 "Zieldateiname=Sedas.dat\n\r" +
                                 "\n\r" +
                                 "QuelleLöschen=0\n\r" +
-                                "IgnoriereMeldungen=0\n\r" +
-                                "DatenAnhängen=0\n\r";
+                                "StopBeiKritischenFehlern=0\n\r" +
+                                "DatenAnSedasAnhängen=0\n\r";
 
             try
             {
@@ -153,7 +154,7 @@ namespace Dat2Sedas_Neu
                         break;
 
                     case "/I":
-                        Param.IgnoreMessages = true;    //'Fehlermeldungen unterdrücken
+                        Param.IgnoreCriticalMessages = true;    //'Fehlermeldungen unterdrücken
                         break;
 
                     case "/A":
@@ -175,13 +176,13 @@ namespace Dat2Sedas_Neu
             messageTitle = "Programminitialisierung";
             message = "Prüfen des Quelldateipfades...";
             log.Log(message, messageTitle, Logger.MsgType.Message);
-            string source = Param.SourceFullPath;     
+            string source = Param.SourceFullPath;
 
             if (source == "")
             {
                 messageTitle = "Initialisierungsfehler";
                 message = "Es wurde keine Quelldatei angegeben.";
-                log.Log(message, messageTitle, Logger.MsgType.Critical);                 
+                log.Log(message, messageTitle, Logger.MsgType.Critical);
                 return false;
             }
 
@@ -189,7 +190,7 @@ namespace Dat2Sedas_Neu
             {
                 messageTitle = "Programminitialisierung";
                 message = $"Die Quelldatei {source} existiert nicht oder ist nicht erreichbar.";
-                log.Log(message, messageTitle, Logger.MsgType.Critical); 
+                log.Log(message, messageTitle, Logger.MsgType.Critical);
                 return false;
             }
 

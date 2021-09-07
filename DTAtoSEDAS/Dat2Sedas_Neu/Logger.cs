@@ -21,7 +21,7 @@ namespace Dat2Sedas_Neu
 
             string loggerStart = $"Logger gestartet: {DateTime.Now.ToString()}\n{logger.GetLoggerSettings()}";
             logger.WriteToLogfile(loggerStart, "", MsgType.Message);
-            logger.HaltOnAllErrors = true;
+            logger.HaltOnCriticalErrors = true;
             logger.MaxLogfileLines = 500;
             logger.LogfileName = "Logfile.txt";
             return logger;
@@ -38,6 +38,7 @@ namespace Dat2Sedas_Neu
 
         public enum Output
         {
+            LogOnly = 0,
             Console = 1,
             Window = 2
         }
@@ -47,7 +48,7 @@ namespace Dat2Sedas_Neu
         #endregion
 
         #region Properties
-        public bool HaltOnAllErrors { get; set; }
+        public bool HaltOnCriticalErrors { get; set; }
         public Output OutputMedium { get; set; }
         public int MaxLogfileLines { get; set; }
         public string LogfileName { get; set; }
@@ -85,14 +86,14 @@ namespace Dat2Sedas_Neu
             {
                 case Output.Console:
                     ShowConsoleMessage(prefix, msg);
-                    if (type == MsgType.Critical)
+                    if (type == MsgType.Critical & HaltOnCriticalErrors)
                     {
                         Console.WriteLine("(weiter mit Taste)");
                         Console.ReadKey();
                     }
                     break;
                 case Output.Window:
-                    if (type == MsgType.Critical)
+                    if (type == MsgType.Critical & HaltOnCriticalErrors)
                     {
                         ShowWindowMessage(msg, title, messageIcon);
                     }
@@ -187,7 +188,7 @@ namespace Dat2Sedas_Neu
             string returnString = $"Logger-Settings:\n" +
                                   $"Speicherort Logdatei: {GetLogfilePath}\n" +
                                   $"Standardausgabe: {OutputMedium}\n" +
-                                  $"HaltOnAllErrors: {HaltOnAllErrors}\n" +
+                                  $"HaltOnAllErrors: {HaltOnCriticalErrors}\n" +
                                   $"Maximale Zeilen: {MaxLogfileLines}";
             return returnString;
         }

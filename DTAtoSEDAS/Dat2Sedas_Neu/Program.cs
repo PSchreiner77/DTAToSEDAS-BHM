@@ -49,26 +49,26 @@ namespace Dat2Sedas_Neu
         private void RewriteSettings()
         {
             //TODO Rückschreiben der Config.Datei prüfen.
-            ShowMessage("Zurückschreiben der Einstellungen...", false);
-            ShowMessage("...Counter aktualisieren...");
+            log.Log("Zurückschreiben der Einstellungen...", "Speichern", Logger.MsgType.Message) ;
+            log.Log("...Counter aktualisieren...","Speichern",Logger.MsgType.Message);
             IniManager INI = new IniManager(Param.INIFilePath);
             INI.UpdateParameterValue("Setup", "Counter", Param.Counter.ToString());
             INI.WriteIniFile();
-            ShowMessage("...zurückschreiben beendet.");
+            log.Log("...zurückschreiben beendet.","Speichern",Logger.MsgType.Message);
         }
 
-        private void ShowMessage(string Message, bool Pause = false)
-        {
-            if (!Param.IgnoreMessages)
-            {
-                Console.WriteLine(Message);
-                if (Pause)
-                {
-                    Console.Write("<Enter> drücken...");
-                    Console.ReadLine();
-                }
-            }
-        }
+        //private void ShowMessage(string Message, bool Pause = false)
+        //{
+        //    if (!Param.IgnoreCriticalMessages)
+        //    {
+        //        Console.WriteLine(Message);
+        //        if (Pause)
+        //        {
+        //            Console.Write("<Enter> drücken...");
+        //            Console.ReadLine();
+        //        }
+        //    }
+        //}
 
         private void ExitProgram()
         {
@@ -79,7 +79,7 @@ namespace Dat2Sedas_Neu
         public void ProgramLoop()
         {
             log = Logger.GetInstance();
-            log.HaltOnAllErrors = false;
+            log.HaltOnCriticalErrors = false;
             log.MaxLogfileLines = 100;
             log.OutputMedium = Logger.Output.Console;
 
@@ -90,7 +90,7 @@ namespace Dat2Sedas_Neu
             Param = Parameters.GetInstance;
 
             if (!ProgramInit.Init()) { ExitProgram(); }
-
+            log.HaltOnCriticalErrors = !Param.IgnoreCriticalMessages;
             Param.Counter = SetCounter(Param.Counter);
 
             ConvertDatToSedas D2S = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter);

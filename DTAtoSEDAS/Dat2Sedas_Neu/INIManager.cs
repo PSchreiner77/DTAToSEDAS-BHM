@@ -16,6 +16,8 @@ namespace INIManager
     /// </summary>
     public class IniManager
     {
+        //TODO ExceptionHandler-Ereignis einbauen (Delegate)
+
         #region PROPERTIES
         private string _INIPath = System.IO.Directory.GetCurrentDirectory() + "\\Config.ini";
         private List<Section> _sectionList = new List<Section>();

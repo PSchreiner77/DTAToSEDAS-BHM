@@ -38,7 +38,7 @@ namespace Dat2Sedas_Neu
         public string INIFilePath { get; } = Directory.GetCurrentDirectory() + @"\config.ini";
 
         public bool DeleteSourceFile { get; set; } = false;
-        public bool IgnoreMessages { get; set; } = false;
+        public bool IgnoreCriticalMessages { get; set; } = false;
         public bool Help { get; set; } = false;
         public bool AppendToSedas { get; set; } = false;
 
