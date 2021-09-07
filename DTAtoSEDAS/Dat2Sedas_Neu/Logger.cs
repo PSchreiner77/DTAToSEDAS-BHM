@@ -17,13 +17,13 @@ namespace Dat2Sedas_Neu
             if (logger == null)
             {
                 logger = new Logger();
-            }
-
-            string loggerStart = $"Logger gestartet: {DateTime.Now.ToString()}\n{logger.GetLoggerSettings()}";
-            logger.WriteToLogfile(loggerStart, "", MsgType.Message);
             logger.HaltOnCriticalErrors = true;
             logger.MaxLogfileLines = 500;
             logger.LogfileName = "Logfile.txt";
+            string loggerStart = $"Logger gestartet: {DateTime.Now.ToString()}\n{logger.GetLoggerSettings()}";
+            logger.WriteToLogfile(loggerStart, "", MsgType.Message);
+            }
+
             return logger;
         }
         #endregion
@@ -84,6 +84,8 @@ namespace Dat2Sedas_Neu
         {
             switch (OutputMedium)
             {
+                case Output.LogOnly:
+                    break;
                 case Output.Console:
                     ShowConsoleMessage(prefix, msg);
                     if (type == MsgType.Critical & HaltOnCriticalErrors)
@@ -137,7 +139,7 @@ namespace Dat2Sedas_Neu
 
         #region Public
         public void Log(string msg)
-        { Log(msg, "", MsgType.Message, OutputMedium); }
+        { Log(msg, "", MsgType.Message,Output.LogOnly); }
 
         public void Log(string msg, MsgType type)
         { Log(msg, "", type, OutputMedium); }

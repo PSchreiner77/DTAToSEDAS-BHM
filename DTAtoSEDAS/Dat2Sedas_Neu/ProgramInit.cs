@@ -41,7 +41,7 @@ namespace Dat2Sedas_Neu
                 Param.DestinationFileFolder = INI.GetParameterValue("Setup", "Zieldateipfad");
                 var test = INI.GetParameterValue("Setup", "QuelleLöschen");
                 Param.DeleteSourceFile = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "QuelleLöschen")));
-                Param.IgnoreCriticalMessages = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "IgnoriereMeldungen")));
+                Param.IgnoreCriticalMessages = Convert.ToBoolean(Convert.ToInt32(INI.GetParameterValue("Setup", "StopBeiKritischenFehlern")));
                 Param.Counter = Convert.ToInt32(INI.GetParameterValue("Setup", "Counter"));
             }
             catch (Exception ex)
@@ -105,14 +105,6 @@ namespace Dat2Sedas_Neu
         private static bool CheckStartArguments()
         {
             string[] Arguments = Environment.GetCommandLineArgs();
-
-            if (Arguments.Count() < 2)
-            {
-                messageTitle = "Initialisierungsfehler";
-                message = "Es wurden keine Startparameter übergeben. Bitte Hilfe aufrufen mit Parametr /?";
-                log.Log(message, messageTitle, Logger.MsgType.Critical);
-                return false;
-            }
 
             if (Arguments.Contains("/?"))
             {

@@ -21,19 +21,8 @@ namespace Dat2Sedas_Neu
         {
             Program prog = new Program();              
             prog.ProgramLoop();
-            Console.ReadKey();
         }
-
-        private void ProgramInit_InitNotification(string message)
-        {
-            log.Log(message, Logger.MsgType.Message);
-        }
-
-        private void ProgramInit_InitFailed(string message)
-        {
-            log.Log(message, Logger.MsgType.Message);
-        }
-
+       
         private int SetCounter(int counter)
         {
             if (counter >= 990)
@@ -57,19 +46,6 @@ namespace Dat2Sedas_Neu
             log.Log("...zurückschreiben beendet.","Speichern",Logger.MsgType.Message);
         }
 
-        //private void ShowMessage(string Message, bool Pause = false)
-        //{
-        //    if (!Param.IgnoreCriticalMessages)
-        //    {
-        //        Console.WriteLine(Message);
-        //        if (Pause)
-        //        {
-        //            Console.Write("<Enter> drücken...");
-        //            Console.ReadLine();
-        //        }
-        //    }
-        //}
-
         private void ExitProgram()
         {
             log.Log("Programm wird nach Fehler beendet.", "Programmabbruch", Logger.MsgType.Critical);
@@ -90,7 +66,7 @@ namespace Dat2Sedas_Neu
             Param = Parameters.GetInstance;
 
             if (!ProgramInit.Init()) { ExitProgram(); }
-            log.HaltOnCriticalErrors = !Param.IgnoreCriticalMessages;
+            log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages;
             Param.Counter = SetCounter(Param.Counter);
 
             ConvertDatToSedas D2S = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter);
