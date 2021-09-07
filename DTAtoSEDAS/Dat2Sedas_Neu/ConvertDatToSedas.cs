@@ -263,24 +263,6 @@ namespace Dat2Sedas_Neu
         }
 
 
-        /// <summary>
-        /// Trimmt einen Text und entfernt eventuell führende Nullen.
-        /// </summary>
-        /// <param name="TrimText"></param>
-        /// <returns></returns>
-        private string MyTRIM(string TrimText)
-        {
-            if (TrimText != "")
-            {
-                TrimText = TrimText.Trim();
-                while (TrimText.Substring(0, 1) == "0")
-                {
-                    TrimText.Remove(0, 1);
-                }
-            }
-            return TrimText;
-        }
-
         private bool ReadDatFileContent()
         {
             log.Log("Beginn der Konvertierung...", "Konvertierung der Daten", Logger.MsgType.Message);
