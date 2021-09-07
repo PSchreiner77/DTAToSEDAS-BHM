@@ -56,7 +56,6 @@ namespace Dat2Sedas_Neu
 
         private static bool CreateNewConfigIni()
         {
-            bool flag = true;
             //LogMessage.LogOnly("Erstellen einer neuen leeren Config.ini...");
             string iniContent = "-----------------------\n\r" +
                                 "DATtoSEDAS Config-Datei\n\r" +
@@ -105,7 +104,6 @@ namespace Dat2Sedas_Neu
 
         private static bool CheckStartArguments()
         {
-            bool CheckParameters = true;
             string[] Arguments = Environment.GetCommandLineArgs();
 
             if (Arguments.Count() < 2)

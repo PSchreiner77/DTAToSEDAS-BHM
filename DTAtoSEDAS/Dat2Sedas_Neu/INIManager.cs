@@ -71,10 +71,9 @@ namespace INIManager
 
         private string checkIniPath(string path)
         {
-
-            if (!System.IO.File.Exists(path))
+            if (!File.Exists(path))
             {
-                throw new IOException($"Ini-Datei {path} kann nicht geladen werden");
+                //TODO LogMessage/Ereignis erzeugen: throw new IOException($"Ini-Datei {path} kann nicht geladen werden");
                 return "";
             }
             return path;
