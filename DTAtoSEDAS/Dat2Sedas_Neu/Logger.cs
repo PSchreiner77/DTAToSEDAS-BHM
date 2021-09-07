@@ -85,14 +85,14 @@ namespace Dat2Sedas_Neu
             {
                 case Output.Console:
                     ShowConsoleMessage(prefix, msg);
-                    if (type == MsgType.Critical || HaltOnAllErrors)
+                    if (type == MsgType.Critical)
                     {
                         Console.WriteLine("(weiter mit Taste)");
                         Console.ReadKey();
                     }
                     break;
                 case Output.Window:
-                    if (type == MsgType.Critical || HaltOnAllErrors)
+                    if (type == MsgType.Critical)
                     {
                         ShowWindowMessage(msg, title, messageIcon);
                     }

@@ -9,6 +9,7 @@ namespace Dat2Sedas_Neu
 {
     class Parameters
     {
+        #region SINGLETON
         //SINGLETON Definition
         private static Parameters instance;
         private Parameters() { }
@@ -23,7 +24,9 @@ namespace Dat2Sedas_Neu
                 return instance;
             }
         }
+        #endregion
 
+        #region FIELDS
         //EIGENSCHAFTEN
         public string[] Arguments = new string[] { };
         public string SourceFileName { get;  set; }
@@ -40,10 +43,11 @@ namespace Dat2Sedas_Neu
         public bool AppendToSedas { get; set; } = false;
 
         public int Counter { get; set; }
+        #endregion
 
-
+        #region METHODS
         //METHODEN
-
+        //private
         private string FolderPathCorrection(string folderPath)
         {
             if (folderPath != "")
@@ -56,6 +60,7 @@ namespace Dat2Sedas_Neu
             return folderPath;
         }
 
+        //public
         public void SetSourceFullPath(string SourceFilePath)
         {
             SetSourceFullPath(Path.GetDirectoryName(SourceFilePath), Path.GetDirectoryName(SourceFileName));
@@ -78,6 +83,7 @@ namespace Dat2Sedas_Neu
             this.DestinationFileFolder = FolderPathCorrection(DestinationFileFolder);
             if (DestinationFileName == "") DestinationFileName = "Sedas.dat"; 
             this.DestinationFileName = DestinationFileName;
-        }         
+        }
+        #endregion
     }
 }

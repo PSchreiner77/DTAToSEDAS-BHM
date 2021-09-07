@@ -9,35 +9,38 @@ using INIManager;
 namespace Dat2Sedas_Neu
 {
     //Delegate zum Senden einer Nachricht einrichten
-    public delegate void InitMessageHandler(string message);
+    //public delegate void InitMessageHandler(string message);
 
     class ProgramInit
     {
         private static Parameters Param;
-        private Logger log = Logger.GetInstance();
-        
-        public static event InitMessageHandler InitNotification;
-        public static event InitMessageHandler InitError;
+        private static Logger log = Logger.GetInstance();
+        private static string messageTitle = "";
+        private static string message = "";
+
+        //public static event InitMessageHandler InitNotification;
+        //public static event InitMessageHandler InitError;
 
         //METHODEN
-        private static void InitErrorMessage(string message)
-        {
-            InitError?.Invoke($"Initialisierung: FEHLER  {message}");
-        }
-        
-        private static void InitMessage(string message)
-        {
-            InitNotification?.Invoke($"Initialisierung: {message}");
-        }
+        //private static void InitErrorMessage(string message)
+        //{
+        //    InitError?.Invoke($"Initialisierung: FEHLER  {message}");
+        //}
+
+        //private static void InitMessage(string message)
+        //{
+        //    InitNotification?.Invoke($"Initialisierung: {message}");
+        //}
 
 
         private static bool CheckIniFile()
         {
             if (!File.Exists(Param.INIFilePath))
             {
+                string title = "Initialisierungsfehler";
                 string message = $"Config.ini Datei ist nicht vorhanden oder nicht erreichbar. {Param.INIFilePath}\n" +
                                   "Es wird eine neue Config.ini Datei angelegt. Bitte prüfen sie die Einstellungen.";
-                InitErrorMessage(message);
+                log.Log(message, title, Logger.MsgType.Critical);
                 CreateNewConfigIni();
                 return false;
             }
@@ -47,7 +50,7 @@ namespace Dat2Sedas_Neu
         private static bool ReadIniValues()
         {
             IniManager INI = new IniManager(Param.INIFilePath);
-            
+
             try
             {
                 Param.SourceFileName = INI.GetParameterValue("Setup", "Quelldateiname");
@@ -60,9 +63,10 @@ namespace Dat2Sedas_Neu
                 Param.Counter = Convert.ToInt32(INI.GetParameterValue("Setup", "Counter"));
             }
             catch (Exception ex)
-            {
-                InitError("Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString());
-                return false;
+            messageTitle = "Initialisierungsfehler";
+            message = "Fehler beim Einlesen der Config.ini: " + "\n\r" + ex.ToString();
+            log.Log(message, messageTitle, Logger.MsgType.Critical);
+            return false;
             }
             return true;
         }
@@ -93,7 +97,9 @@ namespace Dat2Sedas_Neu
 
             try
             {
-                InitMessage("Erstellen einer neuen Config.ini Datei...");
+                messageTitle = "Programminitialisierung";
+                message = "Erstellen einer neuen Config.ini Datei...";
+                log.Log(message, messageTitle, Logger.MsgType.Message);
                 using (StreamWriter sw = new StreamWriter(Param.INIFilePath))
                 {
                     sw.WriteLine(iniContent);
@@ -101,10 +107,16 @@ namespace Dat2Sedas_Neu
             }
             catch (Exception ex)
             {
-                InitError("Fehler beim Erstellen einer neuen leeren Config.ini: " + "\n\r" + ex.ToString());
+                messageTitle = "Initialisierungsfehler";
+                message = "Fehler beim Erstellen einer neuen leeren Config.ini:\n\r" + ex.ToString();
+                log.Log(message, messageTitle, Logger.MsgType.Critical);
+
                 return false;
             }
-            InitMessage("Erstellen einer neuen Config.ini Datei OK.\nBitte prüfen Sie die Einstellungen in der Config.ini!");
+
+            messageTitle = "Programminitialisierung";
+            message = "Erstellen einer neuen Config.ini Datei OK.\nBitte prüfen Sie die Einstellungen in der Config.ini!";
+            log.Log(message, messageTitle, Logger.MsgType.Critical);
             return true;
         }
 
@@ -113,11 +125,13 @@ namespace Dat2Sedas_Neu
             bool CheckParameters = true;
             string[] Arguments = Environment.GetCommandLineArgs();
 
-            //if (Arguments.Count() < 2)
-            //{
-            //    InitError("Es wurden keine Startparameter übergeben. Bitte Hilfe aufrufen mit Parametr /?");
-            //    return false;
-            //}
+            if (Arguments.Count() < 2)
+            {
+                messageTitle = "Initialisierungsfehler";
+                message = "Es wurden keine Startparameter übergeben. Bitte Hilfe aufrufen mit Parametr /?";
+                log.Log(message, messageTitle, Logger.MsgType.Critical);
+                return false;
+            }
 
             if (Arguments.Contains("/?"))
             {
@@ -126,7 +140,7 @@ namespace Dat2Sedas_Neu
                 return false;
             }
 
-            for(int i=1;i<Arguments.Count();i++)
+            for (int i = 1; i < Arguments.Count(); i++)
             {
                 string[] S = Arguments[i].Split('=');
 
@@ -165,31 +179,41 @@ namespace Dat2Sedas_Neu
                         break;
 
                     default:
-                        InitError("Mindestens ein falscher Startparameter angegeben!");
-                        return false;                        
+                        messageTitle = "Initialisierungsfehler";
+                        message = "Mindestens ein falscher Startparameter angegeben!";
+                        log.Log(message, messageTitle, Logger.MsgType.Critical);
+                        return false;
                 }
-            }                
+            }
             return true;
         }
-        
+
         private static bool CheckSource()
         {
-            InitMessage("Prüfen des Quelldateipfades...");
-            string source = Param.SourceFullPath;
+            messageTitle = "Programminitialisierung";
+            message = "Prüfen des Quelldateipfades...";
+            log.Log(message, messageTitle, Logger.MsgType.Message);
+            string source = Param.SourceFullPath;     
 
             if (source == "")
             {
-                InitErrorMessage("Es wurde keine Quelldatei angegeben.");
+                messageTitle = "Initialisierungsfehler";
+                message = "Es wurde keine Quelldatei angegeben.";
+                log.Log(message, messageTitle, Logger.MsgType.Critical);                 
                 return false;
             }
 
             if (!File.Exists(source))
             {
-                InitErrorMessage($"Die Quelldatei {source} existiert nicht oder ist nicht erreichbar.");
+                messageTitle = "Programminitialisierung";
+                message = $"Die Quelldatei {source} existiert nicht oder ist nicht erreichbar.";
+                log.Log(message, messageTitle, Logger.MsgType.Critical); 
                 return false;
             }
 
-            InitMessage("Quelldateipfad OK.");
+            messageTitle = "Initialisierungsfehler";
+            message = "Quelldateipfad OK.";
+            log.Log(message, messageTitle, Logger.MsgType.Message);
             return true;
         }
 
@@ -197,10 +221,12 @@ namespace Dat2Sedas_Neu
         {
             Param.SetDestinationFullPath(Param.DestinationFileFolder, Param.DestinationFileName);
         }
-                
+
         public static bool Init()
         {
-            InitMessage("Initialisieren der Programmparameter...");
+            messageTitle = "Programminitialisierung";
+            message = "Initialisieren der Programmparameter...";
+            log.Log(message, messageTitle, Logger.MsgType.Message);
             Param = Parameters.GetInstance;
 
             if (!CheckIniFile()) return false;
@@ -209,7 +235,9 @@ namespace Dat2Sedas_Neu
             if (!CheckSource()) return false;
             SetDestinationPath();
 
-            InitMessage("Initialisierung der Parameter OK.");
+            messageTitle = "Programminitialisierung";
+            message = "Initialisierung der Parameter OK.";
+            log.Log(message, messageTitle, Logger.MsgType.Message);
             return true;
         }
     }
