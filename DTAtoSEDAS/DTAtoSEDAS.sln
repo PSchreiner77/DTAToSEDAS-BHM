@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatToSedas_CSharp", "DatToS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dat2Sedas_Neu", "Dat2Sedas_Neu\Dat2Sedas_Neu.csproj", "{AE72235D-3C07-447E-9811-C5321354E3A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testbereich", "Testbereich\Testbereich.csproj", "{B4B305E7-5F30-45DF-9508-AD608EA95ACB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{AE72235D-3C07-447E-9811-C5321354E3A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE72235D-3C07-447E-9811-C5321354E3A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE72235D-3C07-447E-9811-C5321354E3A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4B305E7-5F30-45DF-9508-AD608EA95ACB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4B305E7-5F30-45DF-9508-AD608EA95ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4B305E7-5F30-45DF-9508-AD608EA95ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4B305E7-5F30-45DF-9508-AD608EA95ACB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

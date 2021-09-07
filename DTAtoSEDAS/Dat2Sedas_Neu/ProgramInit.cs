@@ -14,6 +14,7 @@ namespace Dat2Sedas_Neu
     class ProgramInit
     {
         private static Parameters Param;
+        private Logger log = Logger.GetInstance();
         
         public static event InitMessageHandler InitNotification;
         public static event InitMessageHandler InitError;
@@ -196,7 +197,7 @@ namespace Dat2Sedas_Neu
         {
             Param.SetDestinationFullPath(Param.DestinationFileFolder, Param.DestinationFileName);
         }
-        
+                
         public static bool Init()
         {
             InitMessage("Initialisieren der Programmparameter...");

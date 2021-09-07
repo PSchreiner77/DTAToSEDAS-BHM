@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AE72235D-3C07-447E-9811-C5321354E3A2}</ProjectGuid>
+    <ProjectGuid>{B4B305E7-5F30-45DF-9508-AD608EA95ACB}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Dat2Sedas_Neu</RootNamespace>
-    <AssemblyName>Dat2Sedas_Neu</AssemblyName>
+    <RootNamespace>Testbereich</RootNamespace>
+    <AssemblyName>Testbereich</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -35,7 +35,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,39 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConvertDatToSedas.cs" />
-    <Compile Include="Help.cs" />
-    <Compile Include="INIManager.cs" />
-    <Compile Include="Logger.cs" />
-    <Compile Include="Parameters.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProgramInit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="bin\Debug\20201022_2.dat" />
-    <None Include="bin\Debug\Config.ini" />
-    <None Include="bin\Debug\Config - Kopieren.ini" />
-    <None Include="bin\Debug\Config - original.ini" />
-    <None Include="Testdaten\20201022.dat" />
-    <None Include="Testdaten\20201022_2.dat" />
-    <None Include="Testdaten\BestellNF.DAT" />
-    <None Include="Testdaten\Sedas.dat" />
-    <None Include="Testdaten\SedasOriginal.dat" />
-    <None Include="Testdaten\TestAusgabeAldiDat.dat" />
-    <None Include="Testdaten\TestAusgabeSEDASAldiDat.dat" />
-    <None Include="Testdaten\UBU34J7R - Kopie.DAT" />
-    <None Include="Testdaten\UBU34J7R.DAT" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bin\Release\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="bin\Debug\loescheArtikel.txt" />
-    <Content Include="bin\Debug\loescheKunde.txt" />
-    <Content Include="bin\Debug\tauscheArtikel.txt" />
-    <Content Include="DLL\INIManager.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

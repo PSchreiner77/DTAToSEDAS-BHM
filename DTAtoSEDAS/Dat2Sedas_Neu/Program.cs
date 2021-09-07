@@ -15,22 +15,27 @@ namespace Dat2Sedas_Neu
         //private string[] Arguments = Environment.GetCommandLineArgs(); //TODO CommandlineArgs besorgen       
 
         public Parameters Param;
+        private Logger log;
 
         static void Main()
         {
             Program prog = new Program();
+            prog.log.HaltOnAllErrors = false;
+            prog.log.MaxLogfileLines = 100;
+            prog.log.OutputMedium = Logger.Output.Console;
+
             prog.ProgramLoop();
             Console.ReadKey();
         }
 
         private void ProgramInit_InitNotification(string message)
         {
-            ShowMessage(message, Pause: false);
+            log.Log(message, Logger.MsgType.Message);
         }
 
         private void ProgramInit_InitFailed(string message)
         {
-            ShowMessage(message, Pause: true);
+            log.Log(message, Logger.MsgType.Message);
         }
 
         private int SetCounter(int counter)
@@ -40,8 +45,8 @@ namespace Dat2Sedas_Neu
                 //TODO Meldung: Counter zurückgesetzt von Counter auf 1
                 Console.WriteLine("Counter von {0} zurückgesetzt.");
                 counter = 0;
-                
-            }            
+
+            }
             return ++counter;
         }
 
@@ -77,12 +82,14 @@ namespace Dat2Sedas_Neu
 
         public void ProgramLoop()
         {
-            //Log-Messages ausgeben, DLL implementieren
-            //LogMessage.GlobalLog = true;    
-            //LogMessage.GlobalOutputToConsole = true;
-            //LogMessage.LogOnly("**********************************");
-            //LogMessage.LogOnly("--------- PROGRAMMSTART ----------");
-            //LogMessage.CheckLogFile(100);
+            log = Logger.GetInstance();
+            log.HaltOnAllErrors = false;
+            log.MaxLogfileLines = 100;
+            log.OutputMedium = Logger.Output.Console;
+
+            log.Log("**********************************");
+            log.Log("--------- PROGRAMMSTART ----------");
+            log.Log(log.GetLoggerSettings());
 
             Param = Parameters.GetInstance;
             ProgramInit.InitError += ProgramInit_InitFailed;
@@ -92,15 +99,15 @@ namespace Dat2Sedas_Neu
 
             Param.Counter = SetCounter(Param.Counter);
 
-            ConvertDatToSedas D2S = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath,Param.Counter);
+            ConvertDatToSedas D2S = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter);
             D2S.CreateSedasData();
             D2S.WriteSedasData();
 
             RewriteSettings();
 
-            //LogMessage.LogOnly("--- Programm normal beendet. ---");
-            //LogMessage.LogOnly("********************************");
-            //LogMessage.LogOnly(""); ;
+            log.Log("--- Programm normal beendet. ---");
+            log.Log("********************************");
+            log.Log("");
         }
     }
 }
