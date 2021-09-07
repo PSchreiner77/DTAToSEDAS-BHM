@@ -8,30 +8,12 @@ using INIManager;
 
 namespace Dat2Sedas_Neu
 {
-    //Delegate zum Senden einer Nachricht einrichten
-    //public delegate void InitMessageHandler(string message);
-
     class ProgramInit
     {
         private static Parameters Param;
         private static Logger log = Logger.GetInstance();
         private static string messageTitle = "";
         private static string message = "";
-
-        //public static event InitMessageHandler InitNotification;
-        //public static event InitMessageHandler InitError;
-
-        //METHODEN
-        //private static void InitErrorMessage(string message)
-        //{
-        //    InitError?.Invoke($"Initialisierung: FEHLER  {message}");
-        //}
-
-        //private static void InitMessage(string message)
-        //{
-        //    InitNotification?.Invoke($"Initialisierung: {message}");
-        //}
-
 
         private static bool CheckIniFile()
         {

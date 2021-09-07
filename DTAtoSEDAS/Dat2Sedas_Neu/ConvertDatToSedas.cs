@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace Dat2Sedas_Neu
 {
     class ConvertDatToSedas
-    {              
+    {
+        private Logger log = Logger.GetInstance();
+
         private string _SourcePath;
         private List<string> _SourceData;
         private string _DestinationPath;
@@ -137,7 +139,7 @@ namespace Dat2Sedas_Neu
             //TODO Auslagern in eigene Metode für beide Formate.
             Bestellzeilen = DeleteCustomers(Bestellzeilen);        //Zu löschende Einträge entfernen
             Bestellzeilen = DeleteArticles(Bestellzeilen);
-            Bestellzeilen = ChangeArticleNumbers(Bestellzeilen); //zu tauschende Artikelnummern tauschen
+            Bestellzeilen = ChangeArticleNumbers(Bestellzeilen);  //zu tauschende Artikelnummern tauschen
             //**
 
             return Bestellzeilen;
@@ -190,7 +192,7 @@ namespace Dat2Sedas_Neu
         {
             if (DatBestellzeilen == null) { return null; }
 
-            ////LogMessage.LogOnly("Austauschen von Artikelnummern laut tauscheArtikel.txt.");
+            log.Log("Austauschen von Artikelnummern laut tauscheArtikel.txt.", "Tauschen der Artikelnummern", Logger.MsgType.Message);
             string pathTauscheArtikel = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
             Dictionary<string, string> ArticlesDict = Datenverarbeitung.LoadChangeArticlesList(pathTauscheArtikel);
 
@@ -250,7 +252,7 @@ namespace Dat2Sedas_Neu
 
         private bool ReadDatFileContent()
         {
-            ////LogMessage.LogOnly("Beginn der Konvertierung...");
+            log.Log("Beginn der Konvertierung...", "Konvertierung der Daten", Logger.MsgType.Message);
 
             _SourceData = Datenverarbeitung.ImportSourceFile(_SourcePath);
             if (_SourceData == null) return false;
@@ -258,12 +260,12 @@ namespace Dat2Sedas_Neu
             #region Als Delegate bauen ReadDatData
             if (checkIfNFFileFormat())
             {
-                //////LogMessage.LogOnly("Einlesen neues Dateiformat...");
+                log.Log("Einlesen neues Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
                 this._DatContent = ReadNewNFDATDataFormat(_SourceData);
             }
             else
             {
-                //////LogMessage.LogOnly("Einlesen neues Dateiformat...");
+                log.Log("Einlesen altes Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
                 this._DatContent = ReadOldDATDataFormat(_SourceData, _SedasErstellDatumJJMMTT);
             }
             #endregion
@@ -303,7 +305,7 @@ namespace Dat2Sedas_Neu
 
         public bool WriteSedasData()
         {
-            ////LogMessage.LogOnly("Schreiben der Sedas.dat...");
+            log.Log("Schreiben der Sedas.dat...", "Schreiben der Sedas.dat Datei", Logger.MsgType.Message);
 
             try
             {
@@ -336,7 +338,8 @@ namespace Dat2Sedas_Neu
             }
             catch (Exception ex)
             {
-                ////LogMessage.LogOnly(ex.ToString());
+                string message = $"Fehler beim Schreiben der Sedas.dat:\n{ex.ToString()}";
+                log.Log(message, "Fehler", Logger.MsgType.Message);
                 return false;
             }
         }
@@ -539,7 +542,7 @@ class DatBestellzeile
 
 
 static class Datenverarbeitung
-{
+{         
     /// <summary>
     /// Liest die Dat-Quelldatei ein ohne Leerzeilen und gibt sie als List<string> zurück.</string>
     /// </summary>
@@ -608,7 +611,7 @@ static class Datenverarbeitung
     }
 }
 
-public class Tools
+static class Tools
 {
     public static string CutLeftStringSide(string Input, int MaxLength)
     {

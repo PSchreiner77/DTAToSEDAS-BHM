@@ -19,11 +19,7 @@ namespace Dat2Sedas_Neu
 
         static void Main()
         {
-            Program prog = new Program();
-            prog.log.HaltOnAllErrors = false;
-            prog.log.MaxLogfileLines = 100;
-            prog.log.OutputMedium = Logger.Output.Console;
-
+            Program prog = new Program();              
             prog.ProgramLoop();
             Console.ReadKey();
         }
@@ -74,9 +70,9 @@ namespace Dat2Sedas_Neu
             }
         }
 
-        private static void ExitProgram()
+        private void ExitProgram()
         {
-            //LogMessage.Show("Programm wird nach Fehler beendet.")
+            log.Log("Programm wird nach Fehler beendet.", "Programmabbruch", Logger.MsgType.Critical);
             Environment.Exit(0);
         }
 
@@ -92,8 +88,6 @@ namespace Dat2Sedas_Neu
             log.Log(log.GetLoggerSettings());
 
             Param = Parameters.GetInstance;
-            ProgramInit.InitError += ProgramInit_InitFailed;
-            ProgramInit.InitNotification += ProgramInit_InitNotification;
 
             if (!ProgramInit.Init()) { ExitProgram(); }
 
