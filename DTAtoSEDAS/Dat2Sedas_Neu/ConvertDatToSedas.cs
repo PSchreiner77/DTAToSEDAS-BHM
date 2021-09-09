@@ -171,12 +171,12 @@ namespace Dat2Sedas_Neu
                 }
                 if (customerDeleted)
                 {
-                    log.Log($"Kundennummer {kundennummer} aus Bestellzeilen entfernt.", messageTitle, Logger.MsgType.Message);
+                    log.Log($" => Kundennummer {kundennummer} aus Bestellzeilen entfernt.", messageTitle, Logger.MsgType.Message);
                     customerDeleted = false;
                     nothingChanged = false;
                 }
-                if (nothingChanged) log.Log("...keine Kundennummern gelöscht.");
             }
+            if (nothingChanged) log.Log("...keine Kundennummern gelöscht.");
 
             DatBestellzeilen = DatBestellzeilen.Except(deletedCustomers).ToList();
             return DatBestellzeilen;
@@ -204,7 +204,7 @@ namespace Dat2Sedas_Neu
                 }
                 if (articleDeleted)
                 {
-                    log.Log($"Artikelnummer {artikelnummer} aus Bestellung gelöscht.", messageTitle, Logger.MsgType.Message);
+                    log.Log($" => Artikelnummer {artikelnummer} aus Bestellung gelöscht.", messageTitle, Logger.MsgType.Message);
                     articleDeleted = false;
                     nothingChanged = false;
                 }
@@ -224,16 +224,27 @@ namespace Dat2Sedas_Neu
             Dictionary<string, string> ArticlesDict = Datenverarbeitung.LoadChangeArticlesList(pathTauscheArtikel);
 
             bool nothingChanged = true;
-            foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
+            foreach (KeyValuePair<string, string> dictEntry in ArticlesDict)
             {
-                if (ArticlesDict.ContainsKey(datBestellzeile.BHMArtikelNummer))
+                bool articleDeleted = false;
+                foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
                 {
-                    datBestellzeile.BHMArtikelNummer = ArticlesDict[datBestellzeile.BHMArtikelNummer];
-                    log.Log($"Artikelnummer ausgetauscht: {datBestellzeile.BHMArtikelNummer} => {ArticlesDict[datBestellzeile.BHMArtikelNummer]}",messageTitle, Logger.MsgType.Message);
+                    if (dictEntry.Key == datBestellzeile.BHMArtikelNummer)
+                    {
+                        datBestellzeile.BHMArtikelNummer = dictEntry.Value;
+                        articleDeleted = true;
+                    }
+
+                }
+                if (articleDeleted)
+                {
+                    log.Log($" => Artikelnummer ausgetauscht: {dictEntry.Key} => {dictEntry.Value}", messageTitle, Logger.MsgType.Message);
                     nothingChanged = false;
+                    articleDeleted = true;
                 }
             }
-            if (nothingChanged) log.Log("...keine Artikelnummern ausgetauscht.", messageTitle,Logger.MsgType.Message);
+
+            if (nothingChanged) log.Log("...keine Artikelnummern ausgetauscht.", messageTitle, Logger.MsgType.Message);
             return DatBestellzeilen;
         }
 
@@ -590,7 +601,11 @@ static class Datenverarbeitung
         List<string> delItems = new List<string>();
         try
         {
-            delItems = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();
+            List<string> allLines = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();
+            foreach (string element in allLines)
+            {
+                delItems.Add(element.Split(';')[0]);
+            }
         }
         catch (Exception ex)
         { }

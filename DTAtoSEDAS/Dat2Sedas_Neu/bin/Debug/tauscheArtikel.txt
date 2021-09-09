@@ -1,1 +1,2 @@
 alteArtNr;neueArtNr;Beschreibung
+81;1000;Testaustausch

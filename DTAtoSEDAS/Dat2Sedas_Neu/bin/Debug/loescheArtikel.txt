@@ -1,4 +1,5 @@
-Artikelnummer
+Artikelnummer;Bemerkung
+77;Testlöschen
 2401
 2403
 2427
