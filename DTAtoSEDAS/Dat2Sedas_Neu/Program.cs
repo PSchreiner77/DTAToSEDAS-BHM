@@ -50,13 +50,14 @@ namespace Dat2Sedas_Neu
         private void ExitProgram()
         {
             log.Log("Programm wird nach Fehler beendet.", "Programmabbruch", Logger.MsgType.Critical);
+            Console.ReadKey();
             Environment.Exit(0);
         }
 
         public void ProgramLoop()
         {
             log = Logger.GetInstance();
-            log.HaltOnCriticalErrors = false;
+            log.HaltOnCriticalErrors = true;
             log.MaxLogfileLines = 100;
             log.OutputMedium = Logger.Output.Console;
 
