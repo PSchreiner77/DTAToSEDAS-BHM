@@ -149,60 +149,91 @@ namespace Dat2Sedas_Neu
         //TODO Löschen und Ändern über Delegaten steuern lassen (Items löschen, welche kommt nach Auswahl).
         private List<DatBestellzeile> DeleteCustomers(List<DatBestellzeile> DatBestellzeilen)
         {
+            string messageTitle = "Kundennummern löschen";
+
             #region über Delegaten steuern lassen
             string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
             List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);
             List<DatBestellzeile> deletedCustomers = new List<DatBestellzeile>();
             #endregion
+            bool nothingChanged = true;
+            log.Log("Kundennummern aus Bestellung löschen...", messageTitle, Logger.MsgType.Message);
             foreach (string kundennummer in customersToDelete)
             {
+                bool customerDeleted = false;
                 foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
                 {
                     if (kundennummer == datBestellzeile.BHMKundenNummer)
                     {
                         deletedCustomers.Add(datBestellzeile);
+                        customerDeleted = true;
                     }
                 }
+                if (customerDeleted)
+                {
+                    log.Log($"Kundennummer {kundennummer} aus Bestellzeilen entfernt.", messageTitle, Logger.MsgType.Message);
+                    customerDeleted = false;
+                    nothingChanged = false;
+                }
+                if (nothingChanged) log.Log("...keine Kundennummern gelöscht.");
             }
+
             DatBestellzeilen = DatBestellzeilen.Except(deletedCustomers).ToList();
             return DatBestellzeilen;
         }
 
         private List<DatBestellzeile> DeleteArticles(List<DatBestellzeile> DatBestellzeilen)
         {
+            string messageTitle = "Artikelnummern löschen";
             string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
             List<string> articlesToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheArtikel);
             List<DatBestellzeile> deletedArticles = new List<DatBestellzeile>();
 
+            bool nothingChanged = true;
+            log.Log("Löschen von Artikelnummern aus der Bestellung...", messageTitle, Logger.MsgType.Message);
             foreach (string artikelnummer in articlesToDelete)
             {
+                bool articleDeleted = false;
                 foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
                 {
                     if (artikelnummer == datBestellzeile.BHMArtikelNummer)
                     {
                         deletedArticles.Add(datBestellzeile);
+                        articleDeleted = true;
                     }
                 }
+                if (articleDeleted)
+                {
+                    log.Log($"Artikelnummer {artikelnummer} aus Bestellung gelöscht.", messageTitle, Logger.MsgType.Message);
+                    articleDeleted = false;
+                    nothingChanged = false;
+                }
             }
+            if (nothingChanged) log.Log("...keine Artikelnummern gelöscht", messageTitle, Logger.MsgType.Message);
             DatBestellzeilen = DatBestellzeilen.Except(deletedArticles).ToList();
             return DatBestellzeilen;
         }
 
         private List<DatBestellzeile> ChangeArticleNumbers(List<DatBestellzeile> DatBestellzeilen)
         {
+            string messageTitle = "Artikelnummern tauschen";
             if (DatBestellzeilen == null) { return null; }
 
-            log.Log("Austauschen von Artikelnummern laut tauscheArtikel.txt.", "Tauschen der Artikelnummern", Logger.MsgType.Message);
+            log.Log("Austauschen von Artikelnummern laut tauscheArtikel.txt...", messageTitle, Logger.MsgType.Message);
             string pathTauscheArtikel = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
             Dictionary<string, string> ArticlesDict = Datenverarbeitung.LoadChangeArticlesList(pathTauscheArtikel);
 
+            bool nothingChanged = true;
             foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
             {
                 if (ArticlesDict.ContainsKey(datBestellzeile.BHMArtikelNummer))
                 {
                     datBestellzeile.BHMArtikelNummer = ArticlesDict[datBestellzeile.BHMArtikelNummer];
+                    log.Log($"Artikelnummer ausgetauscht: {datBestellzeile.BHMArtikelNummer} => {ArticlesDict[datBestellzeile.BHMArtikelNummer]}",messageTitle, Logger.MsgType.Message);
+                    nothingChanged = false;
                 }
             }
+            if (nothingChanged) log.Log("...keine Artikelnummern ausgetauscht.", messageTitle,Logger.MsgType.Message);
             return DatBestellzeilen;
         }
 
@@ -231,24 +262,6 @@ namespace Dat2Sedas_Neu
             return returnString;
         }
 
-
-        /// <summary>
-        /// Trimmt einen Text und entfernt eventuell führende Nullen.
-        /// </summary>
-        /// <param name="TrimText"></param>
-        /// <returns></returns>
-        private string MyTRIM(string TrimText)
-        {
-            if (TrimText != "")
-            {
-                TrimText = TrimText.Trim();
-                while (TrimText.Substring(0, 1) == "0")
-                {
-                    TrimText.Remove(0, 1);
-                }
-            }
-            return TrimText;
-        }
 
         private bool ReadDatFileContent()
         {
@@ -544,7 +557,7 @@ class DatBestellzeile
 
 
 static class Datenverarbeitung
-{         
+{
     /// <summary>
     /// Liest die Dat-Quelldatei ein ohne Leerzeilen und gibt sie als List<string> zurück.</string>
     /// </summary>
