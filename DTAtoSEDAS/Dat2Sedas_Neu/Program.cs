@@ -31,7 +31,6 @@ namespace Dat2Sedas_Neu
                 //TODO Meldung: Counter zurückgesetzt von Counter auf 1
                 Console.WriteLine("Counter von {0} zurückgesetzt.");
                 counter = 0;
-
             }
             return ++counter;
         }

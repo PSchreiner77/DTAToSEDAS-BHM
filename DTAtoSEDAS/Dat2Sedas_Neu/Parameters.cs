@@ -17,11 +17,7 @@ namespace Dat2Sedas_Neu
         {
             get
             {
-                if (instance == null)
-                {
-                    instance = new Parameters();
-                }
-                return instance;
+               return instance == null ? instance = new Parameters() :  instance;
             }
         }
         #endregion
