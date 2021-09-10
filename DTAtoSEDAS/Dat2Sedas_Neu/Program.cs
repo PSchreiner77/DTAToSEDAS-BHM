@@ -9,11 +9,7 @@ using INIManager;
 namespace Dat2Sedas_Neu
 {
     class Program
-    {
-        //TODO ShowMessage Einträge gegen LogMessage austauschen
-
-        //private string[] Arguments = Environment.GetCommandLineArgs(); //TODO CommandlineArgs besorgen       
-
+    {           
         public Parameters Param;
         private Logger log;
 
@@ -28,7 +24,6 @@ namespace Dat2Sedas_Neu
         {
             if (counter >= 990)
             {
-                //TODO Meldung: Counter zurückgesetzt von Counter auf 1
                 Console.WriteLine("Counter von {0} zurückgesetzt.");
                 counter = 0;
             }
@@ -36,8 +31,7 @@ namespace Dat2Sedas_Neu
         }
 
         private void RewriteSettings()
-        {
-            //TODO Rückschreiben der Config.Datei prüfen.
+        {                    
             log.Log("Zurückschreiben der Einstellungen...", "Speichern", Logger.MsgType.Message) ;
             log.Log("...Counter aktualisieren...","Speichern",Logger.MsgType.Message);
             IniManager INI = new IniManager(Param.INIFilePath);

@@ -137,9 +137,9 @@ namespace Dat2Sedas_Neu
             }
 
             //TODO Auslagern in eigene Metode für beide Formate.
-            Bestellzeilen = DeleteCustomers(Bestellzeilen);        //Zu löschende Einträge entfernen
+            Bestellzeilen = DeleteCustomers(Bestellzeilen);       
             Bestellzeilen = DeleteArticles(Bestellzeilen);
-            Bestellzeilen = ChangeArticleNumbers(Bestellzeilen);  //zu tauschende Artikelnummern tauschen
+            Bestellzeilen = ChangeArticleNumbers(Bestellzeilen); 
             //**
 
             return Bestellzeilen;
