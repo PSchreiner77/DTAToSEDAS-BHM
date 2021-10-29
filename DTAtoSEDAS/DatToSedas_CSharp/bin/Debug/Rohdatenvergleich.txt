@@ -1,0 +1,62 @@
+﻿Original-BestellDatei (alt, kummuliert)
+=======================================
+1030051800003789N       300518                                     0136000000003000+
+
+10				Kennung (unbenutzt)
+300518			Lieferdatum
+00003789		Kundennummer
+N				???
+300518			Lieferdatum
+01360			Artikelnummer
+000000003000	Menge
++				??? Mehrmenge? (- = Mindermenge?)
+
+Bestelldatum = Dateidatum
+
+##
+
+Eigene BestellDatei (neu, kummuliert)
+=====================================
+NF;270;9998;020718;260618;1163;1.00;1.65;532;25.000;10
+
+NF			Kennung für neues Dateiformat
+270			Filialnummer
+9998		Kundennummer
+020718		Bestelldatum
+260618		Lieferdatum
+1163		ArtikelKey
+1.00		Menge
+1.65		Preis
+532			ArtikelNummer
+25.000		VPE Gebinde
+10			Anzahl Einträge
+
+##
+
+SEDAS.DAT
+=========
+010()000377777777777771180530;,155
+;)0240051310000002                                                                  
+;030,14,00000000000000000,180530,180530,,,,9175         ,,                          
+;0400000000014282,40001000,,,,02 000000,,                                           
+;0400000000015011,40001000,,,,02 000000,,                                           
+;0400000000015111,40001000,,,,02 000000,,                                           
+;05000000003000         
+..
+..
+;06108,1143                                                                         
+;07000000,00001,00001,000000,(
+
+Zeile (01):	180530			Bestelldatum JJMMTT (6 Stellen)
+Zeile (01):	155				Zähler, LfdNr Bestellungen (3 Stellen bis 999)
+Zeile (02): *-*
+Zeile (03):	180530			Bestelldatum JJMMTT (6 Stellen)
+Zeile (03):	180530			Lieferdatum JJMMTT (6 Stellen)
+Zeile (03):	9175			Kundennummer (4 Stellen)
+Zeile (04):	14282			Artikelnummer (14 Stellen)
+Zeile (04):	4				???
+Zeile (04):	0001000			Menge (7 Stellen)
+Zeile (05):	000000003000	Anzahl Artikelpositionen des Kundenblocks (12 Stellen)
+Zeile (06): 108				Anzahl Kundenblöcke (Stellen nach Bedarf, nach '06')
+Zeile (06): 1143			Anzahl Artikelpositionen gesamt (Stellen nach Bedarf, nach ',')
+Zeile (07): *-*

@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AE72235D-3C07-447E-9811-C5321354E3A2}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Dat2Sedas_Neu</RootNamespace>
+    <AssemblyName>Dat2Sedas_Neu</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ConvertDatToSedas.cs" />
+    <Compile Include="Help.cs" />
+    <Compile Include="INIManager.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Parameters.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="ProgramInit.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="bin\Debug\20201022_2 - Kopie.dat" />
+    <None Include="bin\Debug\20201022_2.dat" />
+    <None Include="bin\Debug\Config.ini" />
+    <None Include="bin\Debug\Config - Kopieren.ini" />
+    <None Include="bin\Debug\Config - original.ini" />
+    <None Include="Testdaten\20201022.dat" />
+    <None Include="Testdaten\20201022_2.dat" />
+    <None Include="Testdaten\BestellNF.DAT" />
+    <None Include="Testdaten\Sedas.dat" />
+    <None Include="Testdaten\SedasOriginal.dat" />
+    <None Include="Testdaten\TestAusgabeAldiDat.dat" />
+    <None Include="Testdaten\TestAusgabeSEDASAldiDat.dat" />
+    <None Include="Testdaten\UBU34J7R - Kopie.DAT" />
+    <None Include="Testdaten\UBU34J7R.DAT" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Release\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\loescheArtikel.txt" />
+    <Content Include="bin\Debug\loescheKunde.txt" />
+    <Content Include="bin\Debug\tauscheArtikel.txt" />
+    <Content Include="DLL\INIManager.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

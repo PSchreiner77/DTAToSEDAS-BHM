@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{98667DBD-CA50-48C8-8973-E4A0A7813185}</ProjectGuid>
+    <ProjectGuid>{9A9B86AD-4477-455C-81CB-A4AAAD8B7CD5}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>DATtoSEDAS.Module1</StartupObject>
-    <RootNamespace>DATtoSEDAS</RootNamespace>
-    <AssemblyName>DATtoSEDAS</AssemblyName>
+    <StartupObject>DatToSedasReengineer.Module1</StartupObject>
+    <RootNamespace>DatToSedasReengineer</RootNamespace>
+    <AssemblyName>DatToSedasReengineer</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Console</MyType>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,10 +22,8 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>DATtoSEDAS.xml</DocumentationFile>
-    <NoWarn>
-    </NoWarn>
-    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <DocumentationFile>DatToSedasReengineer.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,10 +32,8 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>DATtoSEDAS.xml</DocumentationFile>
-    <NoWarn>
-    </NoWarn>
-    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <DocumentationFile>DatToSedasReengineer.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -45,7 +42,7 @@
     <OptionCompare>Binary</OptionCompare>
   </PropertyGroup>
   <PropertyGroup>
-    <OptionStrict>On</OptionStrict>
+    <OptionStrict>Off</OptionStrict>
   </PropertyGroup>
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
@@ -72,9 +69,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConvertDatToSedas.vb" />
     <Compile Include="INIFile.vb" />
-    <Compile Include="Parameter.vb" />
-    <Compile Include="ConvertDATtoSEDAS.vb" />
+    <Compile Include="LogMessage.vb" />
     <Compile Include="Module1.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -91,6 +88,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Parameter.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -99,18 +97,12 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="obj\Debug\DTAtoSEDAS.Resources.resources" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Config.ini" />
-    <None Include="bin\Debug\BestellNF.DAT" />
     <None Include="bin\Debug\Config.ini" />
-    <None Include="bin\Debug\Datenbeschreibung.xlsx" />
-    <None Include="bin\Debug\Sedas.dat" />
-    <None Include="bin\Debug\SedasOriginal.dat" />
-    <None Include="bin\Debug\TestAusgabeAldiDat.dat" />
-    <None Include="bin\Debug\Testdaten\TestAldiDat.dat" />
-    <None Include="bin\Debug\TestDatToSedasAldi.bat" />
+    <None Include="bin\Debug\DatToSedas.log" />
+    <None Include="bin\Debug\DatToSedasReengineer.exe.config" />
+    <None Include="bin\Debug\vs8AB.tmp" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -121,29 +113,19 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="App.config" />
-    <None Include="obj\Debug\DesignTimeResolveAssemblyReferences.cache" />
-    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="obj\Debug\DTAtoSEDAS.vbproj.CopyComplete" />
-    <None Include="obj\Debug\DTAtoSEDAS.vbproj.CoreCompileInputs.cache" />
-    <None Include="obj\Debug\DTAtoSEDAS.vbproj.GenerateResource.cache" />
-    <None Include="obj\Debug\DTAtoSEDAS.vbprojAssemblyReference.cache" />
+    <None Include="Testdaten\20201022.dat" />
+    <None Include="Testdaten\20201022_2.dat" />
+    <None Include="Testdaten\TestAusgabeSEDASAldiDat.dat" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\1.txt" />
-    <Content Include="bin\Debug\1_Info.txt" />
-    <Content Include="bin\Debug\2.TXT" />
+    <Content Include="bin\Debug\DatToSedasReengineer.exe" />
+    <Content Include="bin\Debug\DatToSedasReengineer.pdb" />
     <Content Include="bin\Debug\loeschArtikel.txt" />
     <Content Include="bin\Debug\loeschKunde.txt" />
-    <Content Include="bin\Debug\Rohdatenvergleich.txt" />
-    <Content Include="Changelog.txt" />
-    <Content Include="obj\Debug\DTAtoSEDAS.exe" />
-    <Content Include="obj\Debug\DTAtoSEDAS.pdb" />
-    <Content Include="obj\Debug\DTAtoSEDAS.vbproj.FileListAbsolute.txt" />
-    <Content Include="obj\Debug\DTAtoSEDAS.xml" />
-    <Content Include="obj\Debug\TempPE\My Project.Resources.Designer.vb.dll" />
+    <Content Include="bin\Debug\tauscheArtikel.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="obj\Release\" />
+    <Folder Include="bin\Release\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
