@@ -12,7 +12,11 @@ namespace Dat2Sedas_Neu
         #region SINGLETON
         //SINGLETON Definition
         private static Parameters instance;
-        private Parameters() { }
+        
+        private Parameters() 
+        {
+        }
+               
         public static Parameters GetInstance
         {
             get

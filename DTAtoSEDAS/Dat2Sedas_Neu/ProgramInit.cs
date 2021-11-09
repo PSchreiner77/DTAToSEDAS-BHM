@@ -115,39 +115,39 @@ namespace Dat2Sedas_Neu
 
             for (int i = 1; i < Arguments.Count(); i++)
             {
-                string[] S = Arguments[i].Split('=');
+                string[] startArgument = Arguments[i].Split('=');
 
-                switch (S[0].ToUpper())
+                switch (startArgument[0].ToUpper())
                 {
-                    case "/Q":
+                    case "/Q":               //Quelldatei
                         try
                         {
-                            Param.SourceFileFolder = Path.GetDirectoryName(S[1].ToString());
-                            Param.SourceFileName = Path.GetFileName(S[1].ToString());
+                            Param.SourceFileFolder = Path.GetDirectoryName(startArgument[1].ToString());
+                            Param.SourceFileName = Path.GetFileName(startArgument[1].ToString());
                         }
                         catch (Exception ex)
                         { }
                         break;
 
-                    case "/Z":
+                    case "/Z":             //Zieldatei
                         try
                         {
-                            Param.DestinationFileFolder = Path.GetDirectoryName(S[1].ToString());
-                            Param.DestinationFileName = Path.GetFileName(S[1].ToString());
+                            Param.DestinationFileFolder = Path.GetDirectoryName(startArgument[1].ToString());
+                            Param.DestinationFileName = Path.GetFileName(startArgument[1].ToString());
                         }
                         catch (Exception ex)
                         { }
                         break;
 
-                    case "/D":
+                    case "/D":           //Quelldatei am Ende löschen
                         Param.DeleteSourceFile = true;  //Quelldatei nach Programmende löschen.        
                         break;
 
-                    case "/I":
+                    case "/I":           //Ignoriert Statusmeldungen. Fehlermeldungen werden angezeigt
                         Param.IgnoreCriticalMessages = true;    //'Fehlermeldungen unterdrücken
                         break;
 
-                    case "/A":
+                    case "/A":          //Hängt die Daten an eine existierende SEDAS-Datei an. Standard ist überschreiben.
                         Param.AppendToSedas = true;     //Existiernde Zieldatei fortschreiben
                         break;
 
