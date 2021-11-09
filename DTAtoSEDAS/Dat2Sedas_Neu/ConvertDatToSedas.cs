@@ -408,6 +408,30 @@ namespace Dat2Sedas_Neu
 
 class SedasFile
 {
+    /*
+     *    CSB-SEDAS Datei-Beispiel:
+     *    
+        010()000377777777777771180705;,241
+        ;)0240051310000002
+        ;030,14,00000000000000000,180705,180706,,,,3789         ,,
+        ;0400000000001360,40002000,,,,02 000000,,
+        ...
+        ...
+        ...
+        ;0400000000004023,40001000,,,,02 000000,,
+        ;05000000039000           
+        ;06100,1178
+        ;07000000,00001,00001,000000,(
+
+        Erläuterung:
+        010...  = Datei-Header
+        030...  = Order-Header
+        040...  = Bestellposition(en)
+        050...  = Order-Footer
+        06....  = DateiFooter (Zusammenfassung)
+        070...  = DateiFooter (Dateiende)
+     */
+
     private string _ErstellDatumSedas;
     private int _IniSedasRunThroughCounter;
 
