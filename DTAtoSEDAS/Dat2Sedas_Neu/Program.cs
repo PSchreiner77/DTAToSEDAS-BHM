@@ -30,7 +30,7 @@ namespace Dat2Sedas_Neu
             return ++counter;
         }
 
-        private void RewriteSettings()
+        private void RewriteSettingsToConfig()
         {                    
             log.Log("Zurückschreiben der Einstellungen...", "Speichern", Logger.MsgType.Message) ;
             log.Log("...Counter aktualisieren...","Speichern",Logger.MsgType.Message);
@@ -57,19 +57,29 @@ namespace Dat2Sedas_Neu
             log.Log("**********************************");
             log.Log("--------- PROGRAMMSTART ----------");
             log.Log(log.GetLoggerSettings());
-
+            
+            //Parameter abrufen
             Param = Parameters.GetInstance;
 
             if (!ProgramInit.Init()) { ExitProgram(); }
-            log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages;
+            log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages; //TODO Widersprüchliche Angabe von True/False
+            
+            //Counter setzen
             Param.Counter = SetCounter(Param.Counter);
 
+            //## Daten konvertieren und schreiben
+            //Daten ermitteln und einlesen
             ConvertDatToSedas DatToSedas = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter);
+            
+            //Daten zusammenstellen
             DatToSedas.CreateSedasData();
             
+            //Daten in Datei schreiben
             DatToSedas.WriteSedasData();
 
-            RewriteSettings();
+            //Settings zurückschreiben
+            RewriteSettingsToConfig();
+            //##
 
             log.Log("--- Programm normal beendet. ---");
             log.Log("********************************");
