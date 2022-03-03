@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30611.23
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DATtoSEDAS", "DTAtoSEDAS\DATtoSEDAS.vbproj", "{98667DBD-CA50-48C8-8973-E4A0A7813185}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DATtoSEDAS-stopped", "DTAtoSEDAS\DATtoSEDAS-stopped.vbproj", "{98667DBD-CA50-48C8-8973-E4A0A7813185}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DatToSedasReengineer", "DatToSedasReengineer\DatToSedasReengineer.vbproj", "{9A9B86AD-4477-455C-81CB-A4AAAD8B7CD5}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DatToSedasReengineer-stopped", "DatToSedasReengineer\DatToSedasReengineer-stopped.vbproj", "{9A9B86AD-4477-455C-81CB-A4AAAD8B7CD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatToSedas_CSharp", "DatToSedas_CSharp\DatToSedas_CSharp.csproj", "{8712368B-D737-4701-8A9F-CF86005A6261}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatToSedas_CSharp-stopped", "DatToSedas_CSharp\DatToSedas_CSharp-stopped.csproj", "{8712368B-D737-4701-8A9F-CF86005A6261}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dat2Sedas_Neu", "Dat2Sedas_Neu\Dat2Sedas_Neu.csproj", "{AE72235D-3C07-447E-9811-C5321354E3A2}"
 EndProject

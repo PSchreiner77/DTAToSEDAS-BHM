@@ -68,7 +68,7 @@ namespace Dat2Sedas_Neu
             Param.Counter = SetCounter(Param.Counter);
 
             //## Daten konvertieren und schreiben
-            //Daten ermitteln und einlesen
+            //Sedas-Objekt erstellen mit aktuellem Datum
             ConvertDatToSedas DatToSedas = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter);
             
             //Daten zusammenstellen

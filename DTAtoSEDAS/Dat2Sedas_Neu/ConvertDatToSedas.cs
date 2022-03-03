@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Dat2Sedas_Neu
 {
+
+    //TODO TEST: Dateien vom Wochenende mit 9000er Nummern.
+    //TODO Gruppieren der Daten nach Kundennummer. Es soll vermieden werden, dass in der Sedas.dat 
+    //     Kundennummern wiederholt auftauchen. Sie sollen en-block gelistet werden (sortiert nach Art.Nr).
     class ConvertDatToSedas
     {
         private Logger log = Logger.GetInstance();
@@ -37,7 +41,7 @@ namespace Dat2Sedas_Neu
             _SourceData = Datenverarbeitung.ImportSourceFile(_SourcePath);
             if (_SourceData == null) return false;
 
-            //TODO Als Delegate bauen: ReadDatData auf den dann die Einlesemethode gemappt wird.
+            //TODO Als Delegate bauen: ReadDatData auf den dann die passende (neu/alt) Einlesemethode gemappt wird.
             #region 
             if (checkIfNFFileFormat())
             {
@@ -343,6 +347,7 @@ namespace Dat2Sedas_Neu
             ReadDatFileContent();
 
             log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
+            
             _SedasFile = new SedasFile(_SedasErstellDatumJJMMTT, _counter);
             while (pointer1 < _DatContent.Count())
             {

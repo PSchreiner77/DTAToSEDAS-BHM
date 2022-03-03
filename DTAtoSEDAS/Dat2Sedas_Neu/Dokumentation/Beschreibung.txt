@@ -1,0 +1,9 @@
+﻿
+
+Datenfluss:
+Daten werden aus den Filialverzeichnissen ausgelesen und in \Bestellung\Einzeln abgelegt.
+Quelle:
+/K=%KN_Stelle01% /Q=H:\%firma%\filiale.%Filiale%\export\%Key%00.dat
+
+Ziel:
+/Z=J:\Filialen\Bestellung\Einzeln\%filiale%_%datum%.dat
