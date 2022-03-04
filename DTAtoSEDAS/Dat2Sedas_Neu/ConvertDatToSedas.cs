@@ -16,13 +16,13 @@ namespace Dat2Sedas_Neu
         private Logger log = Logger.GetInstance();
 
         private string _SourcePath;
-        private List<string> _SourceData;
+        private List<string> _SourceDataList;
         private string _DestinationPath;
 
-        private List<DatBestellzeile> _DatContent;
+        private List<DatBestellzeile> _ListeDatBestellzeilen;
         private string _SedasErstellDatumJJMMTT;
         private int _counter;
-        private SedasFile _SedasFile;
+        private SedasFile _SedasFile;  //Objekt mit allen SEDAS-Einträgen, fertig zur Erstellung einer Datei (.ToString()).
 
         //KONSTRUKTOR
         public ConvertDatToSedas(string SourceFilePath, string DestinationFilePath, int Counter)
@@ -37,7 +37,7 @@ namespace Dat2Sedas_Neu
        
         private bool checkIfNFFileFormat()
         {
-            string prefix = _SourceData[0].Substring(0, 2);
+            string prefix = _SourceDataList[0].Substring(0, 2);
             if (prefix == "NF") return true;
             return false;
         }
@@ -125,7 +125,7 @@ namespace Dat2Sedas_Neu
         /// <param name="ErstelldatumTTMMJJ"></param>
         /// <returns></returns>
         private List<DatBestellzeile> ReadNewNFDATDataFormat(List<string> NewNFDATData)
-        {
+        {            
             /*
             Zeile aus neuer NF-DAT-Datei:            
             0 ;1   ;2   ;3     ;4     ;5   ;6    ;7;8  ;9    ;10
@@ -147,7 +147,7 @@ namespace Dat2Sedas_Neu
             10 10               Anzahl Bestellpositionen in Datei
             */
 
-            List<DatBestellzeile> datBestellzeilen = new List<DatBestellzeile>();
+            List<DatBestellzeile> ListeDatBestellzeilen = new List<DatBestellzeile>();
 
             foreach (string eintrag in NewNFDATData)
             {
@@ -165,10 +165,10 @@ namespace Dat2Sedas_Neu
                 datBestellzeile.Verpackungseinheit = arrZeile[9];
                 datBestellzeile.AnzahlBestellPositionen = arrZeile[10];
 
-                datBestellzeilen.Add(datBestellzeile);
+                ListeDatBestellzeilen.Add(datBestellzeile);
             }
 
-            return datBestellzeilen;
+            return ListeDatBestellzeilen;
         }
 
         /// <summary>
@@ -184,8 +184,10 @@ namespace Dat2Sedas_Neu
             return DatBestellzeilen;
         }
 
+        #region Löschen und ändern
         //TODO Löschen und Ändern über Delegaten steuern lassen (Items löschen, welche kommt nach Auswahl).
-        private List<DatBestellzeile> DeleteCustomers(List<DatBestellzeile> DatBestellzeilen)
+        //TODO GGf alles in eigene Klasse(n) auslagern.
+        private List<DatBestellzeile> DeleteCustomers(List<DatBestellzeile> ListeDatBestellzeilen)
         {
             string messageTitle = "Kundennummern löschen";
 
@@ -196,10 +198,16 @@ namespace Dat2Sedas_Neu
             #endregion
             bool nothingChanged = true;
             log.Log("Kundennummern aus Bestellung löschen...", messageTitle, Logger.MsgType.Message);
+
+            /*Einträge mit Kundennummer werden gesucht und in eine eigene Liste für
+             * zu löschende Einträge geschrieben.
+             * Abschließend wird die Liste mit den zu löschenden Einträgen von der
+             * Hauptliste "entfernt".
+             */
             foreach (string kundennummer in customersToDelete)
             {
                 bool customerDeleted = false;
-                foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
+                foreach (DatBestellzeile datBestellzeile in ListeDatBestellzeilen)
                 {
                     if (kundennummer == datBestellzeile.BHMKundenNummer)
                     {
@@ -216,8 +224,9 @@ namespace Dat2Sedas_Neu
             }
             if (nothingChanged) log.Log("...keine Kundennummern gelöscht.");
 
-            DatBestellzeilen = DatBestellzeilen.Except(deletedCustomers).ToList();
-            return DatBestellzeilen;
+            //"Entfernen" der Löschliste von der Hauptliste.
+            ListeDatBestellzeilen = ListeDatBestellzeilen.Except(deletedCustomers).ToList();
+            return ListeDatBestellzeilen;
         }
 
         private List<DatBestellzeile> DeleteArticles(List<DatBestellzeile> DatBestellzeilen)
@@ -264,27 +273,28 @@ namespace Dat2Sedas_Neu
             bool nothingChanged = true;
             foreach (KeyValuePair<string, string> dictEntry in ArticlesDict)
             {
-                bool articleDeleted = false;
+                bool articleChanged = false;
                 foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
                 {
                     if (dictEntry.Key == datBestellzeile.BHMArtikelNummer)
                     {
                         datBestellzeile.BHMArtikelNummer = dictEntry.Value;
-                        articleDeleted = true;
+                        articleChanged = true;
                     }
-
                 }
-                if (articleDeleted)
+                if (articleChanged)
                 {
                     log.Log($" => Artikelnummer ausgetauscht: {dictEntry.Key} => {dictEntry.Value}", messageTitle, Logger.MsgType.Message);
                     nothingChanged = false;
-                    articleDeleted = true;
+                    articleChanged = true;
                 }
             }
 
             if (nothingChanged) log.Log("...keine Artikelnummern ausgetauscht.", messageTitle, Logger.MsgType.Message);
             return DatBestellzeilen;
         }
+
+        #endregion
 
 
         /// <summary>
@@ -311,39 +321,6 @@ namespace Dat2Sedas_Neu
             return returnString;
         }
 
-
-        public void CreateSedasData()
-        {
-            //Bestellungen filtern
-            string actualCustomer;
-            int pointer1 = 0;
-            int pointer2 = 0;
-
-            log.Log("Einlesen der Bestelldatei...", "Einlesen", Logger.MsgType.Message);
-            ReadDatFileContent();
-
-            log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
-            
-            _SedasFile = new SedasFile(_SedasErstellDatumJJMMTT, _counter);
-            while (pointer1 < _DatContent.Count())
-            {
-                //Kundenbestellung erzeugen/beginnen
-                DatBestellzeile Bestellposition = _DatContent[pointer1];
-                actualCustomer = Bestellposition.BHMKundenNummer;
-
-                SedasOrder CustomerOrder = new SedasOrder(_SedasErstellDatumJJMMTT, Bestellposition.LieferDatumJJMMTT, Bestellposition.BHMKundenNummer);
-                pointer2 = pointer1;
-                while (pointer2 < _DatContent.Count() && _DatContent[pointer2].BHMKundenNummer == actualCustomer)
-                {
-                    Bestellposition = _DatContent[pointer2];
-                    CustomerOrder.OrderLines.Add(new SedasOrderLine(Bestellposition.BHMArtikelNummer, Bestellposition.BestellMenge));
-                    pointer2++;
-                }
-                _SedasFile.SedasOrders.Add(CustomerOrder);
-                pointer1 = pointer2; //next Customer Block
-            }
-        }
-
         /// <summary>
         /// Liest die Quell-Dat-Datei ein. Möglich sind das neue Format (NF) und das alte Format. Rückgabewert ist eine Liste mit Bestellzeilen-Objekten.
         /// </summary>
@@ -352,8 +329,8 @@ namespace Dat2Sedas_Neu
         {
             log.Log("Beginn der Konvertierung...", "Konvertierung der Daten", Logger.MsgType.Message);
 
-            _SourceData = Datenverarbeitung.ImportSourceFile(_SourcePath);
-            if (_SourceData == null)
+            _SourceDataList = Datenverarbeitung.ImportSourceFileToList(_SourcePath);
+            if (_SourceDataList == null)
                 return false;
 
             //TODO Als Delegate bauen: ReadDatData auf den dann die passende (neu/alt) Einlesemethode gemappt wird.
@@ -361,17 +338,57 @@ namespace Dat2Sedas_Neu
             if (checkIfNFFileFormat())
             {
                 log.Log("Einlesen neues Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
-                this._DatContent = ReadNewNFDATDataFormat(_SourceData);
+                this._ListeDatBestellzeilen = ReadNewNFDATDataFormat(_SourceDataList);
             }
             else
             {
                 log.Log("Einlesen altes Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
-                this._DatContent = ReadOldDATDataFormat(_SourceData, _SedasErstellDatumJJMMTT);
+                this._ListeDatBestellzeilen = ReadOldDATDataFormat(_SourceDataList, _SedasErstellDatumJJMMTT);
             }
             #endregion
 
-            _DatContent = CleanupOrders(_DatContent);
+            _ListeDatBestellzeilen = CleanupOrders(_ListeDatBestellzeilen);
             return false;
+        }
+
+
+        public void CreateSedasData()
+        {
+            //Bestellungen filtern
+            string actualCustomer;
+            int pointer1 = 0;  // Zeiger für einzelne Bestellung, Findet Bestell-Header
+            int pointer2 = 0; // Zeiger für einzelne Bestellposition in Bestellung
+
+            //TODO Einlesen der Bestelldatei auslagern
+            log.Log("Einlesen der Bestelldatei...", "Einlesen", Logger.MsgType.Message);
+            ReadDatFileContent();
+
+            log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
+            
+            _SedasFile = new SedasFile(_SedasErstellDatumJJMMTT, _counter);
+
+            //Alle Bestellzeilen durchgehen und bei jeder Kundennummer eine neue SEDAS-Bestellung erzeugen
+            while (pointer1 < _ListeDatBestellzeilen.Count())
+            {
+                //TODO Ggf. die Ermittlung der Bestellung und Bestellpositionen über LINQ abfragen/filtern und anschließend erstellen lassen.
+                //Kundenbestellung erzeugen/beginnen
+                DatBestellzeile Bestellposition = _ListeDatBestellzeilen[pointer1];
+                actualCustomer = Bestellposition.BHMKundenNummer;
+
+                //SedasOrder-Objekte (einzelne Bestellung) aus den Bestellzeilen erstellen.
+                SedasOrder CustomerOrder = new SedasOrder(_SedasErstellDatumJJMMTT, Bestellposition.LieferDatumJJMMTT, Bestellposition.BHMKundenNummer);
+
+                pointer2 = pointer1;
+                //Solange die Kundennummer gleich bleibt, und die Liste nich zu Ende ist, aus jeder Zeile eine SEDAS-Bestellposition machen.
+                while (pointer2 < _ListeDatBestellzeilen.Count() && _ListeDatBestellzeilen[pointer2].BHMKundenNummer == actualCustomer)
+                {
+                    Bestellposition = _ListeDatBestellzeilen[pointer2];
+                    CustomerOrder.OrderLines.Add(new SedasOrderLine(Bestellposition.BHMArtikelNummer, Bestellposition.BestellMenge));
+                    pointer2++;
+                }
+                _SedasFile.SedasOrdersList.Add(CustomerOrder);
+                pointer1 = pointer2; //next Customer Block
+            }
         }
 
 
@@ -382,6 +399,7 @@ namespace Dat2Sedas_Neu
             try
             {
                 #region Zielverzeichnis erstellen, wenn nicht vorhanden
+                //TODO Zielverzeichnis sollte schon bei Programmstart geprüft sein. Prüfung überflüssig.
                 bool isPath_NoFile = _DestinationPath.Contains("\\");
                 if (isPath_NoFile)
                 {
@@ -400,7 +418,7 @@ namespace Dat2Sedas_Neu
                 }
                 #endregion
 
-
+                //Eigentliches Schreiben der SEDAS-Informationen in eine Datei.
                 using (StreamWriter sw = new StreamWriter(this._DestinationPath, false))
                 {
                     sw.Write(_SedasFile.GetSedasFileString());
@@ -445,13 +463,13 @@ class SedasFile
      */
 
     private string _ErstellDatumSedas;
-    private int _IniSedasRunThroughCounter;
+    private int _IniSedasRunThroughCounter; //TODO Was bedeutet der Zähler?
 
     public string Header { get { return GetSedasFileHeaderString(); } }
     public string Footer { get { return GetSedasFileFooterString(); } }
-    public List<SedasOrder> SedasOrders = new List<SedasOrder>();
+    public List<SedasOrder> SedasOrdersList = new List<SedasOrder>();
 
-    public int CustomerOrdersCount { get { return SedasOrders.Count; } }
+    public int CustomerOrdersCount { get { return SedasOrdersList.Count; } }
     public int OverallOrderLineEntriesCount { get { return GetTotalNumberOfOrderLines(); } }
 
     //KONSTRUKTOR
@@ -464,10 +482,12 @@ class SedasFile
     }
 
     //METHODEN
+
+    //TODO Propery erstellen
     private int GetTotalNumberOfOrderLines()
     {
         int count = 0;
-        foreach (SedasOrder order in SedasOrders)
+        foreach (SedasOrder order in SedasOrdersList)
         {
             count += order.OrderLines.Count;
         }
@@ -503,7 +523,7 @@ class SedasFile
         string cr = "\r\n";
 
         returnString += GetSedasFileHeaderString() + cr;
-        foreach (SedasOrder order in SedasOrders)
+        foreach (SedasOrder order in SedasOrdersList)
         {
             returnString += order.Header + cr;
             foreach (SedasOrderLine orderLine in order.OrderLines)
@@ -644,9 +664,9 @@ static class Datenverarbeitung
     /// </summary>
     /// <param name="SourceFilePath"></param>
     /// <returns></returns>
-    public static List<string> ImportSourceFile(string SourcePath)
+    public static List<string> ImportSourceFileToList(string SourcePath)
     {
-        List<string> data = new List<string>();
+        List<string> _sourceDataList = new List<string>();
         try
         {
             using (StreamReader sr = new StreamReader(SourcePath))
@@ -654,7 +674,7 @@ static class Datenverarbeitung
                 while (!sr.EndOfStream)
                 {
                     string line = sr.ReadLine();
-                    if (line != "") data.Add(line);
+                    if (line != "") _sourceDataList.Add(line);
                 }
             }
         }
@@ -662,7 +682,7 @@ static class Datenverarbeitung
         { //Fehlerausnahme auslösen und Fehler melden}                
             return null;
         }
-        return data;
+        return _sourceDataList;
     }
 
 
