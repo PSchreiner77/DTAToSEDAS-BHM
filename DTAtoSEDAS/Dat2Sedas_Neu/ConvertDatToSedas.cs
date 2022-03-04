@@ -34,31 +34,7 @@ namespace Dat2Sedas_Neu
         }
 
         //METHODEN
-        private bool ReadDatFileContent()
-        {
-            log.Log("Beginn der Konvertierung...", "Konvertierung der Daten", Logger.MsgType.Message);
-
-            _SourceData = Datenverarbeitung.ImportSourceFile(_SourcePath);
-            if (_SourceData == null) return false;
-
-            //TODO Als Delegate bauen: ReadDatData auf den dann die passende (neu/alt) Einlesemethode gemappt wird.
-            #region 
-            if (checkIfNFFileFormat())
-            {
-                log.Log("Einlesen neues Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
-                this._DatContent = ReadNewNFDATDataFormat(_SourceData);
-            }
-            else
-            {
-                log.Log("Einlesen altes Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
-                this._DatContent = ReadOldDATDataFormat(_SourceData, _SedasErstellDatumJJMMTT);
-            }
-            #endregion
-
-            _DatContent = CleanupOrders(_DatContent);
-            return false;
-        }
-
+       
         private bool checkIfNFFileFormat()
         {
             string prefix = _SourceData[0].Substring(0, 2);
@@ -367,6 +343,37 @@ namespace Dat2Sedas_Neu
                 pointer1 = pointer2; //next Customer Block
             }
         }
+
+        /// <summary>
+        /// Liest die Quell-Dat-Datei ein. Möglich sind das neue Format (NF) und das alte Format. Rückgabewert ist eine Liste mit Bestellzeilen-Objekten.
+        /// </summary>
+        /// <returns></returns>
+        private bool ReadDatFileContent()
+        {
+            log.Log("Beginn der Konvertierung...", "Konvertierung der Daten", Logger.MsgType.Message);
+
+            _SourceData = Datenverarbeitung.ImportSourceFile(_SourcePath);
+            if (_SourceData == null)
+                return false;
+
+            //TODO Als Delegate bauen: ReadDatData auf den dann die passende (neu/alt) Einlesemethode gemappt wird.
+            #region 
+            if (checkIfNFFileFormat())
+            {
+                log.Log("Einlesen neues Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
+                this._DatContent = ReadNewNFDATDataFormat(_SourceData);
+            }
+            else
+            {
+                log.Log("Einlesen altes Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
+                this._DatContent = ReadOldDATDataFormat(_SourceData, _SedasErstellDatumJJMMTT);
+            }
+            #endregion
+
+            _DatContent = CleanupOrders(_DatContent);
+            return false;
+        }
+
 
         public bool WriteSedasData()
         {

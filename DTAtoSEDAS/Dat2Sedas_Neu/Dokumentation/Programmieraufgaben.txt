@@ -5,3 +5,5 @@ Programmcode durchgehen
 Programmablaufplan erstellen
 
 Tests implementieren wo möglich
+
+- ReadSedasDat als eigene public Methode einsetzen
