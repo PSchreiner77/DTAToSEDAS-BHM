@@ -823,10 +823,11 @@ namespace Dat2Sedas_Neu
             return InputFileOrderLines.GetEnumerator();
         }
 
-        public void AddNewNFOrderLine(string orderLineNFFormat)
-        {
-            ConvertInputFileData(orderLineNFFormat);
-        }
+        //DELETE
+        //public void AddNewNFOrderLine(string orderLineNFFormat)
+        //{
+        //    ConvertInputFileData(orderLineNFFormat);
+        //}
     }
 
     class InputFileOrderLineNF
