@@ -46,7 +46,7 @@ namespace Dat2Sedas_Neu
         {
             log = Logger.GetInstance();
             log.HaltOnCriticalErrors = true;
-            log.MaxLogfileLines = 100;
+            log.MaxLogfileLines = 500;
             log.OutputMedium = Logger.Output.Console;
 
             log.Log("**********************************");
@@ -67,7 +67,8 @@ namespace Dat2Sedas_Neu
             ConvertDatToSedas DatToSedas = new ConvertDatToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter);
             
             //Daten zusammenstellen
-            DatToSedas.CreateSedasData();
+            DatToSedas.ImportNFDatFile(Param.SourceFullPath);
+            DatToSedas.CreateSedasDatFile();
             
             //Daten in Datei schreiben
             DatToSedas.WriteSedasData();

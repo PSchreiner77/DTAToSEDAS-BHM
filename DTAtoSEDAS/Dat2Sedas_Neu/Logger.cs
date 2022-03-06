@@ -17,11 +17,11 @@ namespace Dat2Sedas_Neu
             if (logger == null)
             {
                 logger = new Logger();
-            logger.HaltOnCriticalErrors = true;
-            logger.MaxLogfileLines = 500;
-            logger.LogfileName = "Logfile.txt";
-            string loggerStart = $"Logger gestartet: {DateTime.Now.ToString()}\n{logger.GetLoggerSettings()}";
-            logger.WriteToLogfile(loggerStart, "", MsgType.Message);
+                logger.HaltOnCriticalErrors = true;
+                logger.MaxLogfileLines = 500;
+                logger.LogfileName = "Logfile.txt";
+                //string loggerStart = $"Logger gestartet: {DateTime.Now.ToString()}\n{logger.GetLoggerSettings()}";
+                //logger.WriteToLogfile(loggerStart, "", MsgType.Message);
             }
 
             return logger;
@@ -50,7 +50,13 @@ namespace Dat2Sedas_Neu
         #region Properties
         public bool HaltOnCriticalErrors { get; set; }
         public Output OutputMedium { get; set; }
-        public int MaxLogfileLines { get; set; }
+        private int _maxLogfileLines;
+        public int MaxLogfileLines
+        {
+            get { return _maxLogfileLines; }
+            set { if (value < 50) { _maxLogfileLines = 50; } else { _maxLogfileLines = value; } }
+        }
+        public int LinesToDelete { get => MaxLogfileLines - 100 < 50 ? 50 : MaxLogfileLines - 100; }
         public string LogfileName { get; set; }
         public string GetLogfilePath
         {
@@ -124,11 +130,11 @@ namespace Dat2Sedas_Neu
                 List<string> newlLogfileLines = new List<string>();
                 if (actualLogfileLines.Count >= MaxLogfileLines)
                 {
-                    newlLogfileLines.AddRange(actualLogfileLines.GetRange(linesToAdd, actualLogfileLines.Count - linesToAdd));
-                    newlLogfileLines.Add($"---===### Logdatei um {linesToAdd} Zeilen gekürzt ###===---");
+                    newlLogfileLines.Add($"---===### Logdatei um {LinesToDelete} Zeilen gekürzt ###===---");
+                    newlLogfileLines.AddRange(actualLogfileLines.GetRange(actualLogfileLines.Count - LinesToDelete, LinesToDelete));
+                    File.WriteAllLines(GetLogfilePath, newlLogfileLines);
                 }
 
-                File.WriteAllLines(GetLogfilePath, newlLogfileLines);
             }
             catch (Exception ex)
             {
@@ -139,7 +145,7 @@ namespace Dat2Sedas_Neu
 
         #region Public
         public void Log(string msg)
-        { Log(msg, "", MsgType.Message,Output.LogOnly); }
+        { Log(msg, "", MsgType.Message, Output.LogOnly); }
 
         public void Log(string msg, MsgType type)
         { Log(msg, "", type, OutputMedium); }

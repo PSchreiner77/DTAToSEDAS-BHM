@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,16 +12,22 @@ namespace Dat2Sedas_Neu
     //     Kundennummern wiederholt auftauchen. Sie sollen en-block gelistet werden (sortiert nach Art.Nr).
     class ConvertDatToSedas
     {
-        private Logger log = Logger.GetInstance();
 
-        private string _SourcePath;
         private List<string> _SourceDataList;
-        private string _DestinationPath;
+        private List<InputFileOrderLineNF> _ListeDatBestellzeilen;
 
-        private List<DatBestellzeile> _ListeDatBestellzeilen;
+
+        //****************
+        private Logger log = Logger.GetInstance();
         private string _SedasErstellDatumJJMMTT;
+        private string _SourcePath;
+        private string _DestinationPath;
         private int _counter;
         private SedasFile _SedasFile;  //Objekt mit allen SEDAS-Einträgen, fertig zur Erstellung einer Datei (.ToString()).
+
+        InputFileNF inputFile = new InputFileNF();
+
+        //****************
 
         //KONSTRUKTOR
         public ConvertDatToSedas(string SourceFilePath, string DestinationFilePath, int Counter)
@@ -31,150 +38,153 @@ namespace Dat2Sedas_Neu
             this._counter = Counter;
         }
 
+
         //METHODEN
-       
+
         private bool checkIfNFFileFormat()
         {
             string prefix = _SourceDataList[0].Substring(0, 2);
-            if (prefix == "NF") return true;
+            if (prefix == "NF")
+                return true;
             return false;
         }
 
-        //TODO ReadOldDatDataFormat
-        private List<DatBestellzeile> ReadOldDATDataFormat(List<string> OldDATData, string ErstelldatumTTMMJJ)
-        {
+        //TODO ? ReadOldDatDataFormat
+        //private List<InputFileOrderLineNF> ReadOldDATDataFormat(List<string> OldDATData, string ErstelldatumTTMMJJ)
+        //{
 
-            List<DatBestellzeile> datBestellzeilen = new List<DatBestellzeile>();
+        //    List<InputFileOrderLineNF> datBestellzeilen = new List<InputFileOrderLineNF>();
 
-            foreach (string eintrag in OldDATData)
-            {
-                string[] arrZeile = eintrag.Split(';');
-                DatBestellzeile datBestellzeile = new DatBestellzeile();
-                datBestellzeile.NFKennzeichen = arrZeile[0];
-                datBestellzeile.BHMFilialNummer = arrZeile[1];
-                datBestellzeile.BHMKundenNummer = arrZeile[2];
-                datBestellzeile.BestellDatumJJMMT = _SedasErstellDatumJJMMTT; // arrZeile[3];
-                datBestellzeile.LieferDatumJJMMTT = arrZeile[4];
-                datBestellzeile.BHMArtikelKey = arrZeile[5];
-                datBestellzeile.BestellMenge = arrZeile[6];
-                datBestellzeile.Preis = arrZeile[7];
-                datBestellzeile.BHMArtikelNummer = arrZeile[8];
-                datBestellzeile.Verpackungseinheit = arrZeile[9];
-                datBestellzeile.AnzahlBestellPositionen = arrZeile[10];
+        //    foreach (string eintrag in OldDATData)
+        //    {
+        //        string[] arrZeile = eintrag.Split(';');
+        //        InputFileOrderLineNF datBestellzeile = new InputFileOrderLineNF();
+        //        datBestellzeile.NFKennzeichen = arrZeile[0];
+        //        datBestellzeile.BHMFilialNummer = arrZeile[1];
+        //        datBestellzeile.BHMKundenNummer = arrZeile[2];
+        //        datBestellzeile.BestellDatumJJMMT = _SedasErstellDatumJJMMTT; // arrZeile[3];
+        //        datBestellzeile.LieferDatumJJMMTT = arrZeile[4];
+        //        datBestellzeile.BHMArtikelKey = arrZeile[5];
+        //        datBestellzeile.BestellMenge = arrZeile[6];
+        //        datBestellzeile.Preis = arrZeile[7];
+        //        datBestellzeile.BHMArtikelNummer = arrZeile[8];
+        //        datBestellzeile.Verpackungseinheit = arrZeile[9];
+        //        datBestellzeile.AnzahlBestellPositionen = arrZeile[10];
 
-                datBestellzeilen.Add(datBestellzeile);
-            }
+        //        datBestellzeilen.Add(datBestellzeile);
+        //    }
 
-            return datBestellzeilen;
+        //    return datBestellzeilen;
 
-            //bool flag = Operators.CompareString(arrSourceLines(0), "", false) = 0
+        //    //bool flag = Operators.CompareString(arrSourceLines(0), "", false) = 0
 
-            //    // The following expression was wrapped in a checked-statement
-            //List<DatBestellzeile> array = new List<DatBestellzeile>();
-            //if (arrSourceLines[0] == "")
-            //{
-            //    array = null;
-            //    array = array;
-            //}
-            //else
-            //{
-            //    try
-            //    {
-            //        int num = -1;
-            //        int upperBound = arrSourceLines.GetUpperBound(0);
-            //        for (int i = 0; i <= upperBound; i++)
-            //        {
-            //            bool flag2 = Operators.CompareString(arrSourceLines(i), "", false) <> 0;
-            //            if (flag2)
-            //                num += 1;
-            //        }
+        //    //    // The following expression was wrapped in a checked-statement
+        //    //List<DatBestellzeile> array = new List<DatBestellzeile>();
+        //    //if (arrSourceLines[0] == "")
+        //    //{
+        //    //    array = null;
+        //    //    array = array;
+        //    //}
+        //    //else
+        //    //{
+        //    //    try
+        //    //    {
+        //    //        int num = -1;
+        //    //        int upperBound = arrSourceLines.GetUpperBound(0);
+        //    //        for (int i = 0; i <= upperBound; i++)
+        //    //        {
+        //    //            bool flag2 = Operators.CompareString(arrSourceLines(i), "", false) <> 0;
+        //    //            if (flag2)
+        //    //                num += 1;
+        //    //        }
 
-            //        string[,] array2 = New String(num + 1 - 1, 10) { }; //Array dimensionieren
-            //        int num2 = 0;
-            //        int upperBound2 = arrSourceLines.GetUpperBound(0);
-            //        for (int j = 0; j < upperBound2; j++)
-            //        {
-            //            string left = arrSourceLines(j);
-            //            bool flag3 = Operators.CompareString(left, "", false) <> 0;
-            //            if (flag3)
-            //            {
-            //                array2(num2, 2) = this.MyTRIM(Strings.Mid(arrSourceLines(j), 9, 8));
-            //                array2(num2, 3) = ErstelldatumTTMMJJ;
-            //                array2(num2, 4) = this.MyTRIM(Strings.Mid(arrSourceLines(j), 18, 13));
-            //                array2(num2, 6) = this.Shorten(Strings.Mid(arrSourceLines(j), 73, 11), 7);
-            //                array2(num2, 8) = this.Expand(Strings.Trim(Strings.Mid(arrSourceLines(j), 31, 42)), 10);
-            //                num2 += 1;
-            //            }
-            //        }
-            //        array = this.DeleteEntries1(array2);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        array = null;
-            //    }
-            //}
-        }
+        //    //        string[,] array2 = New String(num + 1 - 1, 10) { }; //Array dimensionieren
+        //    //        int num2 = 0;
+        //    //        int upperBound2 = arrSourceLines.GetUpperBound(0);
+        //    //        for (int j = 0; j < upperBound2; j++)
+        //    //        {
+        //    //            string left = arrSourceLines(j);
+        //    //            bool flag3 = Operators.CompareString(left, "", false) <> 0;
+        //    //            if (flag3)
+        //    //            {
+        //    //                array2(num2, 2) = this.MyTRIM(Strings.Mid(arrSourceLines(j), 9, 8));
+        //    //                array2(num2, 3) = ErstelldatumTTMMJJ;
+        //    //                array2(num2, 4) = this.MyTRIM(Strings.Mid(arrSourceLines(j), 18, 13));
+        //    //                array2(num2, 6) = this.Shorten(Strings.Mid(arrSourceLines(j), 73, 11), 7);
+        //    //                array2(num2, 8) = this.Expand(Strings.Trim(Strings.Mid(arrSourceLines(j), 31, 42)), 10);
+        //    //                num2 += 1;
+        //    //            }
+        //    //        }
+        //    //        array = this.DeleteEntries1(array2);
+        //    //    }
+        //    //    catch (Exception ex)
+        //    //    {
+        //    //        array = null;
+        //    //    }
+        //    //}
+        //}
 
-        /// <summary>
-        /// Konvertiert das neue NF-Format in eine Liste mit Bestellzeilen und wendet die Filter für
-        /// Artikel- und Kundenlöschen, sowie Artikelaustausch auf die Liste an.
-        /// </summary>
-        /// <param name="NewNFDATData"></param>
-        /// <param name="ErstelldatumTTMMJJ"></param>
-        /// <returns></returns>
-        private List<DatBestellzeile> ReadNewNFDATDataFormat(List<string> NewNFDATData)
-        {            
-            /*
-            Zeile aus neuer NF-DAT-Datei:            
-            0 ;1   ;2   ;3     ;4     ;5   ;6    ;7;8  ;9    ;10
-            NF;1050;1050;200924;200925;    ;20000; ;209;     ;10    (Aldi-Datei Beispiel)
-            NF; 180;3785;091121;101121;1111; 9000;0;  2;1.000;1     (BHM-Datei Beispiel)
-            
-            (!* Originaldateien enthalten keine Leerzeichen in den Feldern*!)
+        ///// <summary>
+        ///// Konvertiert das neue NF-Format in eine Liste mit Bestellzeilen und wendet die Filter für
+        ///// Artikel- und Kundenlöschen, sowie Artikelaustausch auf die Liste an.
+        ///// </summary>
+        ///// <param name="NewNFDATData"></param>
+        ///// <param name="ErstelldatumTTMMJJ"></param>
+        ///// <returns></returns>
+        //private List<InputFileOrderLineNF> ReadNewNFDATDataFormat(List<string> NewNFDATData)
+        //{
+        //    /*
+        //    Zeile aus neuer NF-DAT-Datei:            
+        //    0 ;1   ;2   ;3     ;4     ;5   ;6    ;7;8  ;9    ;10
+        //    NF;1050;1050;200924;200925;    ;20000; ;209;     ;10    (Aldi-Datei Beispiel)
+        //    NF; 180;3785;091121;101121;1111; 9000;0;  2;1.000;1     (BHM-Datei Beispiel)
 
-            0  NF               Kennzeichen neues Format
-            1  FilNr            BHM Filialnummer der Filiale / Aldi-Filial/Kundennummer
-            2  KdNr             BHM Kundennummer der Filiale / Aldi-Filial/Kundennummer
-            3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen = Erstelldatum
-            4  Lieferdatum      Lieferdatum
-            5  Artikelkey       BHM ArtikelKey
-            6  Menge            Menge*1000, echte Menge=Menge/1000> 20000=20
-            7  Preis            Preis (Bsp. 2.000), Dezimal = .
-            8  ArtNummer        BHM ArtikelNummer
-            9  VPE              Verpackungseinheit
-            10 10               Anzahl Bestellpositionen in Datei
-            */
+        //    (!* Originaldateien enthalten keine Leerzeichen in den Feldern*!)
 
-            List<DatBestellzeile> ListeDatBestellzeilen = new List<DatBestellzeile>();
+        //    0  NF               Kennzeichen neues Format
+        //    1  FilNr            BHM Filialnummer der Filiale / Aldi-Filial/Kundennummer
+        //    2  KdNr             BHM Kundennummer der Filiale / Aldi-Filial/Kundennummer
+        //    3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen = Erstelldatum
+        //    4  Lieferdatum      Lieferdatum
+        //    5  Artikelkey       BHM ArtikelKey
+        //    6  Menge            Menge*1000, echte Menge=Menge/1000> 20000=20
+        //    7  Preis            Preis (Bsp. 2.000), Dezimal = .
+        //    8  ArtNummer        BHM ArtikelNummer
+        //    9  VPE              Verpackungseinheit
+        //    10 10               Anzahl Bestellpositionen in Datei
+        //    */
 
-            foreach (string eintrag in NewNFDATData)
-            {
-                string[] arrZeile = eintrag.Split(';');
-                DatBestellzeile datBestellzeile = new DatBestellzeile();
-                datBestellzeile.NFKennzeichen = arrZeile[0];
-                datBestellzeile.BHMFilialNummer = arrZeile[1];
-                datBestellzeile.BHMKundenNummer = arrZeile[2];
-                //TODO Bestelldatum nativ übernehmen und erst in SEDAS-Objekt umwandeln!
-                datBestellzeile.BestellDatumJJMMT = _SedasErstellDatumJJMMTT; // arrZeile[3]
-                datBestellzeile.LieferDatumJJMMTT = ConvertToSedasDateJJMMTT(arrZeile[4]);
-                datBestellzeile.BHMArtikelKey = arrZeile[5];
-                datBestellzeile.BestellMenge = arrZeile[6];
-                datBestellzeile.Preis = arrZeile[7];
-                datBestellzeile.BHMArtikelNummer = arrZeile[8];
-                datBestellzeile.Verpackungseinheit = arrZeile[9];
-                datBestellzeile.AnzahlBestellPositionen = arrZeile[10];
+        //    List<InputFileOrderLineNF> ListeDatBestellzeilen = new List<InputFileOrderLineNF>();
 
-                ListeDatBestellzeilen.Add(datBestellzeile);
-            }
+        //    foreach (string eintrag in NewNFDATData)
+        //    {
+        //        string[] arrZeile = eintrag.Split(';');
+        //        InputFileOrderLineNF datBestellzeile = new InputFileOrderLineNF();
+        //        datBestellzeile.NFKennzeichen = arrZeile[0];
+        //        datBestellzeile.BHMFilialNummer = arrZeile[1];
+        //        datBestellzeile.BHMKundenNummer = arrZeile[2];
+        //        //TODO Bestelldatum nativ übernehmen und erst in SEDAS-Objekt umwandeln!
+        //        datBestellzeile.BestellDatumJJMMT = _SedasErstellDatumJJMMTT; // arrZeile[3]
+        //        datBestellzeile.LieferDatumJJMMTT = ConvertToSedasDateJJMMTT(arrZeile[4]);
+        //        datBestellzeile.BHMArtikelKey = arrZeile[5];
+        //        datBestellzeile.BestellMenge = arrZeile[6];
+        //        datBestellzeile.Preis = arrZeile[7];
+        //        datBestellzeile.BHMArtikelNummer = arrZeile[8];
+        //        datBestellzeile.Verpackungseinheit = arrZeile[9];
+        //        datBestellzeile.AnzahlBestellPositionen = arrZeile[10];
 
-            return ListeDatBestellzeilen;
-        }
+        //        ListeDatBestellzeilen.Add(datBestellzeile);
+        //    }
+
+        //    return ListeDatBestellzeilen;
+        //}
+
 
         /// <summary>
         ///Bereinigt die Ordnerzeilen von ungewünschten Kunden und Artikeln und tauscht Artikelnummern aus.
         /// </summary>
         /// <returns></returns>
-        private List<DatBestellzeile> CleanupOrders(List<DatBestellzeile> DatBestellzeilen)
+        private List<InputFileOrderLineNF> CleanupOrders(List<InputFileOrderLineNF> DatBestellzeilen)
         {
             DatBestellzeilen = DeleteCustomers(DatBestellzeilen);
             DatBestellzeilen = DeleteArticles(DatBestellzeilen);
@@ -186,14 +196,14 @@ namespace Dat2Sedas_Neu
         #region Löschen und ändern
         //TODO Löschen und Ändern über Delegaten steuern lassen (Items löschen, welche kommt nach Auswahl).
         //TODO GGf alles in eigene Klasse(n) auslagern.
-        private List<DatBestellzeile> DeleteCustomers(List<DatBestellzeile> ListeDatBestellzeilen)
+        private List<InputFileOrderLineNF> DeleteCustomers(List<InputFileOrderLineNF> ListeDatBestellzeilen)
         {
             string messageTitle = "Kundennummern löschen";
 
             #region über Delegaten steuern lassen
             string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
             List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);
-            List<DatBestellzeile> deletedCustomers = new List<DatBestellzeile>();
+            List<InputFileOrderLineNF> deletedCustomers = new List<InputFileOrderLineNF>();
             #endregion
             bool nothingChanged = true;
             log.Log("Kundennummern aus Bestellung löschen...", messageTitle, Logger.MsgType.Message);
@@ -206,7 +216,7 @@ namespace Dat2Sedas_Neu
             foreach (string kundennummer in customersToDelete)
             {
                 bool customerDeleted = false;
-                foreach (DatBestellzeile datBestellzeile in ListeDatBestellzeilen)
+                foreach (InputFileOrderLineNF datBestellzeile in ListeDatBestellzeilen)
                 {
                     if (kundennummer == datBestellzeile.BHMKundenNummer)
                     {
@@ -221,26 +231,27 @@ namespace Dat2Sedas_Neu
                     nothingChanged = false;
                 }
             }
-            if (nothingChanged) log.Log("...keine Kundennummern gelöscht.");
+            if (nothingChanged)
+                log.Log("...keine Kundennummern gelöscht.");
 
             //"Entfernen" der Löschliste von der Hauptliste.
             ListeDatBestellzeilen = ListeDatBestellzeilen.Except(deletedCustomers).ToList();
             return ListeDatBestellzeilen;
         }
 
-        private List<DatBestellzeile> DeleteArticles(List<DatBestellzeile> DatBestellzeilen)
+        private List<InputFileOrderLineNF> DeleteArticles(List<InputFileOrderLineNF> DatBestellzeilen)
         {
             string messageTitle = "Artikelnummern löschen";
             string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
             List<string> articlesToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheArtikel);
-            List<DatBestellzeile> deletedArticles = new List<DatBestellzeile>();
+            List<InputFileOrderLineNF> deletedArticles = new List<InputFileOrderLineNF>();
 
             bool nothingChanged = true;
             log.Log("Löschen von Artikelnummern aus der Bestellung...", messageTitle, Logger.MsgType.Message);
             foreach (string artikelnummer in articlesToDelete)
             {
                 bool articleDeleted = false;
-                foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
+                foreach (InputFileOrderLineNF datBestellzeile in DatBestellzeilen)
                 {
                     if (artikelnummer == datBestellzeile.BHMArtikelNummer)
                     {
@@ -255,15 +266,17 @@ namespace Dat2Sedas_Neu
                     nothingChanged = false;
                 }
             }
-            if (nothingChanged) log.Log("...keine Artikelnummern gelöscht", messageTitle, Logger.MsgType.Message);
+            if (nothingChanged)
+                log.Log("...keine Artikelnummern gelöscht", messageTitle, Logger.MsgType.Message);
             DatBestellzeilen = DatBestellzeilen.Except(deletedArticles).ToList();
             return DatBestellzeilen;
         }
 
-        private List<DatBestellzeile> ChangeArticleNumbers(List<DatBestellzeile> DatBestellzeilen)
+        private List<InputFileOrderLineNF> ChangeArticleNumbers(List<InputFileOrderLineNF> DatBestellzeilen)
         {
             string messageTitle = "Artikelnummern tauschen";
-            if (DatBestellzeilen == null) { return null; }
+            if (DatBestellzeilen == null)
+            { return null; }
 
             log.Log("Austauschen von Artikelnummern laut tauscheArtikel.txt...", messageTitle, Logger.MsgType.Message);
             string pathTauscheArtikel = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
@@ -273,7 +286,7 @@ namespace Dat2Sedas_Neu
             foreach (KeyValuePair<string, string> dictEntry in ArticlesDict)
             {
                 bool articleChanged = false;
-                foreach (DatBestellzeile datBestellzeile in DatBestellzeilen)
+                foreach (InputFileOrderLineNF datBestellzeile in DatBestellzeilen)
                 {
                     if (dictEntry.Key == datBestellzeile.BHMArtikelNummer)
                     {
@@ -289,7 +302,8 @@ namespace Dat2Sedas_Neu
                 }
             }
 
-            if (nothingChanged) log.Log("...keine Artikelnummern ausgetauscht.", messageTitle, Logger.MsgType.Message);
+            if (nothingChanged)
+                log.Log("...keine Artikelnummern ausgetauscht.", messageTitle, Logger.MsgType.Message);
             return DatBestellzeilen;
         }
 
@@ -306,8 +320,10 @@ namespace Dat2Sedas_Neu
             string JJ = date.Year.ToString().Substring(2, 2);
             string MM = date.Month.ToString();
             string TT = date.Day.ToString();
-            if (MM.Length < 2) MM = "0" + MM;
-            if (TT.Length < 2) TT = "0" + TT;
+            if (MM.Length < 2)
+                MM = "0" + MM;
+            if (TT.Length < 2)
+                TT = "0" + TT;
             return JJ + MM + TT;
         }
 
@@ -319,83 +335,111 @@ namespace Dat2Sedas_Neu
         private string ConvertToSedasDateJJMMTT(string DateTTMMJJ)
         {
             string returnString = "";
-            for (int i = DateTTMMJJ.Length-2; i >=0; i -= 2)
+            for (int i = DateTTMMJJ.Length - 2; i >= 0; i -= 2)
             {
                 returnString += DateTTMMJJ.Substring(i, 2);
             }
             return returnString;
         }
 
-        /// <summary>
-        /// Liest die Quell-Dat-Datei ein. Möglich sind das neue Format (NF) und das alte Format. Rückgabewert ist eine Liste mit Bestellzeilen-Objekten.
-        /// </summary>
-        /// <returns></returns>
-        private bool ReadDatFileContent()
+        //DELETE ? 
+        ///// <summary>
+        ///// Liest die Quell-Dat-Datei ein. Möglich sind das neue Format (NF) und das alte Format. Rückgabewert ist eine Liste mit Bestellzeilen-Objekten.
+        ///// </summary>
+        ///// <returns></returns>
+        //private bool ReadDatFileContent()
+        //{
+        //    log.Log("Beginn der Konvertierung...", "Konvertierung der Daten", Logger.MsgType.Message);
+
+        //    _SourceDataList = Datenverarbeitung.ImportSourceFileToList(_SourcePath);
+        //    if (_SourceDataList == null)
+        //        return false;
+
+        //    //TODO Als Delegate bauen: ReadDatData auf den dann die passende (neu/alt) Einlesemethode gemappt wird.
+        //    #region 
+        //    if (checkIfNFFileFormat())
+        //    {
+        //        log.Log("Einlesen neues Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
+        //        this._ListeDatBestellzeilen = ReadNewNFDATDataFormat(_SourceDataList);
+        //    }
+        //    else
+        //    {
+        //        log.Log("Einlesen altes Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
+        //        this._ListeDatBestellzeilen = ReadOldDATDataFormat(_SourceDataList, _SedasErstellDatumJJMMTT);
+        //    }
+        //    #endregion
+
+        //    _ListeDatBestellzeilen = CleanupOrders(_ListeDatBestellzeilen);
+        //    return false;
+        //}
+
+        private List<string> ReadInputFile(string sourcePathNFDatFile)
         {
-            log.Log("Beginn der Konvertierung...", "Konvertierung der Daten", Logger.MsgType.Message);
-
-            _SourceDataList = Datenverarbeitung.ImportSourceFileToList(_SourcePath);
-            if (_SourceDataList == null)
-                return false;
-
-            //TODO Als Delegate bauen: ReadDatData auf den dann die passende (neu/alt) Einlesemethode gemappt wird.
-            #region 
-            if (checkIfNFFileFormat())
+            List<string> _sourceDataList = new List<string>();
+            try
             {
-                log.Log("Einlesen neues Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
-                this._ListeDatBestellzeilen = ReadNewNFDATDataFormat(_SourceDataList);
-            }
-            else
-            {
-                log.Log("Einlesen altes Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
-                this._ListeDatBestellzeilen = ReadOldDATDataFormat(_SourceDataList, _SedasErstellDatumJJMMTT);
-            }
-            #endregion
-
-            _ListeDatBestellzeilen = CleanupOrders(_ListeDatBestellzeilen);
-            return false;
-        }
-
-
-        public void CreateSedasData()
-        {
-            //Bestellungen filtern
-            string actualCustomer;
-            int pointer1 = 0;  // Zeiger für einzelne Bestellung, Findet Bestell-Header
-            int pointer2 = 0; // Zeiger für einzelne Bestellposition in Bestellung
-
-            //TODO Einlesen der Bestelldatei auslagern
-            log.Log("Einlesen der Bestelldatei...", "Einlesen", Logger.MsgType.Message);
-            ReadDatFileContent();
-
-            log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
-            
-            //TODO alle SEDAS-eigenenen Eigenschaften in Sedas-Objekt vereinen und ggf. erzeugen/konvertieren
-            _SedasFile = new SedasFile(_SedasErstellDatumJJMMTT, _counter);
-
-            //Alle Bestellzeilen durchgehen und bei jeder Kundennummer eine neue SEDAS-Bestellung erzeugen
-            while (pointer1 < _ListeDatBestellzeilen.Count())
-            {
-                //TODO Ggf. die Ermittlung der Bestellung und Bestellpositionen über LINQ abfragen/filtern und anschließend erstellen lassen.
-                //Kundenbestellung erzeugen/beginnen
-                DatBestellzeile Bestellposition = _ListeDatBestellzeilen[pointer1];
-                actualCustomer = Bestellposition.BHMKundenNummer;
-
-                //SedasOrder-Objekte (einzelne Bestellung) aus den Bestellzeilen erstellen.
-                SedasOrder CustomerOrder = new SedasOrder(_SedasErstellDatumJJMMTT, Bestellposition.LieferDatumJJMMTT, Bestellposition.BHMKundenNummer);
-
-                pointer2 = pointer1;
-                //Solange die Kundennummer gleich bleibt, und die Liste nich zu Ende ist, aus jeder Zeile eine SEDAS-Bestellposition machen.
-                while (pointer2 < _ListeDatBestellzeilen.Count() && _ListeDatBestellzeilen[pointer2].BHMKundenNummer == actualCustomer)
+                using (StreamReader sr = new StreamReader(sourcePathNFDatFile))
                 {
-                    Bestellposition = _ListeDatBestellzeilen[pointer2];
-                    CustomerOrder.OrderLines.Add(new SedasOrderLine(Bestellposition.BHMArtikelNummer, Bestellposition.BestellMenge));
-                    pointer2++;
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        if (line != "")
+                            _sourceDataList.Add(line);
+                    }
                 }
-                _SedasFile.SedasOrdersList.Add(CustomerOrder);
-                pointer1 = pointer2; //next Customer Block
+            }
+            catch (Exception ex)
+            {
+                //TODO Fehlerausnahme auslösen und Fehler melden}                
+                throw new Exception(ex.Message);
+            }
+            return _sourceDataList;
+        }
+
+
+        private SedasOrder CreateSedasOrder(IEnumerable<InputFileOrderLineNF> singleCustomerOrderLines)
+        {
+            string customerNumber = singleCustomerOrderLines.First().BHMKundenNummer;
+            string sedasLieferDatumJJMMTT = ConvertToSedasDateJJMMTT(singleCustomerOrderLines.First().LieferDatumTTMMJJ); 
+            // SEDAS-Order erstellen
+            SedasOrder singleCustomerOrder = new SedasOrder(this._SedasErstellDatumJJMMTT, sedasLieferDatumJJMMTT, customerNumber);
+
+            foreach (InputFileOrderLineNF orderLine in singleCustomerOrderLines)
+            {
+                //Alle Einträge einer Kundennummer als Sedas-OrderLines der Sedas-Order hinzufügen.
+                singleCustomerOrder.SedasOrderLines.Add(new SedasOrderLine(orderLine.BHMArtikelNummer, orderLine.BestellMenge));
+            }
+
+            return singleCustomerOrder;
+        }
+
+        public void ImportNFDatFile(string filePath)
+        {
+            List<string> orderFileLines = ReadInputFile(filePath);
+            foreach (string line in orderFileLines)
+            {
+                this.inputFile.AddNewNFOrderLine(line);
             }
         }
+
+        public void CreateSedasDatFile()
+        {
+            if (inputFile.Count() > 0)
+            {
+                //Kundennummern ermitteln
+                var listOfCustomerNumbers = this.inputFile.Select(orderLine => orderLine.BHMKundenNummer).Distinct();
+
+                log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
+                this._SedasFile = new SedasFile(this._SedasErstellDatumJJMMTT, this._counter);
+                //Für jede Kundennummer eine Sedas-Order erstellen und dem Sedas-File hinzufügen.
+                foreach (string actualCustomerNumber in listOfCustomerNumbers)
+                {
+                    var singleCustomerOrderLines = this.inputFile.Where(orderLine => orderLine.BHMKundenNummer == actualCustomerNumber).Select(orderLine => orderLine);
+                    this._SedasFile.SedasOrdersList.Add(CreateSedasOrder(singleCustomerOrderLines));
+                }
+            }
+        }
+
 
 
         public bool WriteSedasData()
@@ -427,7 +471,7 @@ namespace Dat2Sedas_Neu
                 //Eigentliches Schreiben der SEDAS-Informationen in eine Datei.
                 using (StreamWriter sw = new StreamWriter(this._DestinationPath, false))
                 {
-                    sw.Write(_SedasFile.GetSedasFileString());
+                    sw.Write(_SedasFile.ToString());
                     sw.WriteLine("                                                                                    ");
                 }
                 return true;
@@ -440,325 +484,498 @@ namespace Dat2Sedas_Neu
             }
         }
     }
-}
 
-class SedasFile
-{
-    /*
-     *    CSB-SEDAS Datei-Beispiel:
-     *    
-        010()000377777777777771180705;,241
-        ;)0240051310000002
-        ;030,14,00000000000000000,180705,180706,,,,3789         ,,
-        ;0400000000001360,40002000,,,,02 000000,,
-        ...
-        ...
-        ...
-        ;0400000000004023,40001000,,,,02 000000,,
-        ;05000000039000           
-        ;06100,1178
-        ;07000000,00001,00001,000000,(
 
-        Erläuterung:
-        010...  = Datei-Header
-        030...  = Order-Header
-        040...  = Bestellposition(en)
-        050...  = Order-Footer
-        06....  = DateiFooter (Zusammenfassung)
-        070...  = DateiFooter (Dateiende)
-     */
 
-    private string _ErstellDatumSedas;
-    private int _IniSedasRunThroughCounter; //TODO Was bedeutet der Zähler?
 
-    public string Header { get { return GetSedasFileHeaderString(); } }
-    public string Footer { get { return GetSedasFileFooterString(); } }
-    public List<SedasOrder> SedasOrdersList = new List<SedasOrder>();
-
-    public int CustomerOrdersCount { get { return SedasOrdersList.Count; } }
-    public int OverallOrderLineEntriesCount { get { return GetTotalNumberOfOrderLines(); } }
-
-    //KONSTRUKTOR
-    //public SedasFile() { }
-
-    public SedasFile(string Erstelldatum, int IniSedasRunThroughCounter)
+    class SedasFile : IEnumerable<SedasOrder>
     {
-        _ErstellDatumSedas = Erstelldatum;
-        _IniSedasRunThroughCounter = IniSedasRunThroughCounter;
-    }
+        /*
+         *    CSB-SEDAS Datei-Beispiel:
+         *    
+            010()000377777777777771180705;,241
+            ;)0240051310000002
+            ;030,14,00000000000000000,180705,180706,,,,3789         ,,
+            ;0400000000001360,40002000,,,,02 000000,,
+            ...
+            ...
+            ...
+            ;0400000000004023,40001000,,,,02 000000,,
+            ;05000000039000           
+            ;06100,1178
+            ;07000000,00001,00001,000000,(
 
-    //METHODEN
+            Erläuterung:
+            010...  = Datei-Header
+            030...  = Order-Header
+            040...  = Bestellposition(en)
+            050...  = Order-Footer
+            06....  = DateiFooter (Zusammenfassung)
+            070...  = DateiFooter (Dateiende)
+         */
 
-    //TODO Propery erstellen
-    private int GetTotalNumberOfOrderLines()
-    {
-        int count = 0;
-        foreach (SedasOrder order in SedasOrdersList)
+        private string _ErstellDatumSedasJJMMTT;
+        private int _IniSedasRunThroughCounter; //TODO Was bedeutet der Zähler?
+        public List<SedasOrder> SedasOrdersList = new List<SedasOrder>();
+
+        //DELETE ? public string FileHeader { get { return GetSedasFileHeaderString(); } }
+        //DELETE ? public string FileFooter { get { return GetSedasFileFooterString(); } }
+
+
+        public int CustomerOrdersCount { get { return SedasOrdersList.Count; } }
+        public int OverallOrderLineEntriesCount { get { return GetTotalNumberOfOrderLines(); } }
+
+        //KONSTRUKTOR
+        public SedasFile(string Erstelldatum, int IniSedasRunThroughCounter)
         {
-            count += order.OrderLines.Count;
+            _ErstellDatumSedasJJMMTT = Erstelldatum;
+            _IniSedasRunThroughCounter = IniSedasRunThroughCounter;
         }
-        return count; ;
-    }
 
-    private string GetSedasFileHeaderString()
-    {
-        return $"010()000377777777777771{_ErstellDatumSedas};,{_IniSedasRunThroughCounter}\r\n;)0240051310000002";
-    }
+        //METHODEN
 
-    private string GetSedasFileFooterString()
-    {
-        #region Aufbau FooterLine
-        //--FOOTER der Zieldatei
-        //; 06100,1178
-        //; 07000000,00001,00001,000000,(
-        //
-        //;06108,1178 
-        //  ;06    = Kennung Zusammenfassung Einträge
-        //  108,   = Anzahl Kunden in Datei (Blöcke)
-        //  1178   = Anzahl einzelner Datensätze/Artikelzeilen
-        #endregion
-        string FooterLine1 = $":06{Tools.ExpandLeftStringSide(CustomerOrdersCount.ToString(), 3)};{OverallOrderLineEntriesCount}";
-        string FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
-
-        return FooterLine1 + "\r\n" + FooterLine2;
-    }
-
-    public string GetSedasFileString()
-    {
-        string returnString = "";
-        string cr = "\r\n";
-
-        returnString += GetSedasFileHeaderString() + cr;
-        foreach (SedasOrder order in SedasOrdersList)
+        //TODO Propery erstellen
+        private int GetTotalNumberOfOrderLines()
         {
-            returnString += order.Header + cr;
-            foreach (SedasOrderLine orderLine in order.OrderLines)
+            int count = 0;
+            foreach (SedasOrder order in SedasOrdersList)
             {
-                returnString += orderLine.GetSedasOrderLineString() + cr;
+                count += order.SedasOrderLines.Count;
             }
-            returnString += order.Footer + cr;
-        }
-        returnString += GetSedasFileFooterString() + cr;
-        return returnString;
-    }
-}
-
-class SedasOrder
-{
-    private string _ErstellDatum;
-    private string _LieferDatum;
-    private string _BHMKundennummer;
-
-    public string Header
-    {
-        get { return GetSedasOrderHeaderString(); }
-    }
-    public string Footer { get { return GetSedasOrderFooterString(); } }
-    public int OrderArticleQuantity { get { return GetSedasOrderArticleQuantity(); } }
-    public List<SedasOrderLine> OrderLines = new List<SedasOrderLine>();
-
-    //KONSTRUKTOR
-    public SedasOrder(string ErstellDatumJJMMTT, string LieferDatumJJMMTT, string BHMKundennummer)
-    {
-        _ErstellDatum = ErstellDatumJJMMTT;
-        _LieferDatum = LieferDatumJJMMTT;
-        _BHMKundennummer = BHMKundennummer;
-    }
-
-    //METHODEN
-    private string GetSedasOrderHeaderString()
-    {
-        return $";030,14,00000000000000000,{_ErstellDatum},{_LieferDatum},,,,{_BHMKundennummer}         ,,";
-    }
-
-    private string GetSedasOrderFooterString()
-    {
-        //;05000000039000
-        //;05               Kennung Footer
-        //   000000039      9 Stellen für Summe bestellter Artikelmengen
-        //            0000  1000er Stelle für Artikelmenge
-
-        string articleQuantity = Tools.ExpandLeftStringSide(OrderArticleQuantity.ToString(), 9);
-        return $";05{articleQuantity}000";
-    }
-
-    public int GetSedasOrderArticleQuantity()
-    {
-        int count = 0;
-        foreach (SedasOrderLine orderLine in OrderLines)
-        {
-            count += Convert.ToInt32(orderLine.ArtikelMenge.Substring(0, orderLine.ArtikelMenge.Length - 3));
+            return count;
+            ;
         }
 
-        return count;
-    }
-}
-
-class SedasOrderLine
-{
-    /* ;0400000000000317,40002000,,,,02 000000,,
-     *      ;040000          = Kennung Zeile BestellPosition
-     *      0000000317       = Artikelnummer
-     *      ,4               = fix
-     *      00002000         = Menge (Wert/1000)
-     *      ,,,,02 000000,,  = fix
-    */
-
-    public string BHMArtikelNummer { get; private set; }
-    public string ArtikelMenge { get; private set; }
-
-
-    //KONSTRUKTOR
-    public SedasOrderLine()
-    { }
-
-    public SedasOrderLine(string BHMArtikelNummer, string ArtikelMenge)
-    {
-        this.BHMArtikelNummer = BHMArtikelNummer;
-        this.ArtikelMenge = ArtikelMenge;
-    }
-
-    //METHODEN
-    public string GetSedasOrderLineString()
-    {
-        return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer, 10)},4{Tools.ExpandLeftStringSide(ArtikelMenge, 7)},,,,02 000000,,";
-    }
-}
-
-class DatBestellzeile
-{
-    #region Aufbau Bestellzeile
-    /*
-    Zeile aus neuer NF-DAT-Datei:            
-    0 ;1   ;2   ;3     ;4     ;5;6   ;7;8 ;9;10
-    NF;1050;1050;200924;200925;;20000;;209;;10
-    0  NF               Kennzeichen neues Format
-    1  KdNr             BHM Filialnummer
-    2  KdNr             BHM Kundennummer der Filiale
-    3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen
-    4  Lieferdatum      Lieferdatum
-    5  -leer-           BHM ArtikelKey
-    6  20000            Menge*1000, echte Menge=Menge/1000> 20000=20
-    7  -leer-           Preis (Bsp. 2.00), Dezimal = .
-    8  ArtNummer        BHM ArtikelNummer
-    9  -leer-           VPE
-    10 10               Anzahl Bestellpositionen in Datei
-    */
-    #endregion
-
-    public string NFKennzeichen { get; set; }
-    public string BHMFilialNummer { get; set; }
-    public string BHMKundenNummer { get; set; }
-    public string BestellDatumJJMMT { get; set; }
-    public string LieferDatumJJMMTT { get; set; }
-    public string BHMArtikelKey { get; set; }
-    public string BestellMenge { get; set; }
-    public string Preis { get; set; }
-    public string BHMArtikelNummer { get; set; }
-    public string Verpackungseinheit { get; set; }
-    public string AnzahlBestellPositionen { get; set; }
-}
-
-
-
-
-
-static class Datenverarbeitung
-{
-    /// <summary>
-    /// Liest die Dat-Quelldatei ein ohne Leerzeilen und gibt sie als List<string> zurück.</string>
-    /// </summary>
-    /// <param name="SourceFilePath"></param>
-    /// <returns></returns>
-    public static List<string> ImportSourceFileToList(string SourcePath)
-    {
-        List<string> _sourceDataList = new List<string>();
-        try
+        private string GetSedasFileHeaderString()
         {
-            using (StreamReader sr = new StreamReader(SourcePath))
+            return $"010()000377777777777771{_ErstellDatumSedasJJMMTT};,{_IniSedasRunThroughCounter}\r\n;)0240051310000002";
+        }
+
+        private string GetSedasFileFooterString()
+        {
+            #region Aufbau FooterLine
+            //--FOOTER der Zieldatei
+            //; 06100,1178
+            //; 07000000,00001,00001,000000,(
+            //
+            //;06108,1178 
+            //  ;06    = Kennung Zusammenfassung Einträge
+            //  108,   = Anzahl Kunden in Datei (Blöcke)
+            //  1178   = Anzahl einzelner Datensätze/Artikelzeilen
+            #endregion
+            string FooterLine1 = $":06{Tools.ExpandLeftStringSide(CustomerOrdersCount.ToString(), 3)};{OverallOrderLineEntriesCount}";
+            string FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
+
+            return FooterLine1 + "\r\n" + FooterLine2;
+        }
+
+        //DELETE
+        //public string GetSedasFileString()
+        //{
+        //    string returnString = "";
+        //    string cr = "\r\n";
+
+        //    returnString += GetSedasFileHeaderString() + cr;
+        //    foreach (SedasOrder order in SedasOrdersList)
+        //    {
+        //        returnString += order.Header + cr;
+        //        foreach (SedasOrderLine orderLine in order.SedasOrderLines)
+        //        {
+        //            returnString += orderLine.GetSedasOrderLineString() + cr;
+        //        }
+        //        returnString += order.Footer + cr;
+        //    }
+        //    returnString += GetSedasFileFooterString() + cr;
+        //    return returnString;
+        //}
+
+        public override string ToString()
+        {
+            string cr = "\r\n";
+
+            string returnString = GetSedasFileHeaderString() + cr;
+            foreach (SedasOrder order in SedasOrdersList)
             {
-                while (!sr.EndOfStream)
+                returnString += order.ToString();
+            }
+            returnString += GetSedasFileFooterString() + cr;
+            return returnString;
+        }
+
+
+        public IEnumerator<SedasOrder> GetEnumerator()
+        {
+            return SedasOrdersList.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+    class SedasOrder :IEnumerable<SedasOrderLine>
+    {
+        private string _ErstellDatumJJMMTT;
+        private string _LieferDatumJJMMTT;
+        private string _BHMKundennummer;
+
+        public string Header
+        {
+            get { return GetSedasOrderHeaderString(); }
+        }
+        public string Footer { get { return GetSedasOrderFooterString(); } }
+        public int OrderArticleQuantity { get { return GetSedasOrderArticleQuantity(); } }
+        public List<SedasOrderLine> SedasOrderLines = new List<SedasOrderLine>();
+
+        //KONSTRUKTOR
+        public SedasOrder(string ErstellDatumJJMMTT, string LieferDatumJJMMTT, string BHMKundennummer)
+        {
+            _ErstellDatumJJMMTT = ErstellDatumJJMMTT;
+            _LieferDatumJJMMTT = LieferDatumJJMMTT;
+            _BHMKundennummer = BHMKundennummer;
+        }
+
+        //METHODEN
+        private string GetSedasOrderHeaderString()
+        {
+            return $";030,14,00000000000000000,{_ErstellDatumJJMMTT},{_LieferDatumJJMMTT},,,,{_BHMKundennummer}         ,,";
+        }
+
+        private string GetSedasOrderFooterString()
+        {
+            //;05000000039000
+            //;05               Kennung Footer
+            //   000000039      9 Stellen für Summe bestellter Artikelmengen
+            //            0000  1000er Stelle für Artikelmenge
+
+            string articleQuantity = Tools.ExpandLeftStringSide(OrderArticleQuantity.ToString(), 9);
+            return $";05{articleQuantity}000";
+        }
+
+        public int GetSedasOrderArticleQuantity()
+        {
+            int count = 0;
+            foreach (SedasOrderLine orderLine in SedasOrderLines)
+            {
+                count += Convert.ToInt32(orderLine.ArtikelMenge.Substring(0, orderLine.ArtikelMenge.Length - 3));
+            }
+
+            return count;
+        }
+
+        public override string ToString()
+        {
+            string cr = "\r\n";
+
+            string returnString = this.Header + cr;
+            foreach (SedasOrderLine orderLine in this.SedasOrderLines)
+            {
+                returnString += orderLine.ToString() + cr;
+            }
+            returnString += this.Footer + cr;
+            
+            return returnString;
+        }
+
+        public IEnumerator<SedasOrderLine> GetEnumerator()
+        {
+            return SedasOrderLines.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+    class SedasOrderLine
+    {
+        /* ;0400000000000317,40002000,,,,02 000000,,
+         *      ;040000          = Kennung Zeile BestellPosition
+         *      0000000317       = Artikelnummer
+         *      ,4               = fix
+         *      00002000         = Menge (Wert/1000)
+         *      ,,,,02 000000,,  = fix
+        */
+
+        public string BHMArtikelNummer { get; set; }
+        public string ArtikelMenge { get; set; }
+
+
+        //KONSTRUKTOR
+        //DELETE
+        //public SedasOrderLine()
+        //{ }
+
+        public SedasOrderLine(string BHMArtikelNummer, string ArtikelMenge)
+        {
+            this.BHMArtikelNummer = BHMArtikelNummer;
+            this.ArtikelMenge = ArtikelMenge;
+        }
+
+        //METHODEN
+
+        public override string ToString()
+        {
+            return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer, 10)},4{Tools.ExpandLeftStringSide(ArtikelMenge, 7)},,,,02 000000,,";
+        }
+
+        //DELETE
+        //public string GetSedasOrderLineString()
+        //{
+        //    return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer, 10)},4{Tools.ExpandLeftStringSide(ArtikelMenge, 7)},,,,02 000000,,";
+        //}
+    }
+
+
+
+
+    class InputFileNF : IEnumerable<InputFileOrderLineNF>
+    {
+        private List<InputFileOrderLineNF> inputFileOrderLines = new List<InputFileOrderLineNF>();
+
+
+        //private void ConvertInputFileData(List<string> inputFileData)
+        //{
+        //    /*
+        //   Zeile aus neuer NF-DAT-Datei:            
+        //   0 ;1   ;2   ;3     ;4     ;5   ;6    ;7;8  ;9    ;10
+        //   NF;1050;1050;200924;200925;    ;20000; ;209;     ;10    (Aldi-Datei Beispiel)
+        //   NF; 180;3785;091121;101121;1111; 9000;0;  2;1.000;1     (BHM-Datei Beispiel)
+
+        //   (!* Originaldateien enthalten keine Leerzeichen in den Feldern*!)
+
+        //   0  NF               Kennzeichen neues Format
+        //   1  FilNr            BHM Filialnummer der Filiale / Aldi-Filial/Kundennummer
+        //   2  KdNr             BHM Kundennummer der Filiale / Aldi-Filial/Kundennummer
+        //   3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen = Erstelldatum
+        //   4  Lieferdatum      Lieferdatum
+        //   5  Artikelkey       BHM ArtikelKey
+        //   6  Menge            Menge*1000, echte Menge=Menge/1000> 20000=20
+        //   7  Preis            Preis (Bsp. 2.000), Dezimal = .
+        //   8  ArtNummer        BHM ArtikelNummer
+        //   9  VPE              Verpackungseinheit
+        //   10 10               Anzahl Bestellpositionen in Datei
+        //   */
+
+        //    try
+        //    {
+        //        foreach (string eintrag in inputFileData)
+        //        {
+        //            ConvertInputFileData(eintrag);
+        //        }
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+        //        //TODO Ausnahme anzeigen
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
+
+        private void ConvertInputFileData(string inputFileOrderLine)
+        {
+            /*
+          Zeile aus neuer NF-DAT-Datei:            
+          0 ;1   ;2   ;3     ;4     ;5   ;6    ;7;8  ;9    ;10
+          NF;1050;1050;200924;200925;    ;20000; ;209;     ;10    (Aldi-Datei Beispiel)
+          NF; 180;3785;091121;101121;1111; 9000;0;  2;1.000;1     (BHM-Datei Beispiel)
+
+          (!* Originaldateien enthalten keine Leerzeichen in den Feldern*!)
+
+          0  NF               Kennzeichen neues Format
+          1  FilNr            BHM Filialnummer der Filiale / Aldi-Filial/Kundennummer
+          2  KdNr             BHM Kundennummer der Filiale / Aldi-Filial/Kundennummer
+          3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen = Erstelldatum
+          4  Lieferdatum      Lieferdatum
+          5  Artikelkey       BHM ArtikelKey
+          6  Menge            Menge*1000, echte Menge=Menge/1000> 20000=20
+          7  Preis            Preis (Bsp. 2.000), Dezimal = .
+          8  ArtNummer        BHM ArtikelNummer
+          9  VPE              Verpackungseinheit
+          10 10               Anzahl Bestellpositionen in Datei
+          */
+
+            try
+            {
+                string[] arrZeile = inputFileOrderLine.Split(';');
+
+                this.inputFileOrderLines.Add(new InputFileOrderLineNF()
                 {
-                    string line = sr.ReadLine();
-                    if (line != "") _sourceDataList.Add(line);
+                    NFKennzeichen = arrZeile[0],
+                    BHMFilialNummer = arrZeile[1],
+                    BHMKundenNummer = arrZeile[2],
+                    BestellDatumTTMMJJ = arrZeile[3],
+                    LieferDatumTTMMJJ = arrZeile[4],
+                    BHMArtikelKey = arrZeile[5],
+                    BestellMenge = arrZeile[6],
+                    Preis = arrZeile[7],
+                    BHMArtikelNummer = arrZeile[8],
+                    Verpackungseinheit = arrZeile[9],
+                    AnzahlBestellPositionen = arrZeile[10]
+                });
+            }
+            catch (Exception ex)
+            {
+                //TODO Ausnahme anzeigen
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return inputFileOrderLines.GetEnumerator();
+        }
+
+        public IEnumerator<InputFileOrderLineNF> GetEnumerator()
+        {
+            return inputFileOrderLines.GetEnumerator();
+        }
+
+        public void AddNewNFOrderLine(string orderLineNFFormat)
+        {
+            ConvertInputFileData(orderLineNFFormat);
+        }
+    }
+
+    class InputFileOrderLineNF
+    {
+        #region Aufbau Bestellzeile
+        /*
+        Zeile aus neuer NF-DAT-Datei:            
+        0 ;1   ;2   ;3     ;4     ;5;6   ;7;8 ;9;10
+        NF;1050;1050;200924;200925;;20000;;209;;10
+        0  NF               Kennzeichen neues Format
+        1  KdNr             BHM Filialnummer
+        2  KdNr             BHM Kundennummer der Filiale
+        3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen
+        4  Lieferdatum      Lieferdatum
+        5  -leer-           BHM ArtikelKey
+        6  20000            Menge*1000, echte Menge=Menge/1000> 20000=20
+        7  -leer-           Preis (Bsp. 2.00), Dezimal = .
+        8  ArtNummer        BHM ArtikelNummer
+        9  -leer-           VPE
+        10 10               Anzahl Bestellpositionen in Datei
+        */
+        #endregion
+
+        public string NFKennzeichen { get; set; }
+        public string BHMFilialNummer { get; set; }
+        public string BHMKundenNummer { get; set; }
+        public string BestellDatumTTMMJJ { get; set; }
+        public string LieferDatumTTMMJJ { get; set; }
+        public string BHMArtikelKey { get; set; }
+        public string BestellMenge { get; set; }
+        public string Preis { get; set; }
+        public string BHMArtikelNummer { get; set; }
+        public string Verpackungseinheit { get; set; }
+        public string AnzahlBestellPositionen { get; set; }
+    }
+
+
+
+
+
+    static class Datenverarbeitung
+    {
+        ///// <summary>
+        ///// Liest die Dat-Quelldatei ein ohne Leerzeilen und gibt sie als List<string> zurück.</string>
+        ///// </summary>
+        ///// <param name="SourceFilePath"></param>
+        ///// <returns></returns>
+        //public static List<string> ImportSourceFileToList(string SourcePath)
+        //{
+        //    List<string> _sourceDataList = new List<string>();
+        //    try
+        //    {
+        //        using (StreamReader sr = new StreamReader(SourcePath))
+        //        {
+        //            while (!sr.EndOfStream)
+        //            {
+        //                string line = sr.ReadLine();
+        //                if (line != "")
+        //                    _sourceDataList.Add(line);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    { //Fehlerausnahme auslösen und Fehler melden}                
+        //        return null;
+        //    }
+        //    return _sourceDataList;
+        //}
+
+
+        public static List<string> LoadDeleteItemsList(string Path)
+        {
+            List<string> delItems = new List<string>();
+            try
+            {
+                List<string> allLines = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();
+                foreach (string element in allLines)
+                {
+                    delItems.Add(element.Split(';')[0]);
                 }
             }
-        }
-        catch (Exception ex)
-        { //Fehlerausnahme auslösen und Fehler melden}                
-            return null;
-        }
-        return _sourceDataList;
-    }
+            catch (Exception ex)
+            { }
 
-
-    public static List<string> LoadDeleteItemsList(string Path)
-    {
-        List<string> delItems = new List<string>();
-        try
-        {
-            List<string> allLines = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();
-            foreach (string element in allLines)
+            foreach (string entry in delItems)
             {
-                delItems.Add(element.Split(';')[0]);
+                entry.Trim();
             }
-        }
-        catch (Exception ex)
-        { }
 
-        foreach (string entry in delItems)
-        {
-            entry.Trim();
+            return delItems;
         }
 
-        return delItems;
-    }
-
-    public static Dictionary<string, string> LoadChangeArticlesList(string Path)
-    {
-        Dictionary<string, string> DictChangeArticles = new Dictionary<string, string>();
-        List<string> changeArticleFileContent = new List<string>();
-        try
+        public static Dictionary<string, string> LoadChangeArticlesList(string Path)
         {
-            changeArticleFileContent = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();
-        }
-        catch (Exception ex)
-        { }
-
-        foreach (string line in changeArticleFileContent)
-        {
-            if (line != "")
+            Dictionary<string, string> DictChangeArticles = new Dictionary<string, string>();
+            List<string> changeArticleFileContent = new List<string>();
+            try
             {
-                string[] elements = line.Split(';');
-                DictChangeArticles.Add(elements[0].Trim(), elements[1].Trim());
+                changeArticleFileContent = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();
             }
-        }
-        return DictChangeArticles;
-    }
-}
+            catch (Exception ex)
+            { }
 
-static class Tools
-{
-    public static string CutLeftStringSide(string Input, int MaxLength)
-    {
-        //Kürzt einen String vorne auf die angegebene Länge            
-        string returnString = "";
-        if (Input.Length > MaxLength)
-        {
-            returnString = Input.Substring(Input.Length - MaxLength);
+            foreach (string line in changeArticleFileContent)
+            {
+                if (line != "")
+                {
+                    string[] elements = line.Split(';');
+                    DictChangeArticles.Add(elements[0].Trim(), elements[1].Trim());
+                }
+            }
+            return DictChangeArticles;
         }
-        return returnString;
     }
 
-    public static string ExpandLeftStringSide(string InputString, int MaxLength)
+    static class Tools
     {
-        //Erweitert einen String links um "0" bis zur angegebenen Länge
-
-        while (InputString.Length < MaxLength)
+        public static string CutLeftStringSide(string Input, int MaxLength)
         {
-            InputString = "0" + InputString;
+            //Kürzt einen String vorne auf die angegebene Länge            
+            string returnString = "";
+            if (Input.Length > MaxLength)
+            {
+                returnString = Input.Substring(Input.Length - MaxLength);
+            }
+            return returnString;
         }
 
-        return InputString;
+        public static string ExpandLeftStringSide(string InputString, int MaxLength)
+        {
+            //Erweitert einen String links um "0" bis zur angegebenen Länge
+
+            while (InputString.Length < MaxLength)
+            {
+                InputString = "0" + InputString;
+            }
+
+            return InputString;
+        }
     }
 }
