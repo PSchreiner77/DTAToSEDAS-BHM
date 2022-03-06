@@ -308,7 +308,29 @@ namespace Dat2Sedas_Neu
         }
 
         #endregion
-
+  
+        private List<string> ReadInputFile(string sourcePathNFDatFile)
+        {
+            List<string> _sourceDataList = new List<string>();
+            try
+            {
+                using (StreamReader sr = new StreamReader(sourcePathNFDatFile))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        if (line != "")
+                            _sourceDataList.Add(line);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //TODO Fehlerausnahme auslösen und Fehler melden
+                throw new Exception(ex.Message);
+            }
+            return _sourceDataList;
+        }
 
         /// <summary>
         /// Gibt ein Datum als String zurück in der Form: 'JJMMTT'
@@ -342,31 +364,6 @@ namespace Dat2Sedas_Neu
             return returnString;
         }
 
-  
-        private List<string> ReadInputFile(string sourcePathNFDatFile)
-        {
-            List<string> _sourceDataList = new List<string>();
-            try
-            {
-                using (StreamReader sr = new StreamReader(sourcePathNFDatFile))
-                {
-                    while (!sr.EndOfStream)
-                    {
-                        string line = sr.ReadLine();
-                        if (line != "")
-                            _sourceDataList.Add(line);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //TODO Fehlerausnahme auslösen und Fehler melden
-                throw new Exception(ex.Message);
-            }
-            return _sourceDataList;
-        }
-
-
         private SedasOrder CreateSedasOrder(IEnumerable<InputFileOrderLineNF> singleCustomerOrderLines)
         {
             string customerNumber = singleCustomerOrderLines.First().BHMKundenNummer;
@@ -382,13 +379,65 @@ namespace Dat2Sedas_Neu
 
             return singleCustomerOrder;
         }
+        
+        private InputFileOrderLineNF ConvertInputFileData(string inputFileOrderLine)
+        {
+            /*
+          Zeile aus neuer NF-DAT-Datei:            
+          0 ;1   ;2   ;3     ;4     ;5   ;6    ;7;8  ;9    ;10
+          NF;1050;1050;200924;200925;    ;20000; ;209;     ;10    (Aldi-Datei Beispiel)
+          NF; 180;3785;091121;101121;1111; 9000;0;  2;1.000;1     (BHM-Datei Beispiel)
+
+          (!* Originaldateien enthalten keine Leerzeichen in den Feldern*!)
+
+          0  NF               Kennzeichen neues Format
+          1  FilNr            BHM Filialnummer der Filiale / Aldi-Filial/Kundennummer
+          2  KdNr             BHM Kundennummer der Filiale / Aldi-Filial/Kundennummer
+          3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen = Erstelldatum
+          4  Lieferdatum      Lieferdatum
+          5  Artikelkey       BHM ArtikelKey
+          6  Menge            Menge*1000, echte Menge=Menge/1000> 20000=20
+          7  Preis            Preis (Bsp. 2.000), Dezimal = .
+          8  ArtNummer        BHM ArtikelNummer
+          9  VPE              Verpackungseinheit
+          10 10               Anzahl Bestellpositionen in Datei
+          */
+
+            try
+            {
+                string[] arrZeile = inputFileOrderLine.Split(';');
+
+                InputFileOrderLineNF newLine = new InputFileOrderLineNF()
+                {
+                    NFKennzeichen = arrZeile[0],
+                    BHMFilialNummer = arrZeile[1],
+                    BHMKundenNummer = arrZeile[2],
+                    BestellDatumTTMMJJ = arrZeile[3],
+                    LieferDatumTTMMJJ = arrZeile[4],
+                    BHMArtikelKey = arrZeile[5],
+                    BestellMenge = arrZeile[6],
+                    Preis = arrZeile[7],
+                    BHMArtikelNummer = arrZeile[8],
+                    Verpackungseinheit = arrZeile[9],
+                    AnzahlBestellPositionen = arrZeile[10]
+                };
+
+                return newLine;
+            }
+            catch (Exception ex)
+            {
+                //TODO Ausnahme anzeigen
+                throw new Exception(ex.Message);
+            }
+        }
+
 
         public void ImportNFDatFile(string filePath)
         {
             List<string> orderFileLines = ReadInputFile(filePath);
             foreach (string line in orderFileLines)
             {
-                this.inputFile.AddNewNFOrderLine(line);
+                this.inputFile.InputFileOrderLines.Add(ConvertInputFileData(line));
             }
         }
 
@@ -672,7 +721,7 @@ namespace Dat2Sedas_Neu
 
     class InputFileNF : IEnumerable<InputFileOrderLineNF>
     {
-        private List<InputFileOrderLineNF> inputFileOrderLines = new List<InputFileOrderLineNF>();
+        public List<InputFileOrderLineNF> InputFileOrderLines = new List<InputFileOrderLineNF>();
 
 
         //private void ConvertInputFileData(List<string> inputFileData)
@@ -713,64 +762,65 @@ namespace Dat2Sedas_Neu
         //    }
         //}
 
-        private void ConvertInputFileData(string inputFileOrderLine)
-        {
-            /*
-          Zeile aus neuer NF-DAT-Datei:            
-          0 ;1   ;2   ;3     ;4     ;5   ;6    ;7;8  ;9    ;10
-          NF;1050;1050;200924;200925;    ;20000; ;209;     ;10    (Aldi-Datei Beispiel)
-          NF; 180;3785;091121;101121;1111; 9000;0;  2;1.000;1     (BHM-Datei Beispiel)
+        //DELETE
+        //private void ConvertInputFileData(string inputFileOrderLine)
+        //{
+        //    /*
+        //  Zeile aus neuer NF-DAT-Datei:            
+        //  0 ;1   ;2   ;3     ;4     ;5   ;6    ;7;8  ;9    ;10
+        //  NF;1050;1050;200924;200925;    ;20000; ;209;     ;10    (Aldi-Datei Beispiel)
+        //  NF; 180;3785;091121;101121;1111; 9000;0;  2;1.000;1     (BHM-Datei Beispiel)
 
-          (!* Originaldateien enthalten keine Leerzeichen in den Feldern*!)
+        //  (!* Originaldateien enthalten keine Leerzeichen in den Feldern*!)
 
-          0  NF               Kennzeichen neues Format
-          1  FilNr            BHM Filialnummer der Filiale / Aldi-Filial/Kundennummer
-          2  KdNr             BHM Kundennummer der Filiale / Aldi-Filial/Kundennummer
-          3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen = Erstelldatum
-          4  Lieferdatum      Lieferdatum
-          5  Artikelkey       BHM ArtikelKey
-          6  Menge            Menge*1000, echte Menge=Menge/1000> 20000=20
-          7  Preis            Preis (Bsp. 2.000), Dezimal = .
-          8  ArtNummer        BHM ArtikelNummer
-          9  VPE              Verpackungseinheit
-          10 10               Anzahl Bestellpositionen in Datei
-          */
+        //  0  NF               Kennzeichen neues Format
+        //  1  FilNr            BHM Filialnummer der Filiale / Aldi-Filial/Kundennummer
+        //  2  KdNr             BHM Kundennummer der Filiale / Aldi-Filial/Kundennummer
+        //  3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen = Erstelldatum
+        //  4  Lieferdatum      Lieferdatum
+        //  5  Artikelkey       BHM ArtikelKey
+        //  6  Menge            Menge*1000, echte Menge=Menge/1000> 20000=20
+        //  7  Preis            Preis (Bsp. 2.000), Dezimal = .
+        //  8  ArtNummer        BHM ArtikelNummer
+        //  9  VPE              Verpackungseinheit
+        //  10 10               Anzahl Bestellpositionen in Datei
+        //  */
 
-            try
-            {
-                string[] arrZeile = inputFileOrderLine.Split(';');
+        //    try
+        //    {
+        //        string[] arrZeile = inputFileOrderLine.Split(';');
 
-                this.inputFileOrderLines.Add(new InputFileOrderLineNF()
-                {
-                    NFKennzeichen = arrZeile[0],
-                    BHMFilialNummer = arrZeile[1],
-                    BHMKundenNummer = arrZeile[2],
-                    BestellDatumTTMMJJ = arrZeile[3],
-                    LieferDatumTTMMJJ = arrZeile[4],
-                    BHMArtikelKey = arrZeile[5],
-                    BestellMenge = arrZeile[6],
-                    Preis = arrZeile[7],
-                    BHMArtikelNummer = arrZeile[8],
-                    Verpackungseinheit = arrZeile[9],
-                    AnzahlBestellPositionen = arrZeile[10]
-                });
-            }
-            catch (Exception ex)
-            {
-                //TODO Ausnahme anzeigen
-                throw new Exception(ex.Message);
-            }
-        }
+        //        this.InputFileOrderLines.Add(new InputFileOrderLineNF()
+        //        {
+        //            NFKennzeichen = arrZeile[0],
+        //            BHMFilialNummer = arrZeile[1],
+        //            BHMKundenNummer = arrZeile[2],
+        //            BestellDatumTTMMJJ = arrZeile[3],
+        //            LieferDatumTTMMJJ = arrZeile[4],
+        //            BHMArtikelKey = arrZeile[5],
+        //            BestellMenge = arrZeile[6],
+        //            Preis = arrZeile[7],
+        //            BHMArtikelNummer = arrZeile[8],
+        //            Verpackungseinheit = arrZeile[9],
+        //            AnzahlBestellPositionen = arrZeile[10]
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //TODO Ausnahme anzeigen
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return inputFileOrderLines.GetEnumerator();
+            return InputFileOrderLines.GetEnumerator();
         }
 
         public IEnumerator<InputFileOrderLineNF> GetEnumerator()
         {
-            return inputFileOrderLines.GetEnumerator();
+            return InputFileOrderLines.GetEnumerator();
         }
 
         public void AddNewNFOrderLine(string orderLineNFFormat)
