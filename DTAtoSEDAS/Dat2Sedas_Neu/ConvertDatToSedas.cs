@@ -156,8 +156,9 @@ namespace Dat2Sedas_Neu
                 datBestellzeile.NFKennzeichen = arrZeile[0];
                 datBestellzeile.BHMFilialNummer = arrZeile[1];
                 datBestellzeile.BHMKundenNummer = arrZeile[2];
-                datBestellzeile.BestellDatumJJMMT = _SedasErstellDatumJJMMTT; // arrZeile[3];
-                datBestellzeile.LieferDatumJJMMTT = arrZeile[4];
+                //TODO Bestelldatum nativ übernehmen und erst in SEDAS-Objekt umwandeln!
+                datBestellzeile.BestellDatumJJMMT = _SedasErstellDatumJJMMTT; // arrZeile[3]
+                datBestellzeile.LieferDatumJJMMTT = ConvertToSedasDateJJMMTT(arrZeile[4]);
                 datBestellzeile.BHMArtikelKey = arrZeile[5];
                 datBestellzeile.BestellMenge = arrZeile[6];
                 datBestellzeile.Preis = arrZeile[7];
@@ -311,10 +312,16 @@ namespace Dat2Sedas_Neu
             if (TT.Length < 2) TT = "0" + TT;
             return JJ + MM + TT;
         }
+
+        /// <summary>
+        /// Dreht das Quelldatei-Datumsformat um in das Sedas-Datumsformat: TTMMJJ => JJMMTT
+        /// </summary>
+        /// <param name="DateTTMMJJ">Quelldatei-Datumsformat: TTMMJJ</param>
+        /// <returns></returns>
         private string ConvertToSedasDateJJMMTT(string DateTTMMJJ)
         {
             string returnString = "";
-            for (int i = 0; i < DateTTMMJJ.Length; i += 2)
+            for (int i = DateTTMMJJ.Length-2; i >=0; i -= 2)
             {
                 returnString += DateTTMMJJ.Substring(i, 2);
             }
@@ -365,6 +372,7 @@ namespace Dat2Sedas_Neu
 
             log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
             
+            //TODO alle SEDAS-eigenenen Eigenschaften in Sedas-Objekt vereinen und ggf. erzeugen/konvertieren
             _SedasFile = new SedasFile(_SedasErstellDatumJJMMTT, _counter);
 
             //Alle Bestellzeilen durchgehen und bei jeder Kundennummer eine neue SEDAS-Bestellung erzeugen

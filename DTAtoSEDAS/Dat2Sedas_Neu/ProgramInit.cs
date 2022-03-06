@@ -122,8 +122,13 @@ namespace Dat2Sedas_Neu
                     case "/Q":               //Quelldatei
                         try
                         {
-                            Param.SourceFileFolder = Path.GetDirectoryName(startArgument[1].ToString());
-                            Param.SourceFileName = Path.GetFileName(startArgument[1].ToString());
+                            string paramSourceFileFolder = Path.GetDirectoryName(startArgument[1].ToString());
+                            string paramSourceFileName = Path.GetFileName(startArgument[1].ToString());
+
+                            if (paramSourceFileFolder != "")
+                                Param.SourceFileFolder = paramSourceFileFolder;
+                            if (paramSourceFileName != "")
+                                Param.SourceFileName = paramSourceFileName;
                         }
                         catch (Exception ex)
                         { }
@@ -132,8 +137,13 @@ namespace Dat2Sedas_Neu
                     case "/Z":             //Zieldatei
                         try
                         {
-                            Param.DestinationFileFolder = Path.GetDirectoryName(startArgument[1].ToString());
-                            Param.DestinationFileName = Path.GetFileName(startArgument[1].ToString());
+                            string paramDestinationFileFolder = Path.GetDirectoryName(startArgument[1].ToString());
+                            string paramDestinationFileName = Path.GetFileName(startArgument[1].ToString());
+
+                            if (paramDestinationFileFolder != "")
+                                Param.DestinationFileFolder = paramDestinationFileFolder;
+                            if (paramDestinationFileName != "")
+                                Param.DestinationFileName = paramDestinationFileName;
                         }
                         catch (Exception ex)
                         { }
@@ -202,10 +212,14 @@ namespace Dat2Sedas_Neu
             log.Log(message, messageTitle, Logger.MsgType.Message);
             Param = Parameters.GetInstance;
 
-            if (!CheckIniFile()) return false;
-            if (!ReadIniValues()) return false;
-            if (!CheckStartArguments()) return false;
-            if (!CheckSource()) return false;
+            if (!CheckIniFile())
+                return false;
+            if (!ReadIniValues())
+                return false;
+            if (!CheckStartArguments())
+                return false;
+            if (!CheckSource())
+                return false;
             SetDestinationPath();
 
             messageTitle = "Programminitialisierung";
