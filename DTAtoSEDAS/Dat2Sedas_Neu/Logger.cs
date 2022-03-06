@@ -20,8 +20,6 @@ namespace Dat2Sedas_Neu
                 logger.HaltOnCriticalErrors = true;
                 logger.MaxLogfileLines = 500;
                 logger.LogfileName = "Logfile.txt";
-                //string loggerStart = $"Logger gestartet: {DateTime.Now.ToString()}\n{logger.GetLoggerSettings()}";
-                //logger.WriteToLogfile(loggerStart, "", MsgType.Message);
             }
 
             return logger;

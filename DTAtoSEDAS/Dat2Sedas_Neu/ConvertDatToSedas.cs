@@ -342,37 +342,7 @@ namespace Dat2Sedas_Neu
             return returnString;
         }
 
-        //DELETE ? 
-        ///// <summary>
-        ///// Liest die Quell-Dat-Datei ein. Möglich sind das neue Format (NF) und das alte Format. Rückgabewert ist eine Liste mit Bestellzeilen-Objekten.
-        ///// </summary>
-        ///// <returns></returns>
-        //private bool ReadDatFileContent()
-        //{
-        //    log.Log("Beginn der Konvertierung...", "Konvertierung der Daten", Logger.MsgType.Message);
-
-        //    _SourceDataList = Datenverarbeitung.ImportSourceFileToList(_SourcePath);
-        //    if (_SourceDataList == null)
-        //        return false;
-
-        //    //TODO Als Delegate bauen: ReadDatData auf den dann die passende (neu/alt) Einlesemethode gemappt wird.
-        //    #region 
-        //    if (checkIfNFFileFormat())
-        //    {
-        //        log.Log("Einlesen neues Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
-        //        this._ListeDatBestellzeilen = ReadNewNFDATDataFormat(_SourceDataList);
-        //    }
-        //    else
-        //    {
-        //        log.Log("Einlesen altes Dateiformat...", "Einlesen der Bestelldaten", Logger.MsgType.Message);
-        //        this._ListeDatBestellzeilen = ReadOldDATDataFormat(_SourceDataList, _SedasErstellDatumJJMMTT);
-        //    }
-        //    #endregion
-
-        //    _ListeDatBestellzeilen = CleanupOrders(_ListeDatBestellzeilen);
-        //    return false;
-        //}
-
+  
         private List<string> ReadInputFile(string sourcePathNFDatFile)
         {
             List<string> _sourceDataList = new List<string>();
@@ -390,7 +360,7 @@ namespace Dat2Sedas_Neu
             }
             catch (Exception ex)
             {
-                //TODO Fehlerausnahme auslösen und Fehler melden}                
+                //TODO Fehlerausnahme auslösen und Fehler melden
                 throw new Exception(ex.Message);
             }
             return _sourceDataList;
@@ -518,9 +488,6 @@ namespace Dat2Sedas_Neu
         private int _IniSedasRunThroughCounter; //TODO Was bedeutet der Zähler?
         public List<SedasOrder> SedasOrdersList = new List<SedasOrder>();
 
-        //DELETE ? public string FileHeader { get { return GetSedasFileHeaderString(); } }
-        //DELETE ? public string FileFooter { get { return GetSedasFileFooterString(); } }
-
 
         public int CustomerOrdersCount { get { return SedasOrdersList.Count; } }
         public int OverallOrderLineEntriesCount { get { return GetTotalNumberOfOrderLines(); } }
@@ -569,26 +536,7 @@ namespace Dat2Sedas_Neu
             return FooterLine1 + "\r\n" + FooterLine2;
         }
 
-        //DELETE
-        //public string GetSedasFileString()
-        //{
-        //    string returnString = "";
-        //    string cr = "\r\n";
-
-        //    returnString += GetSedasFileHeaderString() + cr;
-        //    foreach (SedasOrder order in SedasOrdersList)
-        //    {
-        //        returnString += order.Header + cr;
-        //        foreach (SedasOrderLine orderLine in order.SedasOrderLines)
-        //        {
-        //            returnString += orderLine.GetSedasOrderLineString() + cr;
-        //        }
-        //        returnString += order.Footer + cr;
-        //    }
-        //    returnString += GetSedasFileFooterString() + cr;
-        //    return returnString;
-        //}
-
+     
         public override string ToString()
         {
             string cr = "\r\n";
@@ -704,9 +652,6 @@ namespace Dat2Sedas_Neu
 
 
         //KONSTRUKTOR
-        //DELETE
-        //public SedasOrderLine()
-        //{ }
 
         public SedasOrderLine(string BHMArtikelNummer, string ArtikelMenge)
         {
@@ -720,12 +665,6 @@ namespace Dat2Sedas_Neu
         {
             return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer, 10)},4{Tools.ExpandLeftStringSide(ArtikelMenge, 7)},,,,02 000000,,";
         }
-
-        //DELETE
-        //public string GetSedasOrderLineString()
-        //{
-        //    return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer, 10)},4{Tools.ExpandLeftStringSide(ArtikelMenge, 7)},,,,02 000000,,";
-        //}
     }
 
 
@@ -880,34 +819,6 @@ namespace Dat2Sedas_Neu
 
     static class Datenverarbeitung
     {
-        ///// <summary>
-        ///// Liest die Dat-Quelldatei ein ohne Leerzeilen und gibt sie als List<string> zurück.</string>
-        ///// </summary>
-        ///// <param name="SourceFilePath"></param>
-        ///// <returns></returns>
-        //public static List<string> ImportSourceFileToList(string SourcePath)
-        //{
-        //    List<string> _sourceDataList = new List<string>();
-        //    try
-        //    {
-        //        using (StreamReader sr = new StreamReader(SourcePath))
-        //        {
-        //            while (!sr.EndOfStream)
-        //            {
-        //                string line = sr.ReadLine();
-        //                if (line != "")
-        //                    _sourceDataList.Add(line);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    { //Fehlerausnahme auslösen und Fehler melden}                
-        //        return null;
-        //    }
-        //    return _sourceDataList;
-        //}
-
-
         public static List<string> LoadDeleteItemsList(string Path)
         {
             List<string> delItems = new List<string>();
