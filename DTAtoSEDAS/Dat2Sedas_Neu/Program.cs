@@ -68,7 +68,7 @@ namespace Dat2Sedas_Neu
             
             //Daten zusammenstellen
             DatToSedas.ImportNFDatFile(Param.SourceFullPath);
-            DatToSedas.CreateSedasDatFile();
+            DatToSedas.CreateSedasDatFileFromInputFile();
             
             //Daten in Datei schreiben
             DatToSedas.WriteSedasData();

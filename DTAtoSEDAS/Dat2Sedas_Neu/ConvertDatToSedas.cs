@@ -13,8 +13,8 @@ namespace Dat2Sedas_Neu
     class ConvertDatToSedas
     {
 
-        private List<string> _SourceDataList;
-        private List<InputFileOrderLineNF> _ListeDatBestellzeilen;
+        //private List<string> _SourceDataList;
+        //private List<InputFileOrderLineNF> _ListeDatBestellzeilen;
 
 
         //****************
@@ -26,6 +26,9 @@ namespace Dat2Sedas_Neu
         private SedasFile _SedasFile;  //Objekt mit allen SEDAS-Einträgen, fertig zur Erstellung einer Datei (.ToString()).
 
         InputFileNF inputFile = new InputFileNF();
+        CustomerDeletionList _customersToDelete;
+        ArticleDeletionList _articlesToDelete;
+        ArticleChangeList articlesToChange;
 
         //****************
 
@@ -36,18 +39,26 @@ namespace Dat2Sedas_Neu
             this._SourcePath = SourceFilePath;
             this._DestinationPath = DestinationFilePath;
             this._counter = Counter;
+
+            //Importieren der Lösch- und Änderungslisten.
+            string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
+            string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
+            this._customersToDelete = new CustomerDeletionList(Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde));
+            this._articlesToDelete = new ArticleDeletionList(Datenverarbeitung.LoadDeleteItemsList(pathLoescheArtikel));
+            this.articlesToChange = Datenverarbeitung.LoadChangeArticlesList(pathLoescheArtikel);
         }
 
 
         //METHODEN
 
-        private bool checkIfNFFileFormat()
-        {
-            string prefix = _SourceDataList[0].Substring(0, 2);
-            if (prefix == "NF")
-                return true;
-            return false;
-        }
+        //DELETE ? 
+        //private bool checkIfNFFileFormat()
+        //{
+        //    string prefix = _SourceDataList[0].Substring(0, 2);
+        //    if (prefix == "NF")
+        //        return true;
+        //    return false;
+        //}
 
         //TODO ? ReadOldDatDataFormat
         //private List<InputFileOrderLineNF> ReadOldDATDataFormat(List<string> OldDATData, string ErstelldatumTTMMJJ)
@@ -180,135 +191,148 @@ namespace Dat2Sedas_Neu
         //}
 
 
-        /// <summary>
-        ///Bereinigt die Ordnerzeilen von ungewünschten Kunden und Artikeln und tauscht Artikelnummern aus.
-        /// </summary>
-        /// <returns></returns>
-        private List<InputFileOrderLineNF> CleanupOrders(List<InputFileOrderLineNF> DatBestellzeilen)
-        {
-            DatBestellzeilen = DeleteCustomers(DatBestellzeilen);
-            DatBestellzeilen = DeleteArticles(DatBestellzeilen);
-            DatBestellzeilen = ChangeArticleNumbers(DatBestellzeilen);
-
-            return DatBestellzeilen;
-        }
-
         #region Löschen und ändern
-        //TODO Löschen und Ändern über Delegaten steuern lassen (Items löschen, welche kommt nach Auswahl).
-        //TODO GGf alles in eigene Klasse(n) auslagern.
-        private List<InputFileOrderLineNF> DeleteCustomers(List<InputFileOrderLineNF> ListeDatBestellzeilen)
+        public bool DeleteCustomers()
         {
+            bool customersDeleted = false;
             string messageTitle = "Kundennummern löschen";
-
-            #region über Delegaten steuern lassen
-            string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
-            List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);
-            List<InputFileOrderLineNF> deletedCustomers = new List<InputFileOrderLineNF>();
-            #endregion
-            bool nothingChanged = true;
             log.Log("Kundennummern aus Bestellung löschen...", messageTitle, Logger.MsgType.Message);
 
-            /*Einträge mit Kundennummer werden gesucht und in eine eigene Liste für
-             * zu löschende Einträge geschrieben.
-             * Abschließend wird die Liste mit den zu löschenden Einträgen von der
-             * Hauptliste "entfernt".
-             */
-            foreach (string kundennummer in customersToDelete)
+            foreach (string customerNumber in _customersToDelete)
             {
-                bool customerDeleted = false;
-                foreach (InputFileOrderLineNF datBestellzeile in ListeDatBestellzeilen)
+                if (inputFile.InputFileOrderLines.FirstOrDefault(orderLine => orderLine.BHMKundenNummer == customerNumber) != null)
                 {
-                    if (kundennummer == datBestellzeile.BHMKundenNummer)
-                    {
-                        deletedCustomers.Add(datBestellzeile);
-                        customerDeleted = true;
-                    }
-                }
-                if (customerDeleted)
-                {
-                    log.Log($" => Kundennummer {kundennummer} aus Bestellzeilen entfernt.", messageTitle, Logger.MsgType.Message);
-                    customerDeleted = false;
-                    nothingChanged = false;
+                    inputFile.InputFileOrderLines = inputFile.InputFileOrderLines.Where(orderLine => orderLine.BHMKundenNummer != customerNumber).ToList();
+                    log.Log($" => Kundennummer {customerNumber} aus Bestellzeilen entfernt.", messageTitle, Logger.MsgType.Message);
+                    customersDeleted = true;
                 }
             }
-            if (nothingChanged)
-                log.Log("...keine Kundennummern gelöscht.");
 
-            //"Entfernen" der Löschliste von der Hauptliste.
-            ListeDatBestellzeilen = ListeDatBestellzeilen.Except(deletedCustomers).ToList();
-            return ListeDatBestellzeilen;
+            return customersDeleted;
         }
+        //private List<InputFileOrderLineNF> DeleteCustomers(List<InputFileOrderLineNF> ListeDatBestellzeilen)
+        //       {
+        //           string messageTitle = "Kundennummern löschen";
 
-        private List<InputFileOrderLineNF> DeleteArticles(List<InputFileOrderLineNF> DatBestellzeilen)
+        //           string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
+        //           CustomerDeletionList customersToDelete = new CustomerDeletionList(Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde));
+
+        //           foreach (string customer in customersToDelete)
+        //           {
+
+        //           }
+
+        //           #region über Delegaten steuern lassen
+        //           //List<string> customersToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde);
+        //           List<InputFileOrderLineNF> deletedCustomers = new List<InputFileOrderLineNF>();
+        //           #endregion
+        //           bool nothingChanged = true;
+        //           log.Log("Kundennummern aus Bestellung löschen...", messageTitle, Logger.MsgType.Message);
+
+        //           /*Einträge mit Kundennummer werden gesucht und in eine eigene Liste für
+        //            * zu löschende Einträge geschrieben.
+        //            * Abschließend wird die Liste mit den zu löschenden Einträgen von der
+        //            * Hauptliste "entfernt".
+        //            */
+        //           foreach (string kundennummer in customersToDelete)
+        //           {
+        //               bool customerDeleted = false;
+        //               foreach (InputFileOrderLineNF datBestellzeile in ListeDatBestellzeilen)
+        //               {
+        //                   if (kundennummer == datBestellzeile.BHMKundenNummer)
+        //                   {
+        //                       deletedCustomers.Add(datBestellzeile);
+        //                       customerDeleted = true;
+        //                   }
+        //               }
+        //               if (customerDeleted)
+        //               {
+        //                   log.Log($" => Kundennummer {kundennummer} aus Bestellzeilen entfernt.", messageTitle, Logger.MsgType.Message);
+        //                   customerDeleted = false;
+        //                   nothingChanged = false;
+        //               }
+        //           }
+        //           if (nothingChanged)
+        //               log.Log("...keine Kundennummern gelöscht.");
+
+        //           //"Entfernen" der Löschliste von der Hauptliste.
+        //           ListeDatBestellzeilen = ListeDatBestellzeilen.Except(deletedCustomers).ToList();
+        //           return ListeDatBestellzeilen;
+        //       }
+
+        public bool DeleteArticle()
         {
+            bool articleDeleted = false;
             string messageTitle = "Artikelnummern löschen";
-            string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
-            List<string> articlesToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheArtikel);
-            List<InputFileOrderLineNF> deletedArticles = new List<InputFileOrderLineNF>();
-
-            bool nothingChanged = true;
             log.Log("Löschen von Artikelnummern aus der Bestellung...", messageTitle, Logger.MsgType.Message);
-            foreach (string artikelnummer in articlesToDelete)
+
+            foreach (string articleNumber in _articlesToDelete)
             {
-                bool articleDeleted = false;
-                foreach (InputFileOrderLineNF datBestellzeile in DatBestellzeilen)
+                if (inputFile.InputFileOrderLines.FirstOrDefault(line => line.BHMArtikelNummer == articleNumber) != null)
                 {
-                    if (artikelnummer == datBestellzeile.BHMArtikelNummer)
-                    {
-                        deletedArticles.Add(datBestellzeile);
-                        articleDeleted = true;
-                    }
-                }
-                if (articleDeleted)
-                {
-                    log.Log($" => Artikelnummer {artikelnummer} aus Bestellung gelöscht.", messageTitle, Logger.MsgType.Message);
-                    articleDeleted = false;
-                    nothingChanged = false;
+                    inputFile.InputFileOrderLines = inputFile.InputFileOrderLines.Where(line => line.BHMArtikelNummer != articleNumber).ToList();
+                    log.Log($" => Artikelnummer {articleNumber} aus Bestellung gelöscht.", messageTitle, Logger.MsgType.Message);
+                    articleDeleted = true;
                 }
             }
-            if (nothingChanged)
-                log.Log("...keine Artikelnummern gelöscht", messageTitle, Logger.MsgType.Message);
-            DatBestellzeilen = DatBestellzeilen.Except(deletedArticles).ToList();
-            return DatBestellzeilen;
+
+            return articleDeleted;
         }
 
-        private List<InputFileOrderLineNF> ChangeArticleNumbers(List<InputFileOrderLineNF> DatBestellzeilen)
+        //private List<InputFileOrderLineNF> DeleteArticles(List<InputFileOrderLineNF> DatBestellzeilen)
+        //       {
+        //           string messageTitle = "Artikelnummern löschen";
+        //           string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
+        //           List<string> articlesToDelete = Datenverarbeitung.LoadDeleteItemsList(pathLoescheArtikel);
+        //           List<InputFileOrderLineNF> deletedArticles = new List<InputFileOrderLineNF>();
+
+        //           bool nothingChanged = true;
+        //           log.Log("Löschen von Artikelnummern aus der Bestellung...", messageTitle, Logger.MsgType.Message);
+        //           foreach (string artikelnummer in articlesToDelete)
+        //           {
+        //               bool articleDeleted = false;
+        //               foreach (InputFileOrderLineNF datBestellzeile in DatBestellzeilen)
+        //               {
+        //                   if (artikelnummer == datBestellzeile.BHMArtikelNummer)
+        //                   {
+        //                       deletedArticles.Add(datBestellzeile);
+        //                       articleDeleted = true;
+        //                   }
+        //               }
+        //               if (articleDeleted)
+        //               {
+        //                   log.Log($" => Artikelnummer {artikelnummer} aus Bestellung gelöscht.", messageTitle, Logger.MsgType.Message);
+        //                   articleDeleted = false;
+        //                   nothingChanged = false;
+        //               }
+        //           }
+        //           if (nothingChanged)
+        //               log.Log("...keine Artikelnummern gelöscht", messageTitle, Logger.MsgType.Message);
+        //           DatBestellzeilen = DatBestellzeilen.Except(deletedArticles).ToList();
+        //           return DatBestellzeilen;
+        //       }
+
+        private bool ChangeArticleNumbers()
         {
+            bool articleChanged = false;
             string messageTitle = "Artikelnummern tauschen";
-            if (DatBestellzeilen == null)
-            { return null; }
-
             log.Log("Austauschen von Artikelnummern laut tauscheArtikel.txt...", messageTitle, Logger.MsgType.Message);
-            string pathTauscheArtikel = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
-            Dictionary<string, string> ArticlesDict = Datenverarbeitung.LoadChangeArticlesList(pathTauscheArtikel);
 
-            bool nothingChanged = true;
-            foreach (KeyValuePair<string, string> dictEntry in ArticlesDict)
+            foreach (ArticleChangePair pair in articlesToChange)
             {
-                bool articleChanged = false;
-                foreach (InputFileOrderLineNF datBestellzeile in DatBestellzeilen)
+                var linesToChange = inputFile.InputFileOrderLines.Where(l => l.BHMArtikelNummer == pair.OriginalNumber).ToList();
+                foreach (InputFileOrderLineNF orderLine in linesToChange)
                 {
-                    if (dictEntry.Key == datBestellzeile.BHMArtikelNummer)
-                    {
-                        datBestellzeile.BHMArtikelNummer = dictEntry.Value;
-                        articleChanged = true;
-                    }
-                }
-                if (articleChanged)
-                {
-                    log.Log($" => Artikelnummer ausgetauscht: {dictEntry.Key} => {dictEntry.Value}", messageTitle, Logger.MsgType.Message);
-                    nothingChanged = false;
+                    orderLine.BHMArtikelNummer = pair.NewNumber;
                     articleChanged = true;
                 }
             }
 
-            if (nothingChanged)
-                log.Log("...keine Artikelnummern ausgetauscht.", messageTitle, Logger.MsgType.Message);
-            return DatBestellzeilen;
+            return articleChanged;
         }
 
         #endregion
-  
+
         private List<string> ReadInputFile(string sourcePathNFDatFile)
         {
             List<string> _sourceDataList = new List<string>();
@@ -367,7 +391,7 @@ namespace Dat2Sedas_Neu
         private SedasOrder CreateSedasOrder(IEnumerable<InputFileOrderLineNF> singleCustomerOrderLines)
         {
             string customerNumber = singleCustomerOrderLines.First().BHMKundenNummer;
-            string sedasLieferDatumJJMMTT = ConvertToSedasDateJJMMTT(singleCustomerOrderLines.First().LieferDatumTTMMJJ); 
+            string sedasLieferDatumJJMMTT = ConvertToSedasDateJJMMTT(singleCustomerOrderLines.First().LieferDatumTTMMJJ);
             // SEDAS-Order erstellen
             SedasOrder singleCustomerOrder = new SedasOrder(this._SedasErstellDatumJJMMTT, sedasLieferDatumJJMMTT, customerNumber);
 
@@ -379,7 +403,7 @@ namespace Dat2Sedas_Neu
 
             return singleCustomerOrder;
         }
-        
+
         private InputFileOrderLineNF ConvertInputFileData(string inputFileOrderLine)
         {
             /*
@@ -442,20 +466,29 @@ namespace Dat2Sedas_Neu
             {
                 this.inputFile.InputFileOrderLines.Add(ConvertInputFileData(line));
             }
+
+            DeleteCustomers();
+            DeleteArticle();
+            ChangeArticleNumbers();
         }
 
-        public void CreateSedasDatFile()
+        public void CreateSedasDatFileFromInputFile()
         {
             if (inputFile.Count() > 0)
             {
-                //Kundennummern ermitteln
-                var listOfCustomerNumbers = this.inputFile.Select(orderLine => orderLine.BHMKundenNummer).Distinct();
+                //Daten aus Inputfile löschen und verändern.
+                DeleteCustomers();
 
                 log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
+                //Sedas-Datei-Objekt erstellen
                 this._SedasFile = new SedasFile(this._SedasErstellDatumJJMMTT, this._counter);
-                //Für jede Kundennummer eine Sedas-Order erstellen und dem Sedas-File hinzufügen.
+
+                //Kundennummern aus Input-Daten ermitteln und
+                //für jede Kundennummer eine Sedas-Order erstellen und dem Sedas-File hinzufügen.
+                List<string> listOfCustomerNumbers = (List<string>)this.inputFile.Select(orderLine => orderLine.BHMKundenNummer).Distinct();
                 foreach (string actualCustomerNumber in listOfCustomerNumbers)
                 {
+                    ////Sedas-Order erstllen und alle Zeilen einer Kundennummer hinzufügen.
                     var singleCustomerOrderLines = this.inputFile.Where(orderLine => orderLine.BHMKundenNummer == actualCustomerNumber).Select(orderLine => orderLine);
                     this._SedasFile.SedasOrdersList.Add(CreateSedasOrder(singleCustomerOrderLines));
                 }
@@ -491,7 +524,7 @@ namespace Dat2Sedas_Neu
                 //Eigentliches Schreiben der SEDAS-Informationen in eine Datei.
                 using (StreamWriter sw = new StreamWriter(this._DestinationPath, false))
                 {
-                    sw.Write(_SedasFile.ToString());
+                    sw.Write(this._SedasFile.ToString());
                     sw.WriteLine("                                                                                    ");
                 }
                 return true;
@@ -586,7 +619,7 @@ namespace Dat2Sedas_Neu
             return FooterLine1 + "\r\n" + FooterLine2;
         }
 
-     
+
         public override string ToString()
         {
             string cr = "\r\n";
@@ -612,7 +645,7 @@ namespace Dat2Sedas_Neu
         }
     }
 
-    class SedasOrder :IEnumerable<SedasOrderLine>
+    class SedasOrder : IEnumerable<SedasOrderLine>
     {
         private string _ErstellDatumJJMMTT;
         private string _LieferDatumJJMMTT;
@@ -672,7 +705,7 @@ namespace Dat2Sedas_Neu
                 returnString += orderLine.ToString() + cr;
             }
             returnString += this.Footer + cr;
-            
+
             return returnString;
         }
 
@@ -867,6 +900,83 @@ namespace Dat2Sedas_Neu
 
 
 
+    public class ArticleDeletionList : IEnumerable
+    {
+        private List<string> _articlesToDelete;
+
+        public ArticleDeletionList(List<string> articleList)
+        {
+            _articlesToDelete = articleList;
+        }
+        public IEnumerator GetEnumerator()
+        {
+            return _articlesToDelete.GetEnumerator();
+        }
+    }
+
+    public class CustomerDeletionList : IEnumerable
+    {
+        private List<string> _customerNumbers;
+
+        public CustomerDeletionList(List<string> list)
+        {
+            _customerNumbers = list;
+        }
+        public IEnumerator GetEnumerator()
+        {
+            return _customerNumbers.GetEnumerator();
+        }
+    }
+
+    public class ArticleChangeList : IEnumerable
+    {
+        private List<ArticleChangePair> _articlesToChange;
+
+        public ArticleChangeList()
+        {
+            _articlesToChange = new List<ArticleChangePair>();
+        }
+
+        public void Add(ArticleChangePair articleExchangePair)
+        {
+            _articlesToChange.Add(articleExchangePair);
+        }
+
+        public void Remove(ArticleChangePair articleExcangePair)
+        {
+            ArticleChangePair result = _articlesToChange.First(pair => (pair.OriginalNumber == articleExcangePair.OriginalNumber) & pair.NewNumber == articleExcangePair.NewNumber);
+
+            if (result != null)
+            {
+                _articlesToChange.Remove(result);
+            }
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ArticleChangePair
+    {
+        public string OriginalNumber { get; set; }
+        public string NewNumber { get; set; }
+        public string Description { get; set; }
+
+        public ArticleChangePair(string OriginalNumber, string NewNumber)
+        {
+            new ArticleChangePair(OriginalNumber, NewNumber, "");
+        }
+        public ArticleChangePair(string OriginalNumber, string NewNumber, string Description)
+        {
+            this.OriginalNumber = OriginalNumber;
+            this.NewNumber = NewNumber;
+            this.Description = Description;
+        }
+    }
+
+
 
     static class Datenverarbeitung
     {
@@ -892,9 +1002,9 @@ namespace Dat2Sedas_Neu
             return delItems;
         }
 
-        public static Dictionary<string, string> LoadChangeArticlesList(string Path)
+        public static ArticleChangeList LoadChangeArticlesList(string Path)
         {
-            Dictionary<string, string> DictChangeArticles = new Dictionary<string, string>();
+            //Dictionary<string, string> DictChangeArticles = new Dictionary<string, string>();
             List<string> changeArticleFileContent = new List<string>();
             try
             {
@@ -903,15 +1013,17 @@ namespace Dat2Sedas_Neu
             catch (Exception ex)
             { }
 
+            ArticleChangeList articleChangeList = new ArticleChangeList();
             foreach (string line in changeArticleFileContent)
             {
                 if (line != "")
                 {
                     string[] elements = line.Split(';');
-                    DictChangeArticles.Add(elements[0].Trim(), elements[1].Trim());
-                }
+                    ArticleChangePair newPair = new ArticleChangePair(elements[0].Trim(), elements[1].Trim());
+                };
+
             }
-            return DictChangeArticles;
+            return articleChangeList;
         }
     }
 
