@@ -432,6 +432,9 @@ namespace Dat2Sedas_Neu
         }
 
 
+
+
+
         public void ImportNFDatFile(string filePath)
         {
             List<string> orderFileLines = ReadInputFile(filePath);
@@ -458,8 +461,6 @@ namespace Dat2Sedas_Neu
                 }
             }
         }
-
-
 
         public bool WriteSedasData()
         {
