@@ -43,9 +43,10 @@ namespace Dat2Sedas_Neu
             //Importieren der Lösch- und Änderungslisten.
             string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
             string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
+            string pathTauscheArtikel = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
             this._customersToDelete = new CustomerDeletionList(Datenverarbeitung.LoadDeleteItemsList(pathLoescheKunde));
             this._articlesToDelete = new ArticleDeletionList(Datenverarbeitung.LoadDeleteItemsList(pathLoescheArtikel));
-            this.articlesToChange = Datenverarbeitung.LoadChangeArticlesList(pathLoescheArtikel);
+            this.articlesToChange = Datenverarbeitung.LoadChangeArticlesList(pathTauscheArtikel);
         }
 
 
@@ -485,6 +486,7 @@ namespace Dat2Sedas_Neu
 
                 //Kundennummern aus Input-Daten ermitteln und
                 //für jede Kundennummer eine Sedas-Order erstellen und dem Sedas-File hinzufügen.
+                //DEBUG Fehler mit -DISTINCT-Typ:"Das Objekt des Typs "<DistinctIterator>d__64`1[System.String]" kann nicht in Typ "System.Collections.Generic.List`1[System.String]" umgewandelt werden."
                 List<string> listOfCustomerNumbers = (List<string>)this.inputFile.Select(orderLine => orderLine.BHMKundenNummer).Distinct();
                 foreach (string actualCustomerNumber in listOfCustomerNumbers)
                 {
@@ -954,7 +956,7 @@ namespace Dat2Sedas_Neu
 
         public IEnumerator GetEnumerator()
         {
-            throw new NotImplementedException();
+            return _articlesToChange.GetEnumerator();
         }
     }
 
