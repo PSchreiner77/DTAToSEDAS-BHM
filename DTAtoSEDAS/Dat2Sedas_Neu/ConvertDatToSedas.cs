@@ -701,7 +701,6 @@ namespace Dat2Sedas_Neu
 
 
         //KONSTRUKTOR
-
         public SedasOrderLine(string BHMArtikelNummer, string ArtikelMenge)
         {
             this.BHMArtikelNummer = BHMArtikelNummer;
