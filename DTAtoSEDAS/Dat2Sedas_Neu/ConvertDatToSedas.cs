@@ -204,7 +204,7 @@ namespace Dat2Sedas_Neu
                 if (inputFile.InputFileOrderLines.FirstOrDefault(orderLine => orderLine.BHMKundenNummer == customerNumber) != null)
                 {
                     inputFile.InputFileOrderLines = inputFile.InputFileOrderLines.Where(orderLine => orderLine.BHMKundenNummer != customerNumber).ToList();
-                    log.Log($" => Kundennummer {customerNumber} aus Bestellzeilen entfernt.", messageTitle, Logger.MsgType.Message);
+                    log.Log($" => Kundennummer {customerNumber} aus Bestellungen gelöscht.", messageTitle, Logger.MsgType.Message);
                     customersDeleted = true;
                 }
             }
@@ -321,14 +321,17 @@ namespace Dat2Sedas_Neu
 
             foreach (ArticleChangePair pair in articlesToChange)
             {
-                var linesToChange = inputFile.InputFileOrderLines.Where(l => l.BHMArtikelNummer == pair.OriginalNumber).ToList();
+                bool currentArticleChanged = false;
+                var linesToChange = inputFile.InputFileOrderLines.Where(line => line.BHMArtikelNummer == pair.OriginalNumber).ToList();
                 foreach (InputFileOrderLineNF orderLine in linesToChange)
                 {
                     orderLine.BHMArtikelNummer = pair.NewNumber;
+                    currentArticleChanged = true;
                     articleChanged = true;
                 }
+                if (currentArticleChanged)
+                    log.Log($" => Artikelnummer {pair.OriginalNumber} getauscht gegen {pair.NewNumber}.", messageTitle, Logger.MsgType.Message);
             }
-
             return articleChanged;
         }
 
@@ -467,10 +470,6 @@ namespace Dat2Sedas_Neu
             {
                 this.inputFile.InputFileOrderLines.Add(ConvertInputFileData(line));
             }
-
-            DeleteCustomers();
-            DeleteArticle();
-            ChangeArticleNumbers();
         }
 
         public void CreateSedasDatFileFromInputFile()
@@ -479,6 +478,8 @@ namespace Dat2Sedas_Neu
             {
                 //Daten aus Inputfile löschen und verändern.
                 DeleteCustomers();
+                DeleteArticle();
+                ChangeArticleNumbers();
 
                 log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
                 //Sedas-Datei-Objekt erstellen
@@ -486,8 +487,7 @@ namespace Dat2Sedas_Neu
 
                 //Kundennummern aus Input-Daten ermitteln und
                 //für jede Kundennummer eine Sedas-Order erstellen und dem Sedas-File hinzufügen.
-                //DEBUG Fehler mit -DISTINCT-Typ:"Das Objekt des Typs "<DistinctIterator>d__64`1[System.String]" kann nicht in Typ "System.Collections.Generic.List`1[System.String]" umgewandelt werden."
-                List<string> listOfCustomerNumbers = (List<string>)this.inputFile.Select(orderLine => orderLine.BHMKundenNummer).Distinct();
+                List<string> listOfCustomerNumbers = (List<string>)this.inputFile.Select(orderLine => orderLine.BHMKundenNummer).Distinct().ToList();
                 foreach (string actualCustomerNumber in listOfCustomerNumbers)
                 {
                     ////Sedas-Order erstllen und alle Zeilen einer Kundennummer hinzufügen.
@@ -968,7 +968,8 @@ namespace Dat2Sedas_Neu
 
         public ArticleChangePair(string OriginalNumber, string NewNumber)
         {
-            new ArticleChangePair(OriginalNumber, NewNumber, "");
+            this.OriginalNumber = OriginalNumber;
+            this.NewNumber = NewNumber;
         }
         public ArticleChangePair(string OriginalNumber, string NewNumber, string Description)
         {
@@ -1022,6 +1023,7 @@ namespace Dat2Sedas_Neu
                 {
                     string[] elements = line.Split(';');
                     ArticleChangePair newPair = new ArticleChangePair(elements[0].Trim(), elements[1].Trim());
+                    articleChangeList.Add(newPair);
                 };
 
             }
