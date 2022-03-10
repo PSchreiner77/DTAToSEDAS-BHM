@@ -55,7 +55,7 @@ namespace Dat2Sedas_Neu
             {
                 if (inputFile.InputFileOrderLines.FirstOrDefault(orderLine => orderLine.BHMKundenNummer == customerNumber) != null)
                 {
-                    inputFile.InputFileOrderLines = inputFile.InputFileOrderLines.Where(orderLine => orderLine.BHMKundenNummer != customerNumber).ToList();
+                    inputFile.InputFileOrderLines = inputFile.InputFileOrderLines.Where(orderLine => orderLine.BHMKundenNummer != customerNumber).Select(orderLine => orderLine).ToList();
                     log.Log($" => Kundennummer {customerNumber} aus Bestellungen gelöscht.", messageTitle, Logger.MsgType.Message);
                     customersDeleted = true;
                 }
@@ -582,6 +582,10 @@ namespace Dat2Sedas_Neu
         public ArticleDeletionList(List<string> articleList)
         {
             _articlesToDelete = articleList;
+            for(int i=0;i<_articlesToDelete.Count();i++)
+            {
+                _articlesToDelete[i] = _articlesToDelete[i].Trim();
+            }
         }
         public IEnumerator GetEnumerator()
         {
@@ -596,6 +600,11 @@ namespace Dat2Sedas_Neu
         public CustomerDeletionList(List<string> list)
         {
             _customerNumbers = list;
+
+            for (int i=0;i<_customerNumbers.Count(); i++)
+            {
+                _customerNumbers[i] = _customerNumbers[i].Trim();
+            }
         }
         public IEnumerator GetEnumerator()
         {
@@ -641,14 +650,14 @@ namespace Dat2Sedas_Neu
 
         public ArticleChangePair(string OriginalNumber, string NewNumber)
         {
-            this.OriginalNumber = OriginalNumber;
-            this.NewNumber = NewNumber;
+            this.OriginalNumber = OriginalNumber.Trim();
+            this.NewNumber = NewNumber.Trim();
         }
         public ArticleChangePair(string OriginalNumber, string NewNumber, string Description)
         {
-            this.OriginalNumber = OriginalNumber;
-            this.NewNumber = NewNumber;
-            this.Description = Description;
+            this.OriginalNumber = OriginalNumber.Trim();
+            this.NewNumber = NewNumber.Trim();
+            this.Description = Description.Trim();
         }
     }
 

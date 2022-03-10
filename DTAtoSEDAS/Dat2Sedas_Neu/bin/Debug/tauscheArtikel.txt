@@ -1,2 +1,6 @@
-alteArtNr;neueArtNr;Beschreibung
-243;990099;Testaustausch
+alteArtNr;neueArtNr
+540;534
+11308;11397
+3517;3837
+
+
