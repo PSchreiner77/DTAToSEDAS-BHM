@@ -85,7 +85,7 @@ namespace Dat2Sedas_Neu
             ConvertToSedas DatToSedas = new ConvertToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter);
 
             //Daten zusammenstellen
-            DatSource sdf = DatToSedas.ImportSourceDatFile(Param.SourceFullPath);
+            SourceOrders sdf = DatToSedas.ImportSourceDatFile(Param.SourceFullPath);
             DatToSedas.CreateSedasFile(sdf);
 
             //Daten in Datei schreiben

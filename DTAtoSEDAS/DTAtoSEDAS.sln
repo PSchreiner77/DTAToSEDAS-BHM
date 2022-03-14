@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dat2Sedas_Tests", "Dat2Seda
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertDatToSedas", "ConvertDatToSedas\ConvertDatToSedas.csproj", "{00400DB7-556A-489C-976D-A734D2C3425A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertToDat_Tests", "ConvertToDat_Tests\ConvertToDat_Tests.csproj", "{D45668DE-696C-40F2-8C2A-F72B69E22495}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{00400DB7-556A-489C-976D-A734D2C3425A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00400DB7-556A-489C-976D-A734D2C3425A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00400DB7-556A-489C-976D-A734D2C3425A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D45668DE-696C-40F2-8C2A-F72B69E22495}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D45668DE-696C-40F2-8C2A-F72B69E22495}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D45668DE-696C-40F2-8C2A-F72B69E22495}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D45668DE-696C-40F2-8C2A-F72B69E22495}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

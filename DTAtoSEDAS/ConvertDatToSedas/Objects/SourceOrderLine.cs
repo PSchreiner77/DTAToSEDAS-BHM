@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConvertDatToSedas
 {
-    public class DatSourceOrderLine
+    public class SourceOrderLine
     {
         #region Aufbau Bestellzeile
         /*
@@ -31,11 +31,11 @@ namespace ConvertDatToSedas
         */
         #endregion
 
-        public DatSourceOrderLine()
+        public SourceOrderLine()
         {
         }
 
-        public DatSourceOrderLine(string OrderLineFromImportFile)
+        public SourceOrderLine(string OrderLineFromImportFile)
         {
             try
             {

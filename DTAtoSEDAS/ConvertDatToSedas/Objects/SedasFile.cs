@@ -20,7 +20,8 @@ namespace ConvertDatToSedas
             ...
             ...
             ;0400000000004023,40001000,,,,02 000000,,
-            ;05000000039000           
+            ;05000000039000   
+            ...
             ;06100,1178
             ;07000000,00001,00001,000000,(
 
@@ -29,45 +30,38 @@ namespace ConvertDatToSedas
             030...  = Order-Header
             040...  = Bestellposition(en)
             050...  = Order-Footer
+            ...
             06....  = DateiFooter (Zusammenfassung)
             070...  = DateiFooter (Dateiende)
          */
 
         private string _ErstellDatumSedasJJMMTT;
-        private int _IniSedasRunThroughCounter; //TODO Was bedeutet der Zähler?
+        private int _Counter; //Laufende Nummer 
         public List<SedasOrder> SedasOrdersList = new List<SedasOrder>();
 
-
         public int CustomerOrdersCount { get { return SedasOrdersList.Count; } }
-        public int OverallOrderLineEntriesCount { get { return GetTotalNumberOfOrderLines(); } }
+        public int OrderLinesCount { get { return SedasOrdersList.Sum(o => o.SedasOrderLines.Count()); } }
 
         //KONSTRUKTOR
-        public SedasFile(string Erstelldatum, int IniSedasRunThroughCounter)
+        public SedasFile(string Erstelldatum, int Counter)
         {
             _ErstellDatumSedasJJMMTT = Erstelldatum;
-            _IniSedasRunThroughCounter = IniSedasRunThroughCounter;
+            _Counter = Counter;
         }
 
         //METHODEN
 
-        //TODO Propery erstellen
-        private int GetTotalNumberOfOrderLines()
+        public void Add(SedasOrder sedasOrder)
         {
-            int count = 0;
-            foreach (SedasOrder order in SedasOrdersList)
-            {
-                count += order.SedasOrderLines.Count;
-            }
-            return count;
-            ;
+            SedasOrdersList.Add(sedasOrder);
         }
 
-        private string GetSedasFileHeaderString()
+        private string Header()
         {
-            return $"010()000377777777777771{_ErstellDatumSedasJJMMTT};,{_IniSedasRunThroughCounter}\r\n;)0240051310000002";
+            return $"010()000377777777777771{_ErstellDatumSedasJJMMTT};,{_Counter}\r\n;)0240051310000002";
         }
 
-        private string GetSedasFileFooterString()
+        private string Footer()
         {
             #region Aufbau FooterLine
             //--FOOTER der Zieldatei
@@ -79,23 +73,22 @@ namespace ConvertDatToSedas
             //  108,   = Anzahl Kunden in Datei (Blöcke)
             //  1178   = Anzahl einzelner Datensätze/Artikelzeilen
             #endregion
-            string FooterLine1 = $":06{Tools.ExpandLeftStringSide(CustomerOrdersCount.ToString(), 3)};{OverallOrderLineEntriesCount}";
+            string FooterLine1 = $":06{Tools.ExpandLeftStringSide(CustomerOrdersCount.ToString(), 3)};{OrderLinesCount}";
             string FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
             string FooterLine3 = "                                                                                    ";
             return FooterLine1 + "\r\n" + FooterLine2 + "\r\n" + FooterLine3;
         }
 
-
         public override string ToString()
         {
             string cr = "\r\n";
 
-            string returnString = GetSedasFileHeaderString() + cr;
+            string returnString = Header() + cr;
             foreach (SedasOrder order in SedasOrdersList)
             {
                 returnString += order.ToString();
             }
-            returnString += GetSedasFileFooterString() + cr;
+            returnString += Footer() + cr;
             return returnString;
         }
 

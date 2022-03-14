@@ -48,8 +48,8 @@
     <Compile Include="Objects\ArticleChangeList.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Objects\ArticleDeletionList.cs" />
-    <Compile Include="Objects\DatSourceOrderLine.cs" />
-    <Compile Include="Objects\DatSource.cs" />
+    <Compile Include="Objects\SourceOrderLine.cs" />
+    <Compile Include="Objects\SourceOrders.cs" />
     <Compile Include="Objects\SedasOrderLine.cs" />
     <Compile Include="ConvertToSedas.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

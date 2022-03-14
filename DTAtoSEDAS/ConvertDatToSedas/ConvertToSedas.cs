@@ -13,7 +13,7 @@ namespace ConvertDatToSedas
     public class ConvertToSedas
     {
         private string _SedasErstellDatumJJMMTT;  //Datum der Dateierstellung / des Programmlaufs
-        private int _counter;
+        private int _counter = 0;
         private SedasFile _sedasFile;
 
         private string _pathDeleteCustomer = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
@@ -46,11 +46,49 @@ namespace ConvertDatToSedas
 
 
         //METHODEN
-        public SedasFile Convert(List<string> sourceFileLines)
+        public SourceOrders ImportDatFileContent(List<string> sourceFileLines)
         {
-            DatSource sourceOrders = Converter.ToSourceOrders(sourceFileLines);
+            //Import File into SourceOrder
+            SourceOrders sourceOrders = new SourceOrders();
+            foreach (string line in sourceFileLines)
+            {
+                sourceOrders.Add(new SourceOrderLine(line));
+            }
 
-            SedasFile sedasOrders = Converter.ToSedasOrders(sourceOrders);
+            return sourceOrders;
+
+            //Convert sourceOrder into SedasFile
+            SedasFile sedasOrders = this.ToSedas(sourceOrders,_counter);
+
+            //Delete/change customers and articles
+
+            
+            return null;
+        }
+
+        public SedasFile ToSedas(SourceOrders DatSourceObject, int Counter)
+        {
+            SedasFile sedasFile = new SedasFile(this._SedasErstellDatumJJMMTT, this._counter);
+
+            if (DatSourceObject.Count() > 0)
+            {
+                //Kundennummern aus Input-Daten ermitteln und
+                List<string> listOfCustomerNumbers = (List<string>)DatSourceObject.Select(orderLine => orderLine.BHMKundenNummer).Distinct().ToList();
+                
+                //für jede Kundennummer eine Sedas-Order erstellen und dem Sedas-File hinzufügen.
+                foreach (string actualCustomerNumber in listOfCustomerNumbers)
+                {
+                    //Bestellzeilen der aktuellen Kundennummer ermitteln und als Liste zurückgeben.
+                    var singleCustomerOrderLines = DatSourceObject.Where(orderLine => orderLine.BHMKundenNummer == actualCustomerNumber).Select(orderLine => orderLine);
+                    
+                    SedasOrder singleCustomerSedasOrder = CreateSedasOrder(singleCustomerOrderLines);
+                    sedasFile.SedasOrdersList.Add(singleCustomerSedasOrder);
+                }
+
+
+                return sedasFile;
+            }
+
             return null;
         }
 
@@ -137,7 +175,7 @@ namespace ConvertDatToSedas
             {
                 bool currentArticleChanged = false;
                 var linesToChange = SourceDatFile.InputFileOrderLines.Where(line => line.BHMArtikelNummer == pair.OriginalNumber).ToList();
-                foreach (DatSourceOrderLine orderLine in linesToChange)
+                foreach (SourceOrderLine orderLine in linesToChange)
                 {
                     orderLine.BHMArtikelNummer = pair.NewNumber;
                     currentArticleChanged = true;
@@ -151,14 +189,14 @@ namespace ConvertDatToSedas
         }
         #endregion
 
-        private SedasOrder CreateSedasOrder(IEnumerable<DatSourceOrderLine> singleCustomerOrderLines)
+        private SedasOrder CreateSedasOrder(IEnumerable<SourceOrderLine> singleCustomerOrderLines)
         {
             string customerNumber = singleCustomerOrderLines.First().BHMKundenNummer;
             string sedasLieferDatumJJMMTT = Tools.ConvertToSedasDateJJMMTT(singleCustomerOrderLines.First().LieferDatumTTMMJJ);
             // SEDAS-Order erstellen
             SedasOrder singleCustomerOrder = new SedasOrder(this._SedasErstellDatumJJMMTT, sedasLieferDatumJJMMTT, customerNumber);
 
-            foreach (DatSourceOrderLine orderLine in singleCustomerOrderLines)
+            foreach (SourceOrderLine orderLine in singleCustomerOrderLines)
             {
                 //Alle Einträge einer Kundennummer als Sedas-OrderLines der Sedas-Order hinzufügen.
                 singleCustomerOrder.SedasOrderLines.Add(new SedasOrderLine(orderLine.BHMArtikelNummer, orderLine.BestellMenge));
@@ -167,29 +205,32 @@ namespace ConvertDatToSedas
             return singleCustomerOrder;
         }
 
+
     }
 
 
 
-    internal static class Converter
+
+
+    public static class Converter
     {
 
-        public static DatSource ToSedas(List<string> sourceFileLines)
+        //public static SourceOrders ToSourceOrder(List<string> sourceFileLines)
+        //{
+        //    SourceOrders newInputFile = new SourceOrders();
+
+        //    foreach (string line in sourceFileLines)
+        //    {
+        //        SourceOrderLine newOrderLine = new SourceOrderLine(line);
+        //        newInputFile.SourceOrderLines.Add(newOrderLine);
+        //    }
+        //    return newInputFile;
+        //}
+
+
+        public static SedasFile ToSedas(SourceOrders DatSourceObject)
         {
-            DatSource newInputFile = new DatSource();
-
-            foreach (string line in sourceFileLines)
-            {
-                DatSourceOrderLine newOrderLine = new DatSourceOrderLine(line);
-                newInputFile.InputFileOrderLines.Add(newOrderLine);
-            }
-            return newInputFile;
-        }
-
-
-        public static SedasFile CreateSedasFile(DatSource DatSourceObject)
-        {
-            SedasFile sedasFile = new SedasFile(this._SedasErstellDatumJJMMTT, this._counter);
+            SedasFile sedasFile = new SedasFile(_SedasErstellDatumJJMMTT, this._counter);
 
             if (DatSourceObject.Count() > 0)
             {
