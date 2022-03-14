@@ -10,7 +10,7 @@ namespace Dat2Sedas_Neu
     //TODO TEST: Dateien vom Wochenende mit 9000er Nummern.
     //TODO Gruppieren der Daten nach Kundennummer. Es soll vermieden werden, dass in der Sedas.dat 
     //     Kundennummern wiederholt auftauchen. Sie sollen en-block gelistet werden (sortiert nach Art.Nr).
-    class ConvertDatToSedas
+    public class ConvertDatToSedas
     {
         private Logger log = Logger.GetInstance();
         private string _SedasErstellDatumJJMMTT;
