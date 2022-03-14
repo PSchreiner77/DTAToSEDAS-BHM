@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Release\" />
+    <Folder Include="ConvertDatToSedas\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="bin\Debug\loescheArtikel.txt" />
