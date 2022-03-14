@@ -77,7 +77,7 @@ namespace Dat2Sedas_Neu
                                                          DataProcessing.GetDeleteArticlesList(_pathDeleteArticle),
                                                          DataProcessing.GetDeleteCustomersList(_pathDeleteCustomer));
 
-            newSedas.ImportSourceDatFile(Param.SourceFullPath);
+            newSedas.ConvertDatFile(Param.SourceFullPath);
 
 
             //## Daten konvertieren und schreiben
