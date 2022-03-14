@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dat2Sedas_Neu", "Dat2Sedas_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{60FF235E-2E87-43EB-8694-4EDA18271F8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dat2Sedas_NeuTests", "Dat2Sedas_NeuTests\Dat2Sedas_NeuTests.csproj", "{2BDA7E6F-A8C4-4698-9816-3613E1B67CEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{60FF235E-2E87-43EB-8694-4EDA18271F8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60FF235E-2E87-43EB-8694-4EDA18271F8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60FF235E-2E87-43EB-8694-4EDA18271F8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BDA7E6F-A8C4-4698-9816-3613E1B67CEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BDA7E6F-A8C4-4698-9816-3613E1B67CEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BDA7E6F-A8C4-4698-9816-3613E1B67CEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BDA7E6F-A8C4-4698-9816-3613E1B67CEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
