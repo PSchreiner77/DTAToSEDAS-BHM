@@ -1,14 +1,21 @@
+using Dat2Sedas_Neu;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Dat2Sedas_Tests
+namespace Dat2Sedas_Neu.Tests
 {
-    [TestClass]
+    [TestClass()]
     public class ConvertDatToSedas_Tests
     {
-        [TestMethod]
-        public void DeleteCustomerTest()
+        [TestMethod()]
+        public void DeleteCustomersTest()
         {
-            Assert.IsTrue(true);
+            //Arrange
+
+            //Act
+
+            //Assert
+            Assert.Fail();
         }
     }
+
 }
