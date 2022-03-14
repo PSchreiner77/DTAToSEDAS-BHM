@@ -8,6 +8,7 @@ namespace Dat2Sedas_Tests
         [TestMethod]
         public void DeleteCustomerTest()
         {
+            Assert.IsTrue(true);
         }
     }
 }
