@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dat2Sedas_NeuTests", "Dat2Sedas_NeuTests\Dat2Sedas_NeuTests.csproj", "{2BDA7E6F-A8C4-4698-9816-3613E1B67CEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dat2Sedas_Tests", "Dat2Sedas_Tests\Dat2Sedas_Tests.csproj", "{16954B3C-6FCE-4C8B-9310-C925BA152AB7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{2BDA7E6F-A8C4-4698-9816-3613E1B67CEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BDA7E6F-A8C4-4698-9816-3613E1B67CEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BDA7E6F-A8C4-4698-9816-3613E1B67CEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16954B3C-6FCE-4C8B-9310-C925BA152AB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16954B3C-6FCE-4C8B-9310-C925BA152AB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16954B3C-6FCE-4C8B-9310-C925BA152AB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16954B3C-6FCE-4C8B-9310-C925BA152AB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
