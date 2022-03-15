@@ -158,8 +158,8 @@ namespace ConvertDatToSedas.Tests
 
             //Arrange
             string headerExpected = ";030,14,00000000000000000,221013,221014,,,,1050         ,,";
-            string footerExpected = ";05000000106000";
             string orderLinesExpected = ";0400000000000209,40020000,,,,02 000000,," + "\r\n" +
+                                        ";0400000000000212,40010000,,,,02 000000,," + "\r\n" +
                                         ";0400000000000203,40015000,,,,02 000000,," + "\r\n" +
                                         ";0400000000000206,40018000,,,,02 000000,," + "\r\n" +
                                         ";0400000000000219,40015000,,,,02 000000,," + "\r\n" +
@@ -168,6 +168,7 @@ namespace ConvertDatToSedas.Tests
                                         ";0400000000000028,40004000,,,,02 000000,," + "\r\n" +
                                         ";0400000000000170,40003000,,,,02 000000,," + "\r\n" +
                                         ";0400000000000033,40007000,,,,02 000000,," + "\r\n";
+            string footerExpected = ";05000000116000";
             string expected = headerExpected + "\r\n" + orderLinesExpected + footerExpected + "\r\n";
             SedasOrder testOrder = TestSedasOrder.GetSedasOrder();
 
