@@ -44,25 +44,29 @@ namespace ConvertDatToSedas.Tests
         }
 
         [TestMethod()]
-        public void ConvertToSedasDateJJMMTTTest()
+        public void ConvertToSedasDateJJMMTTTest_StringWithTTMMJJDate()
         {
             //Arrange
-
+            string testDateTTMMJJ = "130822";
+            string expected = "220813";
             //Act
+            string actual = SedasTools.ConvertToSedasDateJJMMTT(testDateTTMMJJ);
 
             //Assert
-            Assert.Fail();
+            Assert.AreEqual(expected,actual);
         }
 
         [TestMethod()]
-        public void ConvertToSedasDateJJMMTTTest1()
+        public void ConvertToSedasDateJJMMTTTest_DateTimeDate()
         {
             //Arrange
-
+            DateTime dateTimeObject = new DateTime(2022,08,13);
+            string expected = "220813";
             //Act
+            string actual = SedasTools.ConvertToSedasDateJJMMTT(dateTimeObject);
 
             //Assert
-            Assert.Fail();
+            Assert.AreEqual(expected, actual);
         }
     }
 }

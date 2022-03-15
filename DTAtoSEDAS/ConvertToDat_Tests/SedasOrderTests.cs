@@ -87,7 +87,18 @@ namespace ConvertDatToSedas.Tests
         [TestMethod()]
         public void ChangeArticleTest()
         {
-            Assert.Fail();
+            //Changes the article of the first OrderLine of the TestOrder.
+            //Arrange
+            SedasOrder order = TestOrder.GetInstance();
+            ArticleChangePair articleChangePair = new ArticleChangePair("209", "1209", "Testaustausch");
+            SedasOrderLine expectedOrderLine = new SedasOrderLine("1209", "20000");
+
+            //Act
+            order.ChangeArticle(articleChangePair);
+            SedasOrderLine actual = order.ElementAt(0);
+
+            //Assert
+            Assert.AreEqual(expectedOrderLine.ToString(),actual.ToString());
         }
 
         [TestMethod()]
