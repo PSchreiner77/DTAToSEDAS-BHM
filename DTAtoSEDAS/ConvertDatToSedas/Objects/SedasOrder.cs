@@ -12,12 +12,7 @@ namespace ConvertDatToSedas
         private string _ErstellDatumJJMMTT;
         private string _LieferDatumJJMMTT;
         private string _BHMKundennummer;
-
-        public string Header
-        {
-            get { return GetSedasOrderHeaderString(); }
-        }
-        public string Footer { get { return GetSedasOrderFooterString(); } }
+       
         public int OrderArticleQuantity { get { return GetSedasOrderArticleQuantity(); } }
         public List<SedasOrderLine> SedasOrderLines = new List<SedasOrderLine>();
 
@@ -29,17 +24,35 @@ namespace ConvertDatToSedas
             _BHMKundennummer = BHMKundennummer;
         }
 
+        public void Add(SedasOrderLine sedasOrderLine)
+        {
+            this.SedasOrderLines.Add(sedasOrderLine);
+        }
+
+        public void AddList(IList<SedasOrderLine> liste)
+        {
+            foreach(SedasOrderLine line in liste)
+            {
+                this.Add(line);
+            }
+        }
+
+        public void Remove(SedasOrderLine sedasOrderLine)
+        {
+
+        }
+
         //METHODEN
-        private string GetSedasOrderHeaderString()
+        public string Header()
         {
             return $";030,14,00000000000000000,{_ErstellDatumJJMMTT},{_LieferDatumJJMMTT},,,,{_BHMKundennummer}         ,,";
         }
 
-        private string GetSedasOrderFooterString()
+        public string Footer()
         {
             //;05000000039000
             //;05               Kennung Footer
-            //   000000039      9 Stellen für Summe bestellter Artikelmengen
+            //   000000039      neun Stellen für Summe bestellter Artikelmengen
             //            0000  1000er Stelle für Artikelmenge
 
             string articleQuantity = Tools.ExpandLeftStringSide(OrderArticleQuantity.ToString(), 9);
@@ -51,7 +64,7 @@ namespace ConvertDatToSedas
             int count = 0;
             foreach (SedasOrderLine orderLine in SedasOrderLines)
             {
-                count += Convert.ToInt32(orderLine.ArtikelMenge.Substring(0, orderLine.ArtikelMenge.Length - 3));
+                count += Convert.ToInt32(orderLine.Bestellmenge.Substring(0, orderLine.Bestellmenge.Length - 3));
             }
 
             return count;
@@ -61,12 +74,12 @@ namespace ConvertDatToSedas
         {
             string cr = "\r\n";
 
-            string returnString = this.Header + cr;
+            string returnString = Header() + cr;
             foreach (SedasOrderLine orderLine in this.SedasOrderLines)
             {
                 returnString += orderLine.ToString() + cr;
             }
-            returnString += this.Footer + cr;
+            returnString += Footer() + cr;
 
             return returnString;
         }

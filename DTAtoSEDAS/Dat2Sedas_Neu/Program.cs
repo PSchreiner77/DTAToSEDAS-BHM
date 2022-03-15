@@ -2,6 +2,7 @@
 using System;
 using ConvertDatToSedas;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Dat2Sedas_Neu
 {
@@ -17,6 +18,58 @@ namespace Dat2Sedas_Neu
             Console.WriteLine("Testhalt");
             Console.ReadKey();
         }
+
+        public void ProgramLoop()
+        {
+            log = Logger.GetInstance();
+            log.HaltOnCriticalErrors = true;
+            log.MaxLogfileLines = 500;
+            log.OutputMedium = Logger.Output.Console;
+
+            log.Log("**********************************");
+            log.Log("--------- PROGRAMMSTART ----------");
+            log.Log(log.GetLoggerSettings());
+
+            //Parameter abrufen
+            Param = Parameters.GetInstance;
+            if (!ProgramInit.Init())
+            { ExitProgram(); }
+            log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages; //TODO Widersprüchliche Angabe von True/False
+
+
+            //Counter setzen
+            Param.Counter = SetCounter(Param.Counter);
+
+            //Korrekturlisten erstellen
+            string _pathDeleteCustomer = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
+            string _pathDeleteArticle = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
+            string _pathChangeArticle = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
+            ArticleChangeList SedasArticleChangeList = DataProcessing.GetChangeArticlesList(_pathChangeArticle);
+            ArticleDeletionList SedasArticleDeletionList = DataProcessing.GetDeleteArticlesList(_pathDeleteArticle);
+            CustomerDeletionList SedasCustomerDeletionList = DataProcessing.GetDeleteCustomersList(_pathDeleteCustomer);
+
+
+            ConvertToSedas newSedas = new ConvertToSedas(Param.Counter,
+                                                         SedasArticleChangeList,
+                                                         SedasArticleDeletionList,
+                                                         SedasCustomerDeletionList);
+
+            List<string> newOrders = DataProcessing.LoadInputFile(Param.SourceFullPath);
+            SourceFile newSourceOrders = newSedas.ImportDatFileContent(newOrders);
+            SedasFile newSedasFile = newSedas.ToSedas(newSourceOrders, Param.Counter);
+
+            //Daten in Datei schreiben
+            DataProcessing.WriteToFile(newSedas.ToString(), Param.DestinationFullPath);
+
+            //Settings zurückschreiben
+            RewriteSettingsToConfig();
+            //##
+
+            log.Log("--- Programm normal beendet. ---");
+            log.Log("********************************");
+            log.Log("");
+        }
+
 
         private int SetCounter(int counter)
         {
@@ -43,61 +96,6 @@ namespace Dat2Sedas_Neu
             log.Log("Programm wird nach Fehler beendet.", "Programmabbruch", Logger.MsgType.Critical);
             Console.ReadKey();
             Environment.Exit(0);
-        }
-
-        public void ProgramLoop()
-        {
-            log = Logger.GetInstance();
-            log.HaltOnCriticalErrors = true;
-            log.MaxLogfileLines = 500;
-            log.OutputMedium = Logger.Output.Console;
-
-            log.Log("**********************************");
-            log.Log("--------- PROGRAMMSTART ----------");
-            log.Log(log.GetLoggerSettings());
-
-            //Parameter abrufen
-            Param = Parameters.GetInstance;
-
-            if (!ProgramInit.Init())
-            { ExitProgram(); }
-            log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages; //TODO Widersprüchliche Angabe von True/False
-
-
-
-            //Counter setzen
-            Param.Counter = SetCounter(Param.Counter);
-            string _pathDeleteCustomer = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
-            string _pathDeleteArticle = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
-            string _pathChangeArticle = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
-
-
-            ConvertToSedas newSedas = new ConvertToSedas(Param.Counter,
-                                                         DataProcessing.GetChangeArticlesList(_pathChangeArticle),
-                                                         DataProcessing.GetDeleteArticlesList(_pathDeleteArticle),
-                                                         DataProcessing.GetDeleteCustomersList(_pathDeleteCustomer));
-
-            newSedas.ConvertDatFile(Param.SourceFullPath);
-
-
-            //## Daten konvertieren und schreiben
-            //Sedas-Objekt erstellen mit aktuellem Datum
-            ConvertToSedas DatToSedas = new ConvertToSedas(Param.SourceFullPath, Param.DestinationFullPath, Param.Counter);
-
-            //Daten zusammenstellen
-            SourceOrders sdf = DatToSedas.ImportSourceDatFile(Param.SourceFullPath);
-            DatToSedas.CreateSedasFile(sdf);
-
-            //Daten in Datei schreiben
-            DatToSedas.WriteSedasData();
-
-            //Settings zurückschreiben
-            RewriteSettingsToConfig();
-            //##
-
-            log.Log("--- Programm normal beendet. ---");
-            log.Log("********************************");
-            log.Log("");
         }
     }
 }

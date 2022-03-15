@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,10 +23,14 @@ namespace ConvertDatToSedas
         private ArticleDeletionList _articlesToDelete;
         private ArticleChangeList articlesToChange = new ArticleChangeList();
 
-        public SedasFile GetSedas { get { return _sedasFile; } }
+        public SedasFile GetSedas { get { return this._sedasFile; } }
 
 
         //KONSTRUKTOR
+
+        public ConvertToSedas()
+        { }
+
         /// <summary>
         /// Erstellt ein Objekt zum Erzeugen einer SEDAS.DAT Datei aus einer Bestell.dat Datei.
         /// </summary>
@@ -46,222 +49,156 @@ namespace ConvertDatToSedas
 
 
         //METHODEN
-        public SourceOrders ImportDatFileContent(List<string> sourceFileLines)
+        public SourceFile ImportDatFileContent(List<string> sourceFileLines)
         {
-            //Import File into SourceOrder
-            SourceOrders sourceOrders = new SourceOrders();
+            if (sourceFileLines.Count() > 0)
+            {
+                List<SourceOrderLine> newOrderLines = GenerateSourceOrderLines(sourceFileLines);
+                List<SourceOrder> newOrders = GenerateSourceOrders(newOrderLines);
+
+                SourceFile newSourceFile = new SourceFile();
+                newSourceFile.AddList(newOrders);
+                return newSourceFile;
+            }
+            return null;
+        }
+
+
+        public SedasFile ToSedas(SourceFile sourceOrders, int Counter)
+        {
+            if (sourceOrders.Count() > 0)
+            {
+                SedasFile newSedasFile = new SedasFile(this._SedasErstellDatumJJMMTT, Counter);
+
+                foreach (SourceOrder sourceOrder in sourceOrders)
+                {
+                    string sedasLieferDatumJJMMT = Tools.ConvertToSedasDateJJMMTT(sourceOrder.LieferDatumTTMMJJ);
+                    SedasOrder newSedasOrder = new SedasOrder(this._SedasErstellDatumJJMMTT,
+                                                              sedasLieferDatumJJMMT,
+                                                              sourceOrder.BHMKundennummer);
+
+                    foreach (SourceOrderLine sourceOrderLine in sourceOrder)
+                    {
+                        SedasOrderLine newSedasOrderLine = ConvertToSedasOrderLine(sourceOrderLine);
+                        newSedasOrder.Add(newSedasOrderLine);
+                    }
+
+                    newSedasFile.Add(newSedasOrder);
+                }
+
+                return newSedasFile;
+            }
+            return null;
+        }
+
+
+        private List<SourceOrderLine> GenerateSourceOrderLines(List<string> sourceFileLines)
+        {
+            List<SourceOrderLine> newOrderLines = new List<SourceOrderLine>();
             foreach (string line in sourceFileLines)
             {
-                sourceOrders.Add(new SourceOrderLine(line));
+                newOrderLines.Add(new SourceOrderLine(line));
             }
-
-            return sourceOrders;
-
-            //Convert sourceOrder into SedasFile
-            SedasFile sedasOrders = this.ToSedas(sourceOrders,_counter);
-
-            //Delete/change customers and articles
-
-            
-            return null;
+            return newOrderLines;
         }
 
-        public SedasFile ToSedas(SourceOrders DatSourceObject, int Counter)
+        private List<SourceOrder> GenerateSourceOrders(List<SourceOrderLine> sourceOrderLines)
         {
-            SedasFile sedasFile = new SedasFile(this._SedasErstellDatumJJMMTT, this._counter);
+            List<SourceOrder> newOrders = new List<SourceOrder>();
 
-            if (DatSourceObject.Count() > 0)
+            var customerGroupedOrderLines = sourceOrderLines.GroupBy(o => o.BHMKundenNummer);
+
+            foreach (var customerOrders in customerGroupedOrderLines)
             {
-                //Kundennummern aus Input-Daten ermitteln und
-                List<string> listOfCustomerNumbers = (List<string>)DatSourceObject.Select(orderLine => orderLine.BHMKundenNummer).Distinct().ToList();
-                
-                //für jede Kundennummer eine Sedas-Order erstellen und dem Sedas-File hinzufügen.
-                foreach (string actualCustomerNumber in listOfCustomerNumbers)
-                {
-                    //Bestellzeilen der aktuellen Kundennummer ermitteln und als Liste zurückgeben.
-                    var singleCustomerOrderLines = DatSourceObject.Where(orderLine => orderLine.BHMKundenNummer == actualCustomerNumber).Select(orderLine => orderLine);
-                    
-                    SedasOrder singleCustomerSedasOrder = CreateSedasOrder(singleCustomerOrderLines);
-                    sedasFile.SedasOrdersList.Add(singleCustomerSedasOrder);
-                }
-
-
-                return sedasFile;
+                SourceOrder newOrder = new SourceOrder(customerOrders.First().BHMKundenNummer);
+                newOrder.AddList(customerOrders.ToList());
+                newOrders.Add(newOrder);
             }
-
-            return null;
+            return newOrders;
         }
 
-
-
-        public bool WriteSedasData()
+        private SedasOrderLine ConvertToSedasOrderLine(SourceOrderLine sourceOrderLine)
         {
-            //log.Log("Schreiben der Sedas.dat...", "Schreiben der Sedas.dat Datei", Logger.MsgType.Message);
-
-            #region Zielverzeichnis erstellen, wenn nicht vorhanden
-            //TODO Zielverzeichnis sollte schon bei Programmstart geprüft sein. Prüfung überflüssig.
-            bool isPath_NoFile = _DestinationPath.Contains("\\");
-            if (isPath_NoFile)
-            {
-                if (!File.Exists(_DestinationPath))
-                {
-                    bool folderExists = Directory.Exists(Path.GetDirectoryName(_DestinationPath));
-                    if (!folderExists)
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(_DestinationPath));
-                    }
-                }
-            }
-            else
-            {
-                this._DestinationPath = Directory.GetCurrentDirectory() + "\\" + this._DestinationPath;
-            }
-            #endregion
-
-            //Eigentliches Schreiben der SEDAS-Informationen in eine Datei.
-            if (DataProcessing.WriteToFile(this.SedasFile.ToString(), _DestinationPath))
-            { return true; }
-
-            string message = $"Fehler beim Schreiben der Zieldatei: {_DestinationPath}";
-            //log.Log(message, "Fehler", Logger.MsgType.Message);
-            return false;
+            SedasOrderLine sol = new SedasOrderLine(sourceOrderLine.BHMArtikelNummer, sourceOrderLine.BestellMenge);
+            return sol;
         }
+
+
+ 
         #region Löschen und ändern
-        public bool DeleteCustomers()
-        {
-            bool customersDeleted = false;
-            string messageTitle = "Kundennummern löschen";
-            //log.Log("Kundennummern aus Bestellung löschen...", messageTitle, Logger.MsgType.Message);
-
-            foreach (string customerNumber in _customersToDelete)
-            {
-                if (SourceDatFile.InputFileOrderLines.FirstOrDefault(orderLine => orderLine.BHMKundenNummer == customerNumber) != null)
-                {
-                    SourceDatFile.InputFileOrderLines = SourceDatFile.InputFileOrderLines.Where(orderLine => orderLine.BHMKundenNummer != customerNumber).Select(orderLine => orderLine).ToList();
-                    //log.Log($" => Kundennummer {customerNumber} aus Bestellungen gelöscht.", messageTitle, Logger.MsgType.Message);
-                    customersDeleted = true;
-                }
-            }
-
-            return customersDeleted;
-        }
-
-        public bool DeleteArticle()
-        {
-            bool articleDeleted = false;
-            string messageTitle = "Artikelnummern löschen";
-            //log.Log("Löschen von Artikelnummern aus der Bestellung...", messageTitle, Logger.MsgType.Message);
-
-            foreach (string articleNumber in _articlesToDelete)
-            {
-                if (SourceDatFile.InputFileOrderLines.FirstOrDefault(line => line.BHMArtikelNummer == articleNumber) != null)
-                {
-                    SourceDatFile.InputFileOrderLines = SourceDatFile.InputFileOrderLines.Where(line => line.BHMArtikelNummer != articleNumber).ToList();
-                    //log.Log($" => Artikelnummer {articleNumber} aus Bestellung gelöscht.", messageTitle, Logger.MsgType.Message);
-                    articleDeleted = true;
-                }
-            }
-
-            return articleDeleted;
-        }
-
-        private bool ChangeArticleNumbers()
-        {
-            bool articleChanged = false;
-            string messageTitle = "Artikelnummern tauschen";
-            //log.Log("Austauschen von Artikelnummern laut tauscheArtikel.txt...", messageTitle, Logger.MsgType.Message);
-
-            foreach (ArticleChangePair pair in articlesToChange)
-            {
-                bool currentArticleChanged = false;
-                var linesToChange = SourceDatFile.InputFileOrderLines.Where(line => line.BHMArtikelNummer == pair.OriginalNumber).ToList();
-                foreach (SourceOrderLine orderLine in linesToChange)
-                {
-                    orderLine.BHMArtikelNummer = pair.NewNumber;
-                    currentArticleChanged = true;
-                    articleChanged = true;
-                }
-
-                //if (currentArticleChanged)
-                //log.Log($" => Artikelnummer {pair.OriginalNumber} getauscht gegen {pair.NewNumber}.", messageTitle, Logger.MsgType.Message);
-            }
-            return articleChanged;
-        }
-        #endregion
-
-        private SedasOrder CreateSedasOrder(IEnumerable<SourceOrderLine> singleCustomerOrderLines)
-        {
-            string customerNumber = singleCustomerOrderLines.First().BHMKundenNummer;
-            string sedasLieferDatumJJMMTT = Tools.ConvertToSedasDateJJMMTT(singleCustomerOrderLines.First().LieferDatumTTMMJJ);
-            // SEDAS-Order erstellen
-            SedasOrder singleCustomerOrder = new SedasOrder(this._SedasErstellDatumJJMMTT, sedasLieferDatumJJMMTT, customerNumber);
-
-            foreach (SourceOrderLine orderLine in singleCustomerOrderLines)
-            {
-                //Alle Einträge einer Kundennummer als Sedas-OrderLines der Sedas-Order hinzufügen.
-                singleCustomerOrder.SedasOrderLines.Add(new SedasOrderLine(orderLine.BHMArtikelNummer, orderLine.BestellMenge));
-            }
-
-            return singleCustomerOrder;
-        }
-
-
-    }
 
 
 
-
-
-    public static class Converter
-    {
-
-        //public static SourceOrders ToSourceOrder(List<string> sourceFileLines)
+        //public bool DeleteCustomers()
         //{
-        //    SourceOrders newInputFile = new SourceOrders();
+        //    bool customersDeleted = false;
+        //    string messageTitle = "Kundennummern löschen";
+        //    //log.Log("Kundennummern aus Bestellung löschen...", messageTitle, Logger.MsgType.Message);
 
-        //    foreach (string line in sourceFileLines)
+        //    foreach (string customerNumber in _customersToDelete)
         //    {
-        //        SourceOrderLine newOrderLine = new SourceOrderLine(line);
-        //        newInputFile.SourceOrderLines.Add(newOrderLine);
+        //        if (SourceDatFile.InputFileOrderLines.FirstOrDefault(orderLine => orderLine.BHMKundenNummer == customerNumber) != null)
+        //        {
+        //            SourceDatFile.InputFileOrderLines = SourceDatFile.InputFileOrderLines.Where(orderLine => orderLine.BHMKundenNummer != customerNumber).Select(orderLine => orderLine).ToList();
+        //            //log.Log($" => Kundennummer {customerNumber} aus Bestellungen gelöscht.", messageTitle, Logger.MsgType.Message);
+        //            customersDeleted = true;
+        //        }
         //    }
-        //    return newInputFile;
+
+        //    return customersDeleted;
         //}
 
+        //public bool DeleteArticle()
+        //{
+        //    bool articleDeleted = false;
+        //    string messageTitle = "Artikelnummern löschen";
+        //    //log.Log("Löschen von Artikelnummern aus der Bestellung...", messageTitle, Logger.MsgType.Message);
 
-        public static SedasFile ToSedas(SourceOrders DatSourceObject)
-        {
-            SedasFile sedasFile = new SedasFile(_SedasErstellDatumJJMMTT, this._counter);
+        //    foreach (string articleNumber in _articlesToDelete)
+        //    {
+        //        if (SourceDatFile.InputFileOrderLines.FirstOrDefault(line => line.BHMArtikelNummer == articleNumber) != null)
+        //        {
+        //            SourceDatFile.InputFileOrderLines = SourceDatFile.InputFileOrderLines.Where(line => line.BHMArtikelNummer != articleNumber).ToList();
+        //            //log.Log($" => Artikelnummer {articleNumber} aus Bestellung gelöscht.", messageTitle, Logger.MsgType.Message);
+        //            articleDeleted = true;
+        //        }
+        //    }
 
-            if (DatSourceObject.Count() > 0)
-            {
-                //Daten aus Inputfile löschen und verändern.
-                this.DeleteCustomers();
-                this.DeleteArticle();
-                this.ChangeArticleNumbers();
+        //    return articleDeleted;
+        //}
 
-                //log.Log("Konvertieren in Sedas-Format", "Sedas-Konvertierung", Logger.MsgType.Message);
-                //Sedas-Datei-Objekt erstellen
-                sedasFile = new SedasFile(this._SedasErstellDatumJJMMTT, this._counter);
+        //private bool ChangeArticleNumbers()
+        //{
+        //    bool articleChanged = false;
+        //    string messageTitle = "Artikelnummern tauschen";
+        //    //log.Log("Austauschen von Artikelnummern laut tauscheArtikel.txt...", messageTitle, Logger.MsgType.Message);
 
-                //Kundennummern aus Input-Daten ermitteln und
-                List<string> listOfCustomerNumbers = (List<string>)DatSourceObject.Select(orderLine => orderLine.BHMKundenNummer).Distinct().ToList();
-                //für jede Kundennummer eine Sedas-Order erstellen und dem Sedas-File hinzufügen.
-                foreach (string actualCustomerNumber in listOfCustomerNumbers)
-                {
-                    ////Sedas-Order erstllen und alle Zeilen einer Kundennummer hinzufügen.
-                    var singleCustomerOrderLines = DatSourceObject.Where(orderLine => orderLine.BHMKundenNummer == actualCustomerNumber).Select(orderLine => orderLine);
-                    SedasOrder singleCustomerSedasOrder = CreateSedasOrder(singleCustomerOrderLines);
-                    sedasFile.SedasOrdersList.Add(singleCustomerSedasOrder);
-                }
+        //    foreach (ArticleChangePair pair in articlesToChange)
+        //    {
+        //        bool currentArticleChanged = false;
+        //        var linesToChange = SourceDatFile.InputFileOrderLines.Where(line => line.BHMArtikelNummer == pair.OriginalNumber).ToList();
+        //        foreach (SourceOrderLine orderLine in linesToChange)
+        //        {
+        //            orderLine.BHMArtikelNummer = pair.NewNumber;
+        //            currentArticleChanged = true;
+        //            articleChanged = true;
+        //        }
+
+        //        //if (currentArticleChanged)
+        //        //log.Log($" => Artikelnummer {pair.OriginalNumber} getauscht gegen {pair.NewNumber}.", messageTitle, Logger.MsgType.Message);
+        //    }
+        //    return articleChanged;
+        //}
+        #endregion
 
 
-                return sedasFile;
-            }
-
-            return null;
-        }
     }
 
+
+
+
+
+   
     // public ConvertToSedas(string SourceFilePath, string DestinationFilePath, int actualCounter)
     //{
     //    this._SedasErstellDatumJJMMTT = Tools.ConvertToSedasDateJJMMTT(DateTime.Now);
@@ -278,77 +215,7 @@ namespace ConvertDatToSedas
     //    this.articlesToChange = DataProcessing.LoadChangeArticlesList(pathTauscheArtikel);
     //}
 
-    //private List<string> ReadInputFile(string sourcePathNFDatFile)
-    //{
-    //    List<string> _sourceDataList = new List<string>();
-    //    try
-    //    {
-    //        using (StreamReader sr = new StreamReader(sourcePathNFDatFile))
-    //        {
-    //            while (!sr.EndOfStream)
-    //            {
-    //                string line = sr.ReadLine();
-    //                if (line != "")
-    //                    _sourceDataList.Add(line);
-    //            }
-    //        }
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        //TODO Fehlerausnahme auslösen und Fehler melden
-    //        throw new Exception(ex.Message);
-    //    }
-    //    return _sourceDataList;
-    //}
 
-    //private InputFileOrderLineNF ConvertInputFileData(string inputFileOrderLine)
-    //{
-    //    /*
-    //  Zeile aus neuer NF-DAT-Datei:            
-    //  0 ;1   ;2   ;3     ;4     ;5   ;6    ;7;8  ;9    ;10
-    //  NF;1050;1050;200924;200925;    ;20000; ;209;     ;10    (Aldi-Datei Beispiel)
-    //  NF; 180;3785;091121;101121;1111; 9000;0;  2;1.000;1     (BHM-Datei Beispiel)
 
-    //  (!* Originaldateien enthalten keine Leerzeichen in den Feldern*!)
-
-    //  0  NF               Kennzeichen neues Format
-    //  1  FilNr            BHM Filialnummer der Filiale / Aldi-Filial/Kundennummer
-    //  2  KdNr             BHM Kundennummer der Filiale / Aldi-Filial/Kundennummer
-    //  3  Bestelldatum     Bestelldatum = Tagesdatum beim Einlesen = Erstelldatum
-    //  4  Lieferdatum      Lieferdatum
-    //  5  Artikelkey       BHM ArtikelKey
-    //  6  Menge            Menge*1000, echte Menge=Menge/1000> 20000=20
-    //  7  Preis            Preis (Bsp. 2.000), Dezimal = .
-    //  8  ArtNummer        BHM ArtikelNummer
-    //  9  VPE              Verpackungseinheit
-    //  10 10               Anzahl Bestellpositionen in Datei
-    //  */
-
-    //    try
-    //    {
-    //        string[] arrZeile = inputFileOrderLine.Split(';');
-
-    //        InputFileOrderLineNF newLine = new InputFileOrderLineNF()
-    //        {
-    //            NFKennzeichen = arrZeile[0],
-    //            BHMFilialNummer = arrZeile[1],
-    //            BHMKundenNummer = arrZeile[2],
-    //            BestellDatumTTMMJJ = arrZeile[3],
-    //            LieferDatumTTMMJJ = arrZeile[4],
-    //            BHMArtikelKey = arrZeile[5],
-    //            BestellMenge = arrZeile[6],
-    //            Preis = arrZeile[7],
-    //            BHMArtikelNummer = arrZeile[8],
-    //            Verpackungseinheit = arrZeile[9],
-    //            AnzahlBestellPositionen = arrZeile[10]
-    //        };
-
-    //        return newLine;
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        //TODO Ausnahme anzeigen
-    //        throw new Exception(ex.Message);
-    //    }
-    //}
+    
 }

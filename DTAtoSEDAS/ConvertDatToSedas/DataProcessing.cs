@@ -82,6 +82,28 @@ namespace ConvertDatToSedas
             return _sourceDataList;
         }
 
+        public static List<string> LoadInputFile(string sourcePathNFDatFile)
+        {
+            List<string> _sourceDataList = new List<string>();
+            try
+            {
+                using (StreamReader sr = new StreamReader(sourcePathNFDatFile))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        if (line != "")
+                            _sourceDataList.Add(line);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //TODO Fehlerausnahme auslösen und Fehler melden
+                throw new Exception(ex.Message);
+            }
+            return _sourceDataList;
+        }
 
 
         private static IList<string> LoadDeleteItemsList(string Path)
@@ -100,5 +122,6 @@ namespace ConvertDatToSedas
 
             return itemList;
         }
+
     }
 }

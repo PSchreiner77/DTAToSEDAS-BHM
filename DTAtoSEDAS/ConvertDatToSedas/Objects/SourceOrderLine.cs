@@ -32,8 +32,7 @@ namespace ConvertDatToSedas
         #endregion
 
         public SourceOrderLine()
-        {
-        }
+        {        }
 
         public SourceOrderLine(string OrderLineFromImportFile)
         {

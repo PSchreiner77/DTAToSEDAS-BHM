@@ -50,18 +50,52 @@ namespace ConvertDatToSedas
         }
 
         //METHODEN
-
         public void Add(SedasOrder sedasOrder)
         {
             SedasOrdersList.Add(sedasOrder);
         }
 
-        private string Header()
+        public void AddList(List<SedasOrder> sedasOrderList)
+        {
+            foreach (SedasOrder order in sedasOrderList)
+            {
+                SedasOrdersList.Add(order);
+            }
+        }
+
+        public void Remove(SedasOrder sedasOrder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveCustomer(CustomerDeletionList customersToDelete)
+        {
+            foreach (string customer in customersToDelete)
+            {
+                RemoveCustomer(customer);
+            }
+        }
+        public void RemoveCustomer(string customerNumber)
+        {
+            //var order = SedasOrdersList.Where(o => o);
+        }
+
+        public void RemoveArticle(string articleNumber)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ChangeArticle(ArticleChangePair articlePair)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string Header()
         {
             return $"010()000377777777777771{_ErstellDatumSedasJJMMTT};,{_Counter}\r\n;)0240051310000002";
         }
 
-        private string Footer()
+        public string Footer()
         {
             #region Aufbau FooterLine
             //--FOOTER der Zieldatei
