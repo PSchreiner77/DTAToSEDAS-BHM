@@ -136,7 +136,7 @@ namespace ConvertDatToSedas
             //  108,   = Anzahl Kunden in Datei (Blöcke)
             //  1178   = Anzahl einzelner Datensätze/Artikelzeilen
             #endregion
-            string FooterLine1 = $":06{Tools.ExpandLeftStringSide(this.CustomerOrdersCount.ToString(), 3)};{this.OrderLinesCount}";
+            string FooterLine1 = $":06{SedasTools.ExpandLeftStringSide(this.CustomerOrdersCount.ToString(), 3)};{this.OrderLinesCount}";
             string FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
             string FooterLine3 = "                                                                                    ";
             

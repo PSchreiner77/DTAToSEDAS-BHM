@@ -39,7 +39,7 @@ namespace ConvertDatToSedas
         /// <param name="actualCounter">Neue Zählerposition für SEDAS.DAT Datei.</param>
         public ConvertToSedas(int actualCounter, ArticleChangeList articlesToChangeList, ArticleDeletionList articlesToDelete, CustomerDeletionList customersToDelete)
         {
-            this._SedasErstellDatumJJMMTT = Tools.ConvertToSedasDateJJMMTT(DateTime.Now);
+            this._SedasErstellDatumJJMMTT = SedasTools.ConvertToSedasDateJJMMTT(DateTime.Now);
             this._counter = actualCounter;
 
             this._customersToDelete = customersToDelete;
@@ -72,7 +72,7 @@ namespace ConvertDatToSedas
 
                 foreach (DatOrder sdatOrder in datOrders)
                 {
-                    string sedasLieferDatumJJMMT = Tools.ConvertToSedasDateJJMMTT(sdatOrder.LieferDatumTTMMJJ);
+                    string sedasLieferDatumJJMMT = SedasTools.ConvertToSedasDateJJMMTT(sdatOrder.LieferDatumTTMMJJ);
                     SedasOrder newSedasOrder = new SedasOrder(this._SedasErstellDatumJJMMTT,
                                                               sedasLieferDatumJJMMT,
                                                               sdatOrder.BHMKundennummer);

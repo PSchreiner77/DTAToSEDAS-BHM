@@ -98,7 +98,7 @@ namespace ConvertDatToSedas
             //   000000039      neun Stellen für Summe bestellter Artikelmengen
             //            0000  1000er Stelle für Artikelmenge
 
-            string articleQuantity = Tools.ExpandLeftStringSide(this.GetOrderedArticleQuantity().ToString(), 9);
+            string articleQuantity = SedasTools.ExpandLeftStringSide(this.GetOrderedArticleQuantity().ToString(), 9);
             return $";05{articleQuantity}000";
         }
 

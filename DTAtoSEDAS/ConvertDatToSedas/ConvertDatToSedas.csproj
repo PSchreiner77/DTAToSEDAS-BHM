@@ -47,7 +47,7 @@
     <Compile Include="DataProcessing.cs" />
     <Compile Include="Objects\ArticleChangeList.cs" />
     <Compile Include="Objects\DatOrder.cs" />
-    <Compile Include="Tools.cs" />
+    <Compile Include="SedasTools.cs" />
     <Compile Include="Objects\ArticleDeletionList.cs" />
     <Compile Include="Objects\DatOrderLine.cs" />
     <Compile Include="Objects\DatFile.cs" />

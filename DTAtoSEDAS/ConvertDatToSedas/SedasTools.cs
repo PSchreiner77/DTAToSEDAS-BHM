@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConvertDatToSedas
 {
-    static class Tools
+    public static class SedasTools
     {
         public static string CutLeftStringSide(string Input, int MaxLength)
         {

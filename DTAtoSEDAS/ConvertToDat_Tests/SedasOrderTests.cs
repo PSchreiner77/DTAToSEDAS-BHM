@@ -171,14 +171,9 @@ namespace ConvertDatToSedas.Tests
 
     internal static class TestOrder
     {
-        private static SedasOrder order { get; set; }
-
-
         internal static SedasOrder GetInstance()
         {
-            if (order == null)
-            {
-                order = new SedasOrder("221013", "221014", "1050");
+               SedasOrder order = new SedasOrder("221013", "221014", "1050");
 
                 order.AddList(new List<SedasOrderLine>()
                 {
@@ -192,7 +187,6 @@ namespace ConvertDatToSedas.Tests
                 new SedasOrderLine("170", "3000"),
                 new SedasOrderLine("33", "7000")
                 });
-            }
 
             return order;
         }
