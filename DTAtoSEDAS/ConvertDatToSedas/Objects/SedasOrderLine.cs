@@ -33,7 +33,6 @@ namespace ConvertDatToSedas
         }
 
         //METHODEN
-
         public override string ToString()
         {
             return $";040000{Tools.ExpandLeftStringSide(BHMArtikelNummer, 10)},4{Tools.ExpandLeftStringSide(Bestellmenge, 7)},,,,02 000000,,";

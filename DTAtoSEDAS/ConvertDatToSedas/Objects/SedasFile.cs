@@ -39,8 +39,15 @@ namespace ConvertDatToSedas
         private int _Counter; //Laufende Nummer 
         public List<SedasOrder> SedasOrdersList = new List<SedasOrder>();
 
-        public int CustomerOrdersCount { get { return SedasOrdersList.Count; } }
-        public int OrderLinesCount { get { return SedasOrdersList.Sum(o => o.SedasOrderLines.Count()); } }
+        /// <summary>
+        /// Gibt die Anzahl aller Kundenbestellungen zurück.
+        /// </summary>
+        public int CustomerOrdersCount { get { return SedasOrdersList.Count(); } }
+        
+        /// <summary>
+        /// Gibt die Anzahl aller Bestellzeilen zurück.
+        /// </summary>
+        public int OrderLinesCount { get { return SedasOrdersList.Sum(o => o.OrderPositionsCount); } }
 
         //KONSTRUKTOR
         public SedasFile(string Erstelldatum, int Counter)
@@ -50,12 +57,12 @@ namespace ConvertDatToSedas
         }
 
         //METHODEN
-        public void Add(SedasOrder sedasOrder)
+        public void AddOrder(SedasOrder sedasOrder)
         {
             SedasOrdersList.Add(sedasOrder);
         }
 
-        public void AddList(List<SedasOrder> sedasOrderList)
+        public void AddListOfOrders(List<SedasOrder> sedasOrderList)
         {
             foreach (SedasOrder order in sedasOrderList)
             {
@@ -63,31 +70,53 @@ namespace ConvertDatToSedas
             }
         }
 
-        public void Remove(SedasOrder sedasOrder)
+        public void RemoveOrder(SedasOrder sedasOrder)
         {
-            throw new NotImplementedException();
+            SedasOrdersList.Remove(sedasOrder);
         }
 
-        public void RemoveCustomer(CustomerDeletionList customersToDelete)
+        public void RemoveCustomers(CustomerDeletionList customersToDelete)
         {
             foreach (string customer in customersToDelete)
             {
                 RemoveCustomer(customer);
             }
         }
+       
         public void RemoveCustomer(string customerNumber)
         {
-            //var order = SedasOrdersList.Where(o => o);
+            SedasOrdersList = SedasOrdersList.Where(o => o.BHMKundennummer != customerNumber).ToList();
         }
 
-        public void RemoveArticle(string articleNumber)
+        public void RemoveArticles(ArticleDeletionList articlestoDelete)
         {
-            throw new NotImplementedException();
+            foreach(string articleNumber in articlestoDelete)
+            {
+                this.RemoveArticle(articleNumber);
+            }
         }
 
+        public void RemoveArticle(string articleNumberToDelete)
+        {
+            foreach(SedasOrder order in SedasOrdersList)
+            {
+                order.RemoveArticle(articleNumberToDelete);
+            }
+        }
+
+        public void ChangeArticles(ArticleChangeList articlesToChange)
+        {
+            foreach(ArticleChangePair articlePair in articlesToChange)
+            {
+                this.ChangeArticle(articlePair);
+            }
+        }
         public void ChangeArticle(ArticleChangePair articlePair)
         {
-            throw new NotImplementedException();
+           foreach(SedasOrder order in SedasOrdersList)
+            {
+                order.ChangeArticle(articlePair);
+            }
         }
 
         public string Header()
@@ -107,12 +136,17 @@ namespace ConvertDatToSedas
             //  108,   = Anzahl Kunden in Datei (Blöcke)
             //  1178   = Anzahl einzelner Datensätze/Artikelzeilen
             #endregion
-            string FooterLine1 = $":06{Tools.ExpandLeftStringSide(CustomerOrdersCount.ToString(), 3)};{OrderLinesCount}";
+            string FooterLine1 = $":06{Tools.ExpandLeftStringSide(this.CustomerOrdersCount.ToString(), 3)};{this.OrderLinesCount}";
             string FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
             string FooterLine3 = "                                                                                    ";
+            
             return FooterLine1 + "\r\n" + FooterLine2 + "\r\n" + FooterLine3;
         }
 
+        /// <summary>
+        /// Erzeugt den Textinhalt für eine Sedas-Datei.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             string cr = "\r\n";

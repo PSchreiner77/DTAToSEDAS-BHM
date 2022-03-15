@@ -9,68 +9,28 @@ namespace ConvertDatToSedas
 {
     public class SedasOrder : IEnumerable<SedasOrderLine>
     {
+        private List<SedasOrderLine> SedasOrderLines = new List<SedasOrderLine>();
+        public string BHMKundennummer { get; private set; }
+        
+        /// <summary>
+        /// Gibt die Anzahl der Bestellpostitionen zurück.
+        /// </summary>
+        public int OrderPositionsCount { get { return SedasOrderLines.Count(); } }
+
         private string _ErstellDatumJJMMTT;
         private string _LieferDatumJJMMTT;
-        private string _BHMKundennummer;
-       
-        public int OrderArticleQuantity { get { return GetSedasOrderArticleQuantity(); } }
-        public List<SedasOrderLine> SedasOrderLines = new List<SedasOrderLine>();
 
         //KONSTRUKTOR
         public SedasOrder(string ErstellDatumJJMMTT, string LieferDatumJJMMTT, string BHMKundennummer)
         {
             _ErstellDatumJJMMTT = ErstellDatumJJMMTT;
             _LieferDatumJJMMTT = LieferDatumJJMMTT;
-            _BHMKundennummer = BHMKundennummer;
+            this.BHMKundennummer = BHMKundennummer;
         }
 
-        public void Add(SedasOrderLine sedasOrderLine)
-        {
-            this.SedasOrderLines.Add(sedasOrderLine);
-        }
-
-        public void AddList(IList<SedasOrderLine> liste)
-        {
-            foreach(SedasOrderLine line in liste)
-            {
-                this.Add(line);
-            }
-        }
-
-
-
-        public void RemoveArticle(string articleNumber)
-        {
-            int index = this.SedasOrderLines.IndexOf(this.SedasOrderLines.Where(p => p.BHMArtikelNummer == articleNumber).FirstOrDefault());
-            if(index > -1)
-            {
-                this.SedasOrderLines.RemoveAt(index);
-            }
-        }
-
-        public void RemoveOrderPosition(SedasOrderLine sedasOrderLine)
-        {
-            SedasOrderLines.Remove(sedasOrderLine);
-        }
 
         //METHODEN
-        public string Header()
-        {
-            return $";030,14,00000000000000000,{_ErstellDatumJJMMTT},{_LieferDatumJJMMTT},,,,{_BHMKundennummer}         ,,";
-        }
-
-        public string Footer()
-        {
-            //;05000000039000
-            //;05               Kennung Footer
-            //   000000039      neun Stellen für Summe bestellter Artikelmengen
-            //            0000  1000er Stelle für Artikelmenge
-
-            string articleQuantity = Tools.ExpandLeftStringSide(OrderArticleQuantity.ToString(), 9);
-            return $";05{articleQuantity}000";
-        }
-
-        public int GetSedasOrderArticleQuantity()
+        public int GetOrderedArticleQuantity()
         {
             int count = 0;
             foreach (SedasOrderLine orderLine in SedasOrderLines)
@@ -80,6 +40,66 @@ namespace ConvertDatToSedas
 
             return count;
         }
+
+        public void Add(SedasOrderLine sedasOrderLine)
+        {
+            //TODO Prüfen, ob Zeile/Artikel schon existiert. Wenn ja, zusammenführen.
+            this.SedasOrderLines.Add(sedasOrderLine);
+        }
+
+        public void AddList(IList<SedasOrderLine> liste)
+        {
+            foreach (SedasOrderLine line in liste)
+            {
+                this.Add(line);
+            }
+        }
+
+        public void RemoveArticles(ArticleDeletionList articlesToDelete)
+        {
+            foreach (string articleNumber in articlesToDelete)
+            {
+                this.RemoveArticle(articleNumber);
+            }
+        }
+
+        public void RemoveArticle(string articleNumber)
+        {
+            SedasOrderLines = SedasOrderLines.Where(ol => ol.BHMArtikelNummer != articleNumber).ToList();
+        }
+
+        public void RemoveOrderPosition(SedasOrderLine sedasOrderLine)
+        {
+            SedasOrderLines.Remove(sedasOrderLine);
+        }
+
+        public void ChangeArticle(ArticleChangePair articleChangePair)
+        {
+            foreach (SedasOrderLine orderLine in SedasOrderLines)
+            {
+                if (orderLine.BHMArtikelNummer == articleChangePair.OriginalNumber)
+                {
+                    orderLine.BHMArtikelNummer = articleChangePair.NewNumber;
+                }
+            }
+        }
+
+        public string Header()
+        {
+            return $";030,14,00000000000000000,{_ErstellDatumJJMMTT},{_LieferDatumJJMMTT},,,,{BHMKundennummer}         ,,";
+        }
+
+        public string Footer()
+        {
+            //;05000000039000
+            //;05               Kennung Footer
+            //   000000039      neun Stellen für Summe bestellter Artikelmengen
+            //            0000  1000er Stelle für Artikelmenge
+
+            string articleQuantity = Tools.ExpandLeftStringSide(this.GetOrderedArticleQuantity().ToString(), 9);
+            return $";05{articleQuantity}000";
+        }
+
 
         public override string ToString()
         {

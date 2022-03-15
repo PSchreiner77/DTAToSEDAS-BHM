@@ -49,17 +49,23 @@ namespace Dat2Sedas_Neu
             CustomerDeletionList SedasCustomerDeletionList = DataProcessing.GetDeleteCustomersList(_pathDeleteCustomer);
 
 
+
+            List<string> newOrders = DataProcessing.LoadInputFile(Param.SourceFullPath);
+
             ConvertToSedas newSedas = new ConvertToSedas(Param.Counter,
                                                          SedasArticleChangeList,
                                                          SedasArticleDeletionList,
                                                          SedasCustomerDeletionList);
 
-            List<string> newOrders = DataProcessing.LoadInputFile(Param.SourceFullPath);
             SourceFile newSourceOrders = newSedas.ImportDatFileContent(newOrders);
             SedasFile newSedasFile = newSedas.ToSedas(newSourceOrders, Param.Counter);
 
+            newSedasFile.RemoveCustomers(SedasCustomerDeletionList);
+            newSedasFile.RemoveArticles(SedasArticleDeletionList);
+            newSedasFile.ChangeArticles(SedasArticleChangeList);
+
             //Daten in Datei schreiben
-            DataProcessing.WriteToFile(newSedas.ToString(), Param.DestinationFullPath);
+            DataProcessing.WriteToFile(newSedasFile.ToString(), Param.DestinationFullPath);
 
             //Settings zurückschreiben
             RewriteSettingsToConfig();

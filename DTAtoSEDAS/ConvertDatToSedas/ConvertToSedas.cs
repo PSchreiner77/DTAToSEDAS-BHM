@@ -83,7 +83,7 @@ namespace ConvertDatToSedas
                         newSedasOrder.Add(newSedasOrderLine);
                     }
 
-                    newSedasFile.Add(newSedasOrder);
+                    newSedasFile.AddOrder(newSedasOrder);
                 }
 
                 return newSedasFile;
@@ -124,7 +124,7 @@ namespace ConvertDatToSedas
         }
 
 
- 
+
         #region Löschen und ändern
 
 
@@ -198,7 +198,7 @@ namespace ConvertDatToSedas
 
 
 
-   
+
     // public ConvertToSedas(string SourceFilePath, string DestinationFilePath, int actualCounter)
     //{
     //    this._SedasErstellDatumJJMMTT = Tools.ConvertToSedasDateJJMMTT(DateTime.Now);
@@ -217,5 +217,5 @@ namespace ConvertDatToSedas
 
 
 
-    
+
 }
