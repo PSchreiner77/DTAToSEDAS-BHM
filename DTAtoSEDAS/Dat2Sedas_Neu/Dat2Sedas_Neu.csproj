@@ -59,7 +59,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConvertDatToSedas.cs" />
     <Compile Include="Help.cs" />
     <Compile Include="INIManager.cs" />
     <Compile Include="Logger.cs" />

@@ -15,12 +15,12 @@ namespace ConvertDatToSedas.Tests
         public void ToStringTest_OutputStringIsCorrect()
         {
             /* ;0400000000000317,40002000,,,,02 000000,,
-         *      ;040000          = Kennung Zeile BestellPosition
-         *      0000000317       = zehn Stellen Artikelnummer
-         *      ,4               = fix
-         *      00002000         = Bestellenge (Wert/1000)
-         *      ,,,,02 000000,,  = fix
-        */
+            *      ;040000          = Kennung Zeile BestellPosition
+            *      0000000317       = zehn Stellen Artikelnummer
+            *      ,4               = fix
+            *      00002000         = Bestellenge (Wert/1000)
+            *      ,,,,02 000000,,  = fix
+            */
             //Arrange
             string testArticle = "317";
             string testAmmount = "12";

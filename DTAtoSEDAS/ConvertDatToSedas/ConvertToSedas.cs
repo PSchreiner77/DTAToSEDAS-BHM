@@ -34,7 +34,7 @@ namespace ConvertDatToSedas
         /// <summary>
         /// Erstellt ein Objekt zum Erzeugen einer SEDAS.DAT Datei aus einer Bestell.dat Datei.
         /// </summary>
-        /// <param name="SourceFilePath">Einzulesende Datei mit Bestelldaten.</param>
+        /// <param name="DatFilePath">Einzulesende Datei mit Bestelldaten.</param>
         /// <param name="DestinationFilePath">Dateipfad für SEDAS.DAT-Ausgabe.</param>
         /// <param name="actualCounter">Neue Zählerposition für SEDAS.DAT Datei.</param>
         public ConvertToSedas(int actualCounter, ArticleChangeList articlesToChangeList, ArticleDeletionList articlesToDelete, CustomerDeletionList customersToDelete)
@@ -49,37 +49,37 @@ namespace ConvertDatToSedas
 
 
         //METHODEN
-        public SourceFile ImportDatFileContent(List<string> sourceFileLines)
+        public DatFile ImportDatFileContent(List<string> datFileLines)
         {
-            if (sourceFileLines.Count() > 0)
+            if (datFileLines.Count() > 0)
             {
-                List<SourceOrderLine> newOrderLines = GenerateSourceOrderLines(sourceFileLines);
-                List<SourceOrder> newOrders = GenerateSourceOrders(newOrderLines);
+                List<DatOrderLine> newOrderLines = GenerateDatOrderLines(datFileLines);
+                List<DatOrder> newOrders = GenerateDatOrders(newOrderLines);
 
-                SourceFile newSourceFile = new SourceFile();
-                newSourceFile.AddList(newOrders);
-                return newSourceFile;
+                DatFile newDatFile = new DatFile();
+                newDatFile.AddList(newOrders);
+                return newDatFile;
             }
             return null;
         }
 
 
-        public SedasFile ToSedas(SourceFile sourceOrders, int Counter)
+        public SedasFile ToSedas(DatFile datOrders, int Counter)
         {
-            if (sourceOrders.Count() > 0)
+            if (datOrders.Count() > 0)
             {
                 SedasFile newSedasFile = new SedasFile(this._SedasErstellDatumJJMMTT, Counter);
 
-                foreach (SourceOrder sourceOrder in sourceOrders)
+                foreach (DatOrder sdatOrder in datOrders)
                 {
-                    string sedasLieferDatumJJMMT = Tools.ConvertToSedasDateJJMMTT(sourceOrder.LieferDatumTTMMJJ);
+                    string sedasLieferDatumJJMMT = Tools.ConvertToSedasDateJJMMTT(sdatOrder.LieferDatumTTMMJJ);
                     SedasOrder newSedasOrder = new SedasOrder(this._SedasErstellDatumJJMMTT,
                                                               sedasLieferDatumJJMMT,
-                                                              sourceOrder.BHMKundennummer);
+                                                              sdatOrder.BHMKundennummer);
 
-                    foreach (SourceOrderLine sourceOrderLine in sourceOrder)
+                    foreach (DatOrderLine datOrderLine in sdatOrder)
                     {
-                        SedasOrderLine newSedasOrderLine = ConvertToSedasOrderLine(sourceOrderLine);
+                        SedasOrderLine newSedasOrderLine = ConvertToSedasOrderLine(datOrderLine);
                         newSedasOrder.Add(newSedasOrderLine);
                     }
 
@@ -92,130 +92,36 @@ namespace ConvertDatToSedas
         }
 
 
-        private List<SourceOrderLine> GenerateSourceOrderLines(List<string> sourceFileLines)
+        private List<DatOrderLine> GenerateDatOrderLines(List<string> datFileLines)
         {
-            List<SourceOrderLine> newOrderLines = new List<SourceOrderLine>();
-            foreach (string line in sourceFileLines)
+            List<DatOrderLine> newOrderLines = new List<DatOrderLine>();
+            foreach (string line in datFileLines)
             {
-                newOrderLines.Add(new SourceOrderLine(line));
+                newOrderLines.Add(new DatOrderLine(line));
             }
             return newOrderLines;
         }
 
-        private List<SourceOrder> GenerateSourceOrders(List<SourceOrderLine> sourceOrderLines)
+        private List<DatOrder> GenerateDatOrders(List<DatOrderLine> datOrderLines)
         {
-            List<SourceOrder> newOrders = new List<SourceOrder>();
+            List<DatOrder> newOrders = new List<DatOrder>();
 
-            var customerGroupedOrderLines = sourceOrderLines.GroupBy(o => o.BHMKundenNummer);
+            var customerGroupedOrderLines = datOrderLines.GroupBy(o => o.BHMKundenNummer);
 
             foreach (var customerOrders in customerGroupedOrderLines)
             {
-                SourceOrder newOrder = new SourceOrder(customerOrders.First().BHMKundenNummer);
+                DatOrder newOrder = new DatOrder(customerOrders.First().BHMKundenNummer);
                 newOrder.AddList(customerOrders.ToList());
                 newOrders.Add(newOrder);
             }
             return newOrders;
         }
 
-        private SedasOrderLine ConvertToSedasOrderLine(SourceOrderLine sourceOrderLine)
+        private SedasOrderLine ConvertToSedasOrderLine(DatOrderLine datOrderLine)
         {
-            SedasOrderLine sol = new SedasOrderLine(sourceOrderLine.BHMArtikelNummer, sourceOrderLine.BestellMenge);
+            SedasOrderLine sol = new SedasOrderLine(datOrderLine.BHMArtikelNummer, datOrderLine.BestellMenge);
             return sol;
         }
 
-
-
-        #region Löschen und ändern
-
-
-
-        //public bool DeleteCustomers()
-        //{
-        //    bool customersDeleted = false;
-        //    string messageTitle = "Kundennummern löschen";
-        //    //log.Log("Kundennummern aus Bestellung löschen...", messageTitle, Logger.MsgType.Message);
-
-        //    foreach (string customerNumber in _customersToDelete)
-        //    {
-        //        if (SourceDatFile.InputFileOrderLines.FirstOrDefault(orderLine => orderLine.BHMKundenNummer == customerNumber) != null)
-        //        {
-        //            SourceDatFile.InputFileOrderLines = SourceDatFile.InputFileOrderLines.Where(orderLine => orderLine.BHMKundenNummer != customerNumber).Select(orderLine => orderLine).ToList();
-        //            //log.Log($" => Kundennummer {customerNumber} aus Bestellungen gelöscht.", messageTitle, Logger.MsgType.Message);
-        //            customersDeleted = true;
-        //        }
-        //    }
-
-        //    return customersDeleted;
-        //}
-
-        //public bool DeleteArticle()
-        //{
-        //    bool articleDeleted = false;
-        //    string messageTitle = "Artikelnummern löschen";
-        //    //log.Log("Löschen von Artikelnummern aus der Bestellung...", messageTitle, Logger.MsgType.Message);
-
-        //    foreach (string articleNumber in _articlesToDelete)
-        //    {
-        //        if (SourceDatFile.InputFileOrderLines.FirstOrDefault(line => line.BHMArtikelNummer == articleNumber) != null)
-        //        {
-        //            SourceDatFile.InputFileOrderLines = SourceDatFile.InputFileOrderLines.Where(line => line.BHMArtikelNummer != articleNumber).ToList();
-        //            //log.Log($" => Artikelnummer {articleNumber} aus Bestellung gelöscht.", messageTitle, Logger.MsgType.Message);
-        //            articleDeleted = true;
-        //        }
-        //    }
-
-        //    return articleDeleted;
-        //}
-
-        //private bool ChangeArticleNumbers()
-        //{
-        //    bool articleChanged = false;
-        //    string messageTitle = "Artikelnummern tauschen";
-        //    //log.Log("Austauschen von Artikelnummern laut tauscheArtikel.txt...", messageTitle, Logger.MsgType.Message);
-
-        //    foreach (ArticleChangePair pair in articlesToChange)
-        //    {
-        //        bool currentArticleChanged = false;
-        //        var linesToChange = SourceDatFile.InputFileOrderLines.Where(line => line.BHMArtikelNummer == pair.OriginalNumber).ToList();
-        //        foreach (SourceOrderLine orderLine in linesToChange)
-        //        {
-        //            orderLine.BHMArtikelNummer = pair.NewNumber;
-        //            currentArticleChanged = true;
-        //            articleChanged = true;
-        //        }
-
-        //        //if (currentArticleChanged)
-        //        //log.Log($" => Artikelnummer {pair.OriginalNumber} getauscht gegen {pair.NewNumber}.", messageTitle, Logger.MsgType.Message);
-        //    }
-        //    return articleChanged;
-        //}
-        #endregion
-
-
     }
-
-
-
-
-
-
-    // public ConvertToSedas(string SourceFilePath, string DestinationFilePath, int actualCounter)
-    //{
-    //    this._SedasErstellDatumJJMMTT = Tools.ConvertToSedasDateJJMMTT(DateTime.Now);
-    //    this._SourcePath = SourceFilePath;
-    //    this._DestinationPath = DestinationFilePath;
-    //    this._counter = actualCounter;
-
-    //    //Importieren der Lösch- und Änderungslisten.
-    //    string pathLoescheKunde = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
-    //    string pathLoescheArtikel = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
-    //    string pathTauscheArtikel = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
-    //    this._customersToDelete = new CustomerDeletionList(DataProcessing.LoadDeleteItemsList(pathLoescheKunde));
-    //    this._articlesToDelete = new ArticleDeletionList(DataProcessing.LoadDeleteItemsList(pathLoescheArtikel));
-    //    this.articlesToChange = DataProcessing.LoadChangeArticlesList(pathTauscheArtikel);
-    //}
-
-
-
-
 }

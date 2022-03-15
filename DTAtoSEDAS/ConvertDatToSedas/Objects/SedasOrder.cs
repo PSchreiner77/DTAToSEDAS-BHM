@@ -86,6 +86,8 @@ namespace ConvertDatToSedas
 
         public string Header()
         {
+            /* ;030,14,00000000000000000,180705,180706,,,,3789         ,,
+            */
             return $";030,14,00000000000000000,{_ErstellDatumJJMMTT},{_LieferDatumJJMMTT},,,,{BHMKundennummer}         ,,";
         }
 

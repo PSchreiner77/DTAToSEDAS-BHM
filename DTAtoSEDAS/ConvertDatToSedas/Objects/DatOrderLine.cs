@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConvertDatToSedas
 {
-    public class SourceOrderLine
+    public class DatOrderLine
     {
         #region Aufbau Bestellzeile
         /*
@@ -31,26 +31,24 @@ namespace ConvertDatToSedas
         */
         #endregion
 
-        public SourceOrderLine()
-        {        }
-
-        public SourceOrderLine(string OrderLineFromImportFile)
+      
+        public DatOrderLine(string OrderLineFromImportFile)
         {
             try
             {
                 string[] arrZeile = OrderLineFromImportFile.Split(';');
 
-                this.NFKennzeichen = arrZeile[0];
-                this.BHMFilialNummer = arrZeile[1];
-                this.BHMKundenNummer = arrZeile[2];
-                this.BestellDatumTTMMJJ = arrZeile[3];
-                this.LieferDatumTTMMJJ = arrZeile[4];
-                this.BHMArtikelKey = arrZeile[5];
-                this.BestellMenge = arrZeile[6];
-                this.Preis = arrZeile[7];
-                this.BHMArtikelNummer = arrZeile[8];
-                this.Verpackungseinheit = arrZeile[9];
-                this.AnzahlBestellPositionen = arrZeile[10];
+                this.NFKennzeichen = arrZeile[0].Trim();
+                this.BHMFilialNummer = arrZeile[1].Trim();
+                this.BHMKundenNummer = arrZeile[2].Trim();
+                this.BestellDatumTTMMJJ = arrZeile[3].Trim();
+                this.LieferDatumTTMMJJ = arrZeile[4].Trim();
+                this.BHMArtikelKey = arrZeile[5].Trim();
+                this.BestellMenge = arrZeile[6].Trim();
+                this.Preis = arrZeile[7].Trim();
+                this.BHMArtikelNummer = arrZeile[8].Trim();
+                this.Verpackungseinheit = arrZeile[9].Trim();
+                this.AnzahlBestellPositionen = arrZeile[10].Trim();
             }
             catch (Exception ex)
             {

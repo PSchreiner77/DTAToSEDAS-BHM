@@ -57,7 +57,7 @@ namespace Dat2Sedas_Neu
                                                          SedasArticleDeletionList,
                                                          SedasCustomerDeletionList);
 
-            SourceFile newSourceOrders = newSedas.ImportDatFileContent(newOrders);
+            DatFile newSourceOrders = newSedas.ImportDatFileContent(newOrders);
             SedasFile newSedasFile = newSedas.ToSedas(newSourceOrders, Param.Counter);
 
             newSedasFile.RemoveCustomers(SedasCustomerDeletionList);

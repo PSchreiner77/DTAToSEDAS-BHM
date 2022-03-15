@@ -28,13 +28,13 @@ namespace ConvertDatToSedas.Tests
             orders.Add("NF;1080;1080;200924;200925;;7000;;33;;10");
 
             ConvertToSedas C2S = new ConvertToSedas();
-            SourceFile newSourceFile = new SourceFile();
+            DatFile newSourceFile = new DatFile();
 
             //Act
             newSourceFile = C2S.ImportDatFileContent(orders);
 
             //Assert
-            Assert.IsTrue(newSourceFile.SourceOrders.Count() == 4);
+            Assert.IsTrue(newSourceFile.Count() == 4);
             Assert.IsTrue(newSourceFile.ElementAt(0).ElementAt(0).BHMArtikelNummer == "209");
         }
 
@@ -44,7 +44,7 @@ namespace ConvertDatToSedas.Tests
             //Arrange
             List<string> orders = new List<string>();
             ConvertToSedas C2S = new ConvertToSedas();
-            SourceFile newSourceFile = new SourceFile();
+            DatFile newSourceFile = new DatFile();
 
             //Act
             newSourceFile = C2S.ImportDatFileContent(orders);

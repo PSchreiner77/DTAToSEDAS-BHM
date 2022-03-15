@@ -46,11 +46,11 @@
     <Compile Include="Objects\CustomerDeletionList.cs" />
     <Compile Include="DataProcessing.cs" />
     <Compile Include="Objects\ArticleChangeList.cs" />
-    <Compile Include="Objects\SourceOrder.cs" />
+    <Compile Include="Objects\DatOrder.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Objects\ArticleDeletionList.cs" />
-    <Compile Include="Objects\SourceOrderLine.cs" />
-    <Compile Include="Objects\SourceFile.cs" />
+    <Compile Include="Objects\DatOrderLine.cs" />
+    <Compile Include="Objects\DatFile.cs" />
     <Compile Include="Objects\SedasOrderLine.cs" />
     <Compile Include="ConvertToSedas.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
