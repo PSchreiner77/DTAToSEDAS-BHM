@@ -21,20 +21,20 @@ namespace ConvertDatToSedas.Tests
         public void GetOrderedArticleQuantityTest()
         {
             //Arrange
-            SedasOrder testOrder = TestOrder.GetInstance();
-
+            SedasOrder testOrder = TestSedasOrder.GetSedasOrder();
+            int expected = 10;
             //Act
-            int testValue = testOrder.Count();
+            int actual = testOrder.Count();
 
             //Assert
-            Assert.AreEqual(9, testValue);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod()]
         public void AddTest_CheckIfNewOrderLineIsAdded()
         {
             //Arrange
-            SedasOrder testOrder = TestOrder.GetInstance();
+            SedasOrder testOrder = TestSedasOrder.GetSedasOrder();
             SedasOrderLine newOrderLine = new SedasOrderLine("547", "2000");
             int startCount = testOrder.Count();
 
@@ -51,7 +51,7 @@ namespace ConvertDatToSedas.Tests
         public void AddListTest()
         {
             //Arrange
-            SedasOrder testOrder = TestOrder.GetInstance();
+            SedasOrder testOrder = TestSedasOrder.GetSedasOrder();
             int startCount = testOrder.Count();
 
             List<SedasOrderLine> orderLineList = new List<SedasOrderLine>();
@@ -89,7 +89,7 @@ namespace ConvertDatToSedas.Tests
         {
             //Changes the article of the first OrderLine of the TestOrder.
             //Arrange
-            SedasOrder order = TestOrder.GetInstance();
+            SedasOrder order = TestSedasOrder.GetSedasOrder();
             ArticleChangePair articleChangePair = new ArticleChangePair("209", "1209", "Testaustausch");
             SedasOrderLine expectedOrderLine = new SedasOrderLine("1209", "20000");
 
@@ -117,7 +117,7 @@ namespace ConvertDatToSedas.Tests
 
             //Arrange
             string headerExpected = ";030,14,00000000000000000,221013,221014,,,,1050         ,,";
-            SedasOrder testOrder = TestOrder.GetInstance();
+            SedasOrder testOrder = TestSedasOrder.GetSedasOrder();
 
             //Act
             string headerActual = testOrder.Header();
@@ -135,8 +135,8 @@ namespace ConvertDatToSedas.Tests
             //            0000  1000er Stelle für Artikelmenge (fix)
 
             //Arrange
-            string footerExpected = ";05000000106000";
-            SedasOrder testOrder = TestOrder.GetInstance();
+            string footerExpected = ";05000000116000";
+            SedasOrder testOrder = TestSedasOrder.GetSedasOrder();
 
             //Act
             string footerActual = testOrder.Footer();
@@ -169,7 +169,7 @@ namespace ConvertDatToSedas.Tests
                                         ";0400000000000170,40003000,,,,02 000000,," + "\r\n" +
                                         ";0400000000000033,40007000,,,,02 000000,," + "\r\n";
             string expected = headerExpected + "\r\n" + orderLinesExpected + footerExpected + "\r\n";
-            SedasOrder testOrder = TestOrder.GetInstance();
+            SedasOrder testOrder = TestSedasOrder.GetSedasOrder();
 
             //Act
             string actual = testOrder.ToString();
@@ -180,15 +180,16 @@ namespace ConvertDatToSedas.Tests
 
     }
 
-    internal static class TestOrder
+    internal static class TestSedasOrder
     {
-        internal static SedasOrder GetInstance()
+        internal static SedasOrder GetSedasOrder()
         {
                SedasOrder order = new SedasOrder("221013", "221014", "1050");
 
                 order.AddList(new List<SedasOrderLine>()
                 {
                 new SedasOrderLine("209", "20000"),
+                new SedasOrderLine("212", "10000"),
                 new SedasOrderLine("203", "15000"),
                 new SedasOrderLine("206", "18000"),
                 new SedasOrderLine("219", "15000"),
