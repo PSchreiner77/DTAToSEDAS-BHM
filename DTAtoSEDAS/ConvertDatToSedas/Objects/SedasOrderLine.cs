@@ -10,7 +10,7 @@ namespace ConvertDatToSedas
     {
         /* ;0400000000000317,40002000,,,,02 000000,,
          *      ;040000          = Kennung Zeile BestellPosition
-         *      0000000317       = Artikelnummer
+         *      0000000317       = zehn Stellen Artikelnummer
          *      ,4               = fix
          *      00002000         = Bestellenge (Wert/1000)
          *      ,,,,02 000000,,  = fix
@@ -25,6 +25,11 @@ namespace ConvertDatToSedas
         {
             this.BHMArtikelNummer = BHMArtikelNummer;
             this.Bestellmenge = Bestellmenge;
+        }
+
+        public SedasOrderLine(string BHMArtikelNummer, int Bestellmenge)
+        {
+
         }
 
         //METHODEN

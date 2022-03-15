@@ -37,9 +37,20 @@ namespace ConvertDatToSedas
             }
         }
 
-        public void Remove(SedasOrderLine sedasOrderLine)
-        {
 
+
+        public void RemoveArticle(string articleNumber)
+        {
+            int index = this.SedasOrderLines.IndexOf(this.SedasOrderLines.Where(p => p.BHMArtikelNummer == articleNumber).FirstOrDefault());
+            if(index > -1)
+            {
+                this.SedasOrderLines.RemoveAt(index);
+            }
+        }
+
+        public void RemoveOrderPosition(SedasOrderLine sedasOrderLine)
+        {
+            SedasOrderLines.Remove(sedasOrderLine);
         }
 
         //METHODEN

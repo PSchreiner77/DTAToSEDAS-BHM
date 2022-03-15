@@ -54,17 +54,5 @@ namespace ConvertDatToSedas.Tests
 
 
         }
-
-        [TestMethod]
-        public void GenerateOrderLinesTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void ToStringTest()
-        {
-            Assert.Fail();
-        }
     }
 }
