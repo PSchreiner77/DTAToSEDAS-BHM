@@ -10,6 +10,9 @@ namespace Dat2Sedas_Neu
     {
         public Parameters Param;
         private Logger log;
+        private ArticleChangeList sedasArticleChangeList { get; set; }
+        private ArticleDeletionList sedasArticleDeletionList { get; set; }
+        private CustomerDeletionList sedasCustomerDeletionList { get; set; }
 
         static void Main()
         {
@@ -33,36 +36,26 @@ namespace Dat2Sedas_Neu
             //Parameter abrufen
             Param = Parameters.GetInstance;
             if (!ProgramInit.Init())
-            { ExitProgram(); }
-            log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages; //TODO Widersprüchliche Angabe von True/False
+            {
+                ExitProgram();
+            }
 
+            log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages; //TODO Widersprüchliche Angabe von True/False
 
             //Counter setzen
             Param.Counter = SetCounter(Param.Counter);
 
             //Korrekturlisten erstellen
-            string _pathDeleteCustomer = Directory.GetCurrentDirectory() + @"\loescheKunde.txt";
-            string _pathDeleteArticle = Directory.GetCurrentDirectory() + @"\loescheArtikel.txt";
-            string _pathChangeArticle = Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt";
-            ArticleChangeList SedasArticleChangeList = DataProcessing.GetChangeArticlesList(_pathChangeArticle);
-            ArticleDeletionList SedasArticleDeletionList = DataProcessing.GetDeleteArticlesList(_pathDeleteArticle);
-            CustomerDeletionList SedasCustomerDeletionList = DataProcessing.GetDeleteCustomersList(_pathDeleteCustomer);
-
-
-
+            GenerateCorrectionLists();
+            
+            ///Sedas erzeugen (Import, Erstellen, Filtern)
             List<string> newOrders = DataProcessing.LoadInputFile(Param.SourceFullPath);
-
-            ConvertToSedas newSedas = new ConvertToSedas(Param.Counter,
-                                                         SedasArticleChangeList,
-                                                         SedasArticleDeletionList,
-                                                         SedasCustomerDeletionList);
-
+            ConvertToSedas newSedas = new ConvertToSedas();
             DatFile newSourceOrders = newSedas.ImportDatFileContent(newOrders);
             SedasFile newSedasFile = newSedas.ToSedas(newSourceOrders, Param.Counter);
-
-            newSedasFile.RemoveCustomers(SedasCustomerDeletionList);
-            newSedasFile.RemoveArticles(SedasArticleDeletionList);
-            newSedasFile.ChangeArticles(SedasArticleChangeList);
+            newSedasFile.RemoveCustomers(sedasCustomerDeletionList);
+            newSedasFile.RemoveArticles(sedasArticleDeletionList);
+            newSedasFile.ChangeArticles(sedasArticleChangeList);
 
             //Daten in Datei schreiben
             DataProcessing.WriteToFile(newSedasFile.ToString(), Param.DestinationFullPath);
@@ -87,6 +80,12 @@ namespace Dat2Sedas_Neu
             return ++counter;
         }
 
+        private void GenerateCorrectionLists()
+        {
+            this.sedasArticleChangeList = DataProcessing.GetChangeArticlesList(Param.PathChangeArticlesList);
+            this.sedasArticleDeletionList = DataProcessing.GetDeleteArticlesList(Param.PathDeleteArticleList);
+            this.sedasCustomerDeletionList = DataProcessing.GetDeleteCustomersList(Param.PathDeleteCustomerList);
+        }
         private void RewriteSettingsToConfig()
         {
             log.Log("Zurückschreiben der Einstellungen...", "Speichern", Logger.MsgType.Message);

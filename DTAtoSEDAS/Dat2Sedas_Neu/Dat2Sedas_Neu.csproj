@@ -71,7 +71,7 @@
     <None Include="App.config" />
     <None Include="bin\Debug\20201022_2 - Kopie.dat" />
     <None Include="bin\Debug\20201022_2.dat" />
-    <None Include="bin\Debug\Config-test.ini" />
+    <None Include="bin\Debug\Config.ini" />
     <None Include="bin\Debug\Config - Kopieren.ini" />
     <None Include="bin\Debug\Config - original.ini" />
     <None Include="bin\Debug\Quelle\Filialen\Bestellung\zusammengefasst\20220301.dat" />

@@ -7,16 +7,16 @@ namespace Dat2Sedas_Neu
         #region SINGLETON
         //SINGLETON Definition
         private static Parameters instance;
-        
-        private Parameters() 
+
+        private Parameters()
         {
         }
-               
+
         public static Parameters GetInstance
         {
             get
             {
-               return instance == null ? instance = new Parameters() :  instance;
+                return instance == null ? instance = new Parameters() : instance;
             }
         }
         #endregion
@@ -24,13 +24,17 @@ namespace Dat2Sedas_Neu
         #region FIELDS
         //EIGENSCHAFTEN
         public string[] Arguments = new string[] { };
-        public string SourceFileName { get;  set; }
-        public string SourceFileFolder { get;  set; }
+        public string SourceFileName { get; set; }
+        public string SourceFileFolder { get; set; }
         public string SourceFullPath { get { return SourceFileFolder + SourceFileName; } }
-        public string DestinationFileName { get;  set; }
-        public string DestinationFileFolder { get;  set; }
-        public string DestinationFullPath { get { return Path.Combine(DestinationFileFolder , DestinationFileName); } }
+        public string DestinationFileName { get; set; }
+        public string DestinationFileFolder { get; set; }
+        public string DestinationFullPath { get { return Path.Combine(DestinationFileFolder, DestinationFileName); } }
         public string INIFilePath { get; } = Directory.GetCurrentDirectory() + @"\config.ini";
+       
+        public string PathDeleteCustomerList { get => Directory.GetCurrentDirectory() + @"\loescheKunde.txt"; }
+        public string PathDeleteArticleList { get => Directory.GetCurrentDirectory() + @"\loescheArtikel.txt"; }
+        public string PathChangeArticlesList { get => Directory.GetCurrentDirectory() + @"\tauscheArtikel.txt"; }
 
         public bool DeleteSourceFile { get; set; } = false;
         public bool IgnoreCriticalMessages { get; set; } = false;
@@ -47,7 +51,7 @@ namespace Dat2Sedas_Neu
         {
             if (folderPath != "")
             {
-                if (folderPath.Substring(folderPath.Length-1, 1) != "\\")
+                if (folderPath.Substring(folderPath.Length - 1, 1) != "\\")
                 {
                     folderPath += "\\";
                 }
@@ -63,7 +67,7 @@ namespace Dat2Sedas_Neu
 
         public void SetSourceFullPath(string SourceFileFolder, string SourceFileName)
         {
-            
+
             this.SourceFileFolder = FolderPathCorrection(SourceFileFolder);
             this.SourceFileName = SourceFileName;
         }
@@ -76,7 +80,8 @@ namespace Dat2Sedas_Neu
         public void SetDestinationFullPath(string DestinationFileFolder, string DestinationFileName)
         {
             this.DestinationFileFolder = FolderPathCorrection(DestinationFileFolder);
-            if (DestinationFileName == "") DestinationFileName = "Sedas.dat"; 
+            if (DestinationFileName == "")
+                DestinationFileName = "Sedas.dat";
             this.DestinationFileName = DestinationFileName;
         }
         #endregion

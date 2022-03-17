@@ -11,12 +11,12 @@ namespace ConvertDatToSedas
     {
         public static ArticleDeletionList GetDeleteArticlesList(string Path)
         {
-            return (ArticleDeletionList)LoadDeleteItemsList(Path);
+            return new ArticleDeletionList(LoadDeleteItemsList(Path));
         }
 
         public static CustomerDeletionList GetDeleteCustomersList(string Path)
         {
-            return (CustomerDeletionList)LoadDeleteItemsList(Path);
+            return new CustomerDeletionList(LoadDeleteItemsList(Path));
         }
 
         public static ArticleChangeList GetChangeArticlesList(string Path)
@@ -106,12 +106,12 @@ namespace ConvertDatToSedas
         }
 
 
-        private static IList<string> LoadDeleteItemsList(string Path)
+        private static List<string> LoadDeleteItemsList(string Path)
         {
-            IList<string> itemList = new List<string>();
+            List<string> itemList = new List<string>();
             try
             {
-                IList<string> allLines = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList<string>();
+                List<string> allLines = File.ReadAllText(Path).Split(new string[] { "\r\n" }, StringSplitOptions.None).ToList();
                 foreach (string element in allLines)
                 {
                     itemList.Add(element.Split(';')[0].Trim()); //nur erstes Element von Split nehmen.
