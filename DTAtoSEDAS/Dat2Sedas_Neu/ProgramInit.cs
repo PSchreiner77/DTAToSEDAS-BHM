@@ -221,6 +221,7 @@ namespace Dat2Sedas_Neu
             return true;
         }
 
+
         private static void SetDestinationPath()
         {
             Param.SetDestinationFullPath(Param.DestinationFileFolder, Param.DestinationFileName);

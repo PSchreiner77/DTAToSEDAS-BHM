@@ -43,7 +43,7 @@ namespace ConvertDatToSedas
         /// Gibt die Anzahl aller Kundenbestellungen zurück.
         /// </summary>
         public int CustomerOrdersCount { get { return SedasOrdersList.Count(); } }
-        
+
         /// <summary>
         /// Gibt die Anzahl aller Bestellzeilen zurück.
         /// </summary>
@@ -77,12 +77,15 @@ namespace ConvertDatToSedas
 
         public void RemoveCustomers(CustomerDeletionList customersToDelete)
         {
-            foreach (string customer in customersToDelete)
+            if (customersToDelete != null)
             {
-                RemoveCustomer(customer);
+                foreach (string customer in customersToDelete)
+                {
+                    RemoveCustomer(customer);
+                }
             }
         }
-       
+
         public void RemoveCustomer(string customerNumber)
         {
             SedasOrdersList = SedasOrdersList.Where(o => o.BHMKundennummer != customerNumber).ToList();
@@ -90,15 +93,18 @@ namespace ConvertDatToSedas
 
         public void RemoveArticles(ArticleDeletionList articlestoDelete)
         {
-            foreach(string articleNumber in articlestoDelete)
+            if (articlestoDelete != null)
             {
-                this.RemoveArticle(articleNumber);
+                foreach (string articleNumber in articlestoDelete)
+                {
+                    this.RemoveArticle(articleNumber);
+                }
             }
         }
 
         public void RemoveArticle(string articleNumberToDelete)
         {
-            foreach(SedasOrder order in SedasOrdersList)
+            foreach (SedasOrder order in SedasOrdersList)
             {
                 order.RemoveArticle(articleNumberToDelete);
             }
@@ -106,14 +112,18 @@ namespace ConvertDatToSedas
 
         public void ChangeArticles(ArticleChangeList articlesToChange)
         {
-            foreach(ArticleChangePair articlePair in articlesToChange)
+            if (articlesToChange != null)
             {
-                this.ChangeArticle(articlePair);
+                foreach (ArticleChangePair articlePair in articlesToChange)
+                {
+                    this.ChangeArticle(articlePair);
+                }
             }
         }
+        
         public void ChangeArticle(ArticleChangePair articlePair)
         {
-           foreach(SedasOrder order in SedasOrdersList)
+            foreach (SedasOrder order in SedasOrdersList)
             {
                 order.ChangeArticle(articlePair);
             }
@@ -139,7 +149,7 @@ namespace ConvertDatToSedas
             string FooterLine1 = $":06{SedasTools.ExpandLeftStringSide(this.CustomerOrdersCount.ToString(), 3)};{this.OrderLinesCount}";
             string FooterLine2 = $";07000000,00001,00001,000000,(                                                      ";
             string FooterLine3 = "                                                                                    ";
-            
+
             return FooterLine1 + "\r\n" + FooterLine2 + "\r\n" + FooterLine3;
         }
 

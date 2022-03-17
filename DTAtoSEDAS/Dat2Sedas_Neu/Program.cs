@@ -46,18 +46,17 @@ namespace Dat2Sedas_Neu
             Param.Counter = SetCounter(Param.Counter);
 
             //Korrekturlisten erstellen
-            GenerateCorrectionLists();
             
-            ///Sedas erzeugen (Import, Erstellen, Filtern)
             List<string> newOrders = DataProcessing.LoadInputFile(Param.SourceFullPath);
             ConvertToSedas newSedas = new ConvertToSedas();
             DatFile newSourceOrders = newSedas.ImportDatFileContent(newOrders);
             SedasFile newSedasFile = newSedas.ToSedas(newSourceOrders, Param.Counter);
+
+            GenerateCorrectionLists();
             newSedasFile.RemoveCustomers(sedasCustomerDeletionList);
             newSedasFile.RemoveArticles(sedasArticleDeletionList);
             newSedasFile.ChangeArticles(sedasArticleChangeList);
 
-            //Daten in Datei schreiben
             DataProcessing.WriteToFile(newSedasFile.ToString(), Param.DestinationFullPath);
 
             //Settings zurückschreiben
@@ -86,6 +85,7 @@ namespace Dat2Sedas_Neu
             this.sedasArticleDeletionList = DataProcessing.GetDeleteArticlesList(Param.PathDeleteArticleList);
             this.sedasCustomerDeletionList = DataProcessing.GetDeleteCustomersList(Param.PathDeleteCustomerList);
         }
+       
         private void RewriteSettingsToConfig()
         {
             log.Log("Zurückschreiben der Einstellungen...", "Speichern", Logger.MsgType.Message);
