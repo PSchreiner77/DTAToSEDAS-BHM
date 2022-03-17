@@ -32,6 +32,7 @@ namespace Dat2Sedas_Neu.Tests
             parameters = null;
         }
 
+        [TestMethod()]
         public void DestinationFullPathProperty_PathWithoutBackslashEnding_WithFilename()
         {
             //Arrange
@@ -47,35 +48,30 @@ namespace Dat2Sedas_Neu.Tests
 
             parameters = null;
         }
+               
 
-        public void DestinationFullPathProperty_PathWithBackslashEnding_WithoutFilename()
-        {
-            //Arrange
-            parameters = Parameters.GetInstance;
-            parameters.DestinationFileFolder = @"D:\Testfolder\";
-            //parameters.DestinationFileName = "TestFilenam2.txt";
-            string expected = @"D:\Testfolder\Sedas.dat";
-
-            string actual = parameters.DestinationFullPath;
-
-            //Assert
-            Assert.AreEqual(expected, actual);
-
-            parameters = null;
-        }
-
-        public void DestinationFullPathProperty_PathWithoutBackslashEnding_WithoutFilename()
+        [TestMethod()]
+        public void DestinationFullPathProperty_NoFilenameSet()
         {
             //Arrange
             parameters = Parameters.GetInstance;
             parameters.DestinationFileFolder = @"D:\Testfolder";
-            //parameters.DestinationFileName = "TestFilenam2.txt";
-            string expected = @"D:\Testfolder\Sedas.dat";
-
-            string actual = parameters.DestinationFullPath;
 
             //Assert
-            Assert.AreEqual(expected, actual);
+            Assert.ThrowsException<ArgumentNullException>(() => parameters.DestinationFullPath);
+
+            parameters = null;
+        }
+
+        [TestMethod()]
+        public void DestinationFullPathProperty_NoFolderpathSet()
+        {
+            //Arrange
+            parameters = Parameters.GetInstance;
+            parameters.DestinationFileName = "TestFile.txt";
+
+            //Assert
+            Assert.ThrowsException<ArgumentNullException>(() => parameters.DestinationFullPath);
 
             parameters = null;
         }
