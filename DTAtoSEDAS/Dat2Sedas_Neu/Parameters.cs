@@ -32,7 +32,7 @@ namespace Dat2Sedas_Neu
         
         public string SourceFileName { get; set; }
         public string SourceFileFolder { get; set; }
-        public string SourceFullPath { get {return Path.Combine(DestinationFileFolder, DestinationFileName); } }
+        public string SourceFullPath { get {return Path.Combine(SourceFileFolder, SourceFileName); } }
        
         public string DestinationFileName { get; set; }
         public string DestinationFileFolder { get; set; }
