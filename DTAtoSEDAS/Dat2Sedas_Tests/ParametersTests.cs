@@ -11,13 +11,13 @@ namespace Dat2Sedas_Neu.Tests
     [TestClass()]
     public class ParametersTests
     {
-
         Parameters parameters;
 
         [TestMethod()]
         public void DestinationFullPathProperty_PathWithBackslashEnding_WithFilename()
         {
             //Arrange
+            Parameters.DestroyInstance();
             parameters = Parameters.GetInstance;
             parameters.DestinationFileFolder = @"D:\Testfolder\";
             parameters.DestinationFileName = "TestFilename.txt";
@@ -28,25 +28,23 @@ namespace Dat2Sedas_Neu.Tests
 
             //Assert
             Assert.AreEqual(expected, actual);
-
-            parameters = null;
         }
 
         [TestMethod()]
         public void DestinationFullPathProperty_PathWithoutBackslashEnding_WithFilename()
         {
             //Arrange
+            Parameters.DestroyInstance();
             parameters = Parameters.GetInstance;
             parameters.DestinationFileFolder = @"D:\Testfolder";
             parameters.DestinationFileName = "TestFilenam2.txt";
             string expected = @"D:\Testfolder\TestFilenam2.txt";
 
+            //Act
             string actual = parameters.DestinationFullPath;
 
             //Assert
             Assert.AreEqual(expected, actual);
-
-            parameters = null;
         }
                
 
@@ -54,26 +52,24 @@ namespace Dat2Sedas_Neu.Tests
         public void DestinationFullPathProperty_NoFilenameSet()
         {
             //Arrange
+            Parameters.DestroyInstance();
             parameters = Parameters.GetInstance;
             parameters.DestinationFileFolder = @"D:\Testfolder";
 
             //Assert
             Assert.ThrowsException<ArgumentNullException>(() => parameters.DestinationFullPath);
-
-            parameters = null;
         }
 
         [TestMethod()]
         public void DestinationFullPathProperty_NoFolderpathSet()
         {
             //Arrange
+            Parameters.DestroyInstance();
             parameters = Parameters.GetInstance;
             parameters.DestinationFileName = "TestFile.txt";
 
             //Assert
             Assert.ThrowsException<ArgumentNullException>(() => parameters.DestinationFullPath);
-
-            parameters = null;
         }
     }
 }

@@ -19,6 +19,11 @@ namespace Dat2Sedas_Neu
                 return instance == null ? instance = new Parameters() : instance;
             }
         }
+        
+        public static void DestroyInstance()
+        {
+            instance = null;
+        }
         #endregion
 
 
