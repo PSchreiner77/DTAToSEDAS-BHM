@@ -42,10 +42,7 @@ namespace Dat2Sedas_Neu
 
             log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages; //TODO Widersprüchliche Angabe von True/False
 
-            //Counter setzen
             Param.Counter = SetCounter(Param.Counter);
-
-            //Korrekturlisten erstellen
             
             List<string> newOrders = DataProcessing.LoadInputFile(Param.SourceFullPath);
             ConvertToSedas newSedas = new ConvertToSedas();
@@ -61,7 +58,6 @@ namespace Dat2Sedas_Neu
 
             //Settings zurückschreiben
             RewriteSettingsToConfig();
-            //##
 
             log.Log("--- Programm normal beendet. ---");
             log.Log("********************************");

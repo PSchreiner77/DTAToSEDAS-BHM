@@ -32,7 +32,7 @@ namespace Dat2Sedas_Neu
         
         public string SourceFileName { get; set; }
         public string SourceFileFolder { get; set; }
-        public string SourceFullPath { get { return SourceFileFolder + SourceFileName; } }
+        public string SourceFullPath { get {return Path.Combine(DestinationFileFolder, DestinationFileName); } }
        
         public string DestinationFileName { get; set; }
         public string DestinationFileFolder { get; set; }
@@ -79,16 +79,16 @@ namespace Dat2Sedas_Neu
         //}
         
 
-        private string FolderPathCorrection(string folderPath)
-        {
-            if (folderPath != "")
-            {
-                if (folderPath.Substring(folderPath.Length - 1, 1) != "\\")
-                {
-                    folderPath += "\\";
-                }
-            }
-            return folderPath;
-        }
+       //DELETE private string FolderPathCorrection(string folderPath)
+        //{
+        //    if (folderPath != "")
+        //    {
+        //        if (folderPath.Substring(folderPath.Length - 1, 1) != "\\")
+        //        {
+        //            folderPath += "\\";
+        //        }
+        //    }
+        //    return folderPath;
+        //}
     }
 }
