@@ -28,7 +28,7 @@ namespace Dat2Sedas_Neu
             if (!CheckSource())
                 return false;
             
-            //SetDestinationPath();
+            //DELETE SetDestinationPath();
 
             messageTitle = "Programminitialisierung";
             message = "Initialisierung der Parameter OK.";
@@ -223,10 +223,10 @@ namespace Dat2Sedas_Neu
         }
 
 
-        private static void SetDestinationPath()
-        {
-            Param.SetDestinationFullPath(Param.DestinationFileFolder, Param.DestinationFileName);
-        }
+        //private static void SetDestinationPath()
+        //{
+        //    Param.SetDestinationFullPath(Param.DestinationFileFolder, Param.DestinationFileName);
+        //}
 
     }
 }

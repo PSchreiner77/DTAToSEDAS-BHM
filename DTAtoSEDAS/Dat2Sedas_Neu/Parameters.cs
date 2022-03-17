@@ -51,30 +51,32 @@ namespace Dat2Sedas_Neu
 
         public int Counter { get; set; }
 
+
         //METHODEN
-        public void SetSourceFullPath(string SourceFilePath)
-        {
-            SetSourceFullPath(Path.GetDirectoryName(SourceFilePath), Path.GetDirectoryName(SourceFileName));
-        }
+        //DELETE
+        //DELETE public void SetSourceFullPath(string SourceFilePath)
+        //{
+        //    SetSourceFullPath(Path.GetDirectoryName(SourceFilePath), Path.GetDirectoryName(SourceFileName));
+        //}
 
-        public void SetSourceFullPath(string SourceFileFolder, string SourceFileName)
-        {
-            this.SourceFileFolder = FolderPathCorrection(SourceFileFolder);
-            this.SourceFileName = SourceFileName;
-        }
+        //DELETE public void SetSourceFullPath(string SourceFileFolder, string SourceFileName)
+        //{
+        //    this.SourceFileFolder = FolderPathCorrection(SourceFileFolder);
+        //    this.SourceFileName = SourceFileName;
+        //}
 
-        public void SetDestinationFullPath(string DestinationFilePath)
-        {
-            SetDestinationFullPath(Path.GetDirectoryName(DestinationFilePath), Path.GetDirectoryName(DestinationFilePath));
-        }
+        //DELETE public void SetDestinationFullPath(string DestinationFilePath)
+        //{
+        //    SetDestinationFullPath(Path.GetDirectoryName(DestinationFilePath), Path.GetDirectoryName(DestinationFilePath));
+        //}
 
-        public void SetDestinationFullPath(string DestinationFileFolder, string DestinationFileName)
-        {
-            this.DestinationFileFolder = FolderPathCorrection(DestinationFileFolder);
-            if (DestinationFileName == "")
-                DestinationFileName = "Sedas.dat";
-            this.DestinationFileName = DestinationFileName;
-        }
+        //DELETE public void SetDestinationFullPath(string DestinationFileFolder, string DestinationFileName)
+        //{
+        //    this.DestinationFileFolder = FolderPathCorrection(DestinationFileFolder);
+        //    if (DestinationFileName == "")
+        //        DestinationFileName = "Sedas.dat";
+        //    this.DestinationFileName = DestinationFileName;
+        //}
         
 
         private string FolderPathCorrection(string folderPath)
