@@ -2,7 +2,7 @@
 
 namespace Dat2Sedas_Neu
 {
-    class Parameters
+   public class Parameters
     {
         #region SINGLETON
         //SINGLETON Definition
@@ -21,15 +21,18 @@ namespace Dat2Sedas_Neu
         }
         #endregion
 
-        #region FIELDS
+
         //EIGENSCHAFTEN
         public string[] Arguments = new string[] { };
+        
         public string SourceFileName { get; set; }
         public string SourceFileFolder { get; set; }
         public string SourceFullPath { get { return SourceFileFolder + SourceFileName; } }
+       
         public string DestinationFileName { get; set; }
         public string DestinationFileFolder { get; set; }
         public string DestinationFullPath { get { return Path.Combine(DestinationFileFolder, DestinationFileName); } }
+       
         public string INIFilePath { get; } = Directory.GetCurrentDirectory() + @"\config.ini";
        
         public string PathDeleteCustomerList { get => Directory.GetCurrentDirectory() + @"\loescheKunde.txt"; }
@@ -42,24 +45,8 @@ namespace Dat2Sedas_Neu
         public bool AppendToSedas { get; set; } = false;
 
         public int Counter { get; set; }
-        #endregion
 
-        #region METHODS
         //METHODEN
-        //private
-        private string FolderPathCorrection(string folderPath)
-        {
-            if (folderPath != "")
-            {
-                if (folderPath.Substring(folderPath.Length - 1, 1) != "\\")
-                {
-                    folderPath += "\\";
-                }
-            }
-            return folderPath;
-        }
-
-        //public
         public void SetSourceFullPath(string SourceFilePath)
         {
             SetSourceFullPath(Path.GetDirectoryName(SourceFilePath), Path.GetDirectoryName(SourceFileName));
@@ -67,7 +54,6 @@ namespace Dat2Sedas_Neu
 
         public void SetSourceFullPath(string SourceFileFolder, string SourceFileName)
         {
-
             this.SourceFileFolder = FolderPathCorrection(SourceFileFolder);
             this.SourceFileName = SourceFileName;
         }
@@ -84,6 +70,18 @@ namespace Dat2Sedas_Neu
                 DestinationFileName = "Sedas.dat";
             this.DestinationFileName = DestinationFileName;
         }
-        #endregion
+        
+
+        private string FolderPathCorrection(string folderPath)
+        {
+            if (folderPath != "")
+            {
+                if (folderPath.Substring(folderPath.Length - 1, 1) != "\\")
+                {
+                    folderPath += "\\";
+                }
+            }
+            return folderPath;
+        }
     }
 }

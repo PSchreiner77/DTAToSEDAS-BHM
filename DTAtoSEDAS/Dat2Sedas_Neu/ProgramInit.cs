@@ -27,7 +27,8 @@ namespace Dat2Sedas_Neu
                 return false;
             if (!CheckSource())
                 return false;
-            SetDestinationPath();
+            
+            //SetDestinationPath();
 
             messageTitle = "Programminitialisierung";
             message = "Initialisierung der Parameter OK.";
