@@ -8,11 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="bin\Debug\TestFiles\20201022_TestInputNFDatFile.dat" />
-    <None Include="bin\Debug\TestFiles\20201022_TestOutputExpected.dat" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
@@ -26,6 +21,11 @@
 
   <ItemGroup>
     <Folder Include="bin\Debug\net6.0\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\TestFiles\20201022_TestInputNFDatFile.dat" />
+    <None Include="bin\Debug\TestFiles\20201022_TestOutputExpected.dat" />
   </ItemGroup>
 
 </Project>
