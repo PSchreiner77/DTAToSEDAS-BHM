@@ -34,9 +34,9 @@ namespace ConvertDatToSedas
       
         public DatOrderLine(string OrderLineFromImportFile)
         {
+            string[] arrZeile = OrderLineFromImportFile.Split(';');
             try
             {
-                string[] arrZeile = OrderLineFromImportFile.Split(';');
 
                 this.NFKennzeichen = arrZeile[0].Trim();
                 this.BHMFilialNummer = arrZeile[1].Trim();
@@ -52,7 +52,7 @@ namespace ConvertDatToSedas
             }
             catch (Exception ex)
             {
-                //TODO Ausnahme anzeigen
+                //TODO Ausnahme anzeigen, LOG erzeugen.
                 throw new Exception(ex.Message);
             }
         }

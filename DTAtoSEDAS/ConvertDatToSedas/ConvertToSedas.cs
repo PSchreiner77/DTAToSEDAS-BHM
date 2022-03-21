@@ -12,7 +12,7 @@ namespace ConvertDatToSedas
     public class ConvertToSedas
     {
         private string _SedasErstellDatumJJMMTT;  //Datum der Dateierstellung / des Programmlaufs
-       
+
         //KONSTRUKTOR
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace ConvertDatToSedas
         {
             this._SedasErstellDatumJJMMTT = SedasTools.ConvertToSedasDateJJMMTT(DateTime.Now);
         }
-              
+
 
         //METHODEN
         /// <summary>
@@ -35,16 +35,17 @@ namespace ConvertDatToSedas
         /// <returns></returns>
         public DatFile ImportDatFileContent(List<string> datFileLines)
         {
-            if (datFileLines.Count() > 0)
-            {
-                List<DatOrderLine> newOrderLines = GenerateDatOrderLines(datFileLines);
-                List<DatOrder> newOrders = GenerateDatOrders(newOrderLines);
+            if (datFileLines.Count() <= 0)
+                return null;
 
-                DatFile newDatFile = new DatFile();
-                newDatFile.AddList(newOrders);
-                return newDatFile;
-            }
-            return null;
+
+            List<DatOrderLine> newOrderLines = GenerateDatOrderLines(datFileLines);
+            List<DatOrder> newOrders = GenerateDatOrders(newOrderLines);
+
+            DatFile newDatFile = new DatFile();
+            newDatFile.AddList(newOrders);
+            return newDatFile;
+
         }
 
         /// <summary>
@@ -86,7 +87,10 @@ namespace ConvertDatToSedas
             List<DatOrderLine> newOrderLines = new List<DatOrderLine>();
             foreach (string line in datFileLines)
             {
-                newOrderLines.Add(new DatOrderLine(line));
+                if (line != "")
+                {
+                    newOrderLines.Add(new DatOrderLine(line));
+                }
             }
             return newOrderLines;
         }

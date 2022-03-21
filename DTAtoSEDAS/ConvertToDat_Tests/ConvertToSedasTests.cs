@@ -71,6 +71,7 @@ namespace ConvertDatToSedas.Tests
             DatFile inputFile = C2S.ImportDatFileContent(importFileLines);
             SedasFile outputSedasFile = C2S.ToSedas(inputFile,255);
             string actual = outputSedasFile.ToString();
+            File.WriteAllText("..\\TestFiles\\20201022_TestOutputActual.dat",actual);
             
 
             //Assert
