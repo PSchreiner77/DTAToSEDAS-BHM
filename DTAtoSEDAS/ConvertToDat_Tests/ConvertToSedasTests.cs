@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace ConvertDatToSedas.Tests
 {
@@ -44,15 +45,34 @@ namespace ConvertDatToSedas.Tests
             //Arrange
             List<string> orders = new List<string>();
             ConvertToSedas C2S = new ConvertToSedas();
-            DatFile newSourceFile = new DatFile();
 
             //Act
-            newSourceFile = C2S.ImportDatFileContent(orders);
+            DatFile newSourceFile = C2S.ImportDatFileContent(orders);
 
             //Assert
             Assert.IsTrue(newSourceFile == null);
 
 
+        }
+
+        [TestMethod()]
+        public void ToSedas_Test_OutputCompareTest()
+        {
+            //Arrange
+            string inputFilePath = @".\TestFiles\20201022_TestInputNFDatFile.dat";
+            ConvertToSedas C2S = new ConvertToSedas();
+            List<string> importFileLines = File.ReadAllLines(inputFilePath).ToList<string>();
+
+            string expectedFilePath = @".\TestFiles\20201022_TestOutputExpected.dat";
+            string expected = File.ReadAllText(expectedFilePath);
+
+            //Act
+            DatFile inputFile = C2S.ImportDatFileContent(importFileLines);
+            SedasFile outputSedasFile = C2S.ToSedas(inputFile,255);
+            string actual = outputSedasFile.ToString();
+
+            //Assert
+            Assert.AreEqual(expected,actual);
         }
     }
 }
