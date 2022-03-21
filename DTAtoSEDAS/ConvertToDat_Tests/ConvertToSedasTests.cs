@@ -60,7 +60,7 @@ namespace ConvertDatToSedas.Tests
         public void ToSedas_Test_OutputCompareTest()
         {
             //Arrange
-            string inputFilePath = ".\\TestFiles\\20201022_TestInputNFDatFile.dat";
+            string inputFilePath = "..\\TestFiles\\20201022_TestInputNFDatFile.dat";
             ConvertToSedas C2S = new ConvertToSedas();
             List<string> importFileLines = File.ReadAllLines(inputFilePath).ToList<string>();
 
