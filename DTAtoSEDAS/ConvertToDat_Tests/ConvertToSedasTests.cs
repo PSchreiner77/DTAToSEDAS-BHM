@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.IO;
 
 namespace ConvertDatToSedas.Tests
 {
@@ -59,7 +60,7 @@ namespace ConvertDatToSedas.Tests
         public void ToSedas_Test_OutputCompareTest()
         {
             //Arrange
-            string inputFilePath = @".\TestFiles\20201022_TestInputNFDatFile.dat";
+            string inputFilePath = @"..\\TestFiles\20201022_TestInputNFDatFile.dat";
             ConvertToSedas C2S = new ConvertToSedas();
             List<string> importFileLines = File.ReadAllLines(inputFilePath).ToList<string>();
 
@@ -70,6 +71,7 @@ namespace ConvertDatToSedas.Tests
             DatFile inputFile = C2S.ImportDatFileContent(importFileLines);
             SedasFile outputSedasFile = C2S.ToSedas(inputFile,255);
             string actual = outputSedasFile.ToString();
+            
 
             //Assert
             Assert.AreEqual(expected,actual);
