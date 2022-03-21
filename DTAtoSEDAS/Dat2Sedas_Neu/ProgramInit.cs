@@ -12,6 +12,31 @@ namespace Dat2Sedas_Neu
         private static string messageTitle = "";
         private static string message = "";
 
+        public static bool Init()
+        {
+            messageTitle = "Programminitialisierung";
+            message = "Initialisieren der Programmparameter...";
+            log.Log(message, messageTitle, Logger.MsgType.Message);
+
+            Param = Parameters.GetInstance;
+            if (!CheckIniFile())
+                return false;
+            if (!ReadIniValues())
+                return false;
+            if (!CheckStartArguments())
+                return false;
+            if (!CheckSource())
+                return false;
+            
+            //DELETE SetDestinationPath();
+
+            messageTitle = "Programminitialisierung";
+            message = "Initialisierung der Parameter OK.";
+            log.Log(message, messageTitle, Logger.MsgType.Message);
+            return true;
+        }
+
+
         private static bool CheckIniFile()
         {
             if (!File.Exists(Param.INIFilePath))
@@ -197,32 +222,11 @@ namespace Dat2Sedas_Neu
             return true;
         }
 
-        private static void SetDestinationPath()
-        {
-            Param.SetDestinationFullPath(Param.DestinationFileFolder, Param.DestinationFileName);
-        }
 
-        public static bool Init()
-        {
-            messageTitle = "Programminitialisierung";
-            message = "Initialisieren der Programmparameter...";
-            log.Log(message, messageTitle, Logger.MsgType.Message);
-            Param = Parameters.GetInstance;
+        //private static void SetDestinationPath()
+        //{
+        //    Param.SetDestinationFullPath(Param.DestinationFileFolder, Param.DestinationFileName);
+        //}
 
-            if (!CheckIniFile())
-                return false;
-            if (!ReadIniValues())
-                return false;
-            if (!CheckStartArguments())
-                return false;
-            if (!CheckSource())
-                return false;
-            SetDestinationPath();
-
-            messageTitle = "Programminitialisierung";
-            message = "Initialisierung der Parameter OK.";
-            log.Log(message, messageTitle, Logger.MsgType.Message);
-            return true;
-        }
     }
 }
