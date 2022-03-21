@@ -23,9 +23,4 @@
     <Folder Include="bin\Debug\net6.0\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="bin\Debug\TestFiles\20201022_TestInputNFDatFile.dat" />
-    <None Include="bin\Debug\TestFiles\20201022_TestOutputExpected.dat" />
-  </ItemGroup>
-
 </Project>
