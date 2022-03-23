@@ -8,6 +8,11 @@ using System.Windows.Forms;
 
 namespace Dat2Sedas_Neu
 {
+    interface ILogger
+    {
+        //TODO Interface definieren und implementieren. Überlegen, ob auch im Logger implementieren, oder den Logger ganz als ILogger bauen.
+        void Info(string message);
+    }
     public class Logger
     {
         #region SINGLETON 
