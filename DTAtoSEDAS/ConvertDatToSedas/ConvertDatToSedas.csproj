@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExceptionHandler.cs" />
+    <Compile Include="SedasLogger.cs" />
     <Compile Include="Objects\SedasOrder.cs" />
     <Compile Include="Objects\ArticleChangePair.cs" />
     <Compile Include="Objects\CustomerDeletionList.cs" />

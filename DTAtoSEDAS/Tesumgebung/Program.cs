@@ -5,58 +5,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tesumgebung
+namespace Testumgebung
 {
     internal class Program
     {
         static void Main(string[] args)
         {
+            Program prog = new Program();
+            //Logger.SetLogger(new ConsoleLogger());
 
-           
+            SedasLogger.SetupLogger(prog.SedasEventHandler);
+            SedasLogger.CallMessage();
+            Console.ReadKey();
 
         }
 
-
-    }
-
-    public sealed class Logger
-    {
-        private static Logger instance = new Logger();
-
-        public static void Log(string Typ, string Message)
+        public string SedasEventHandler(string Typ, string Message)
         {
-            instance.NeueMeldung(Typ, Message);
-        }
-
-        private ILogger _logger;
-        public static void SetLogger(ILogger newLogger)
-        {
-            instance._logger = newLogger;
-        }
-
-        private void NeueMeldung(string Typ, string Message)
-        {
-            
+            Console.WriteLine( Typ + " - " + Message);
+            return "";
         }
     }
 
-
-    interface ILogger
+    public static class SedasLogger
     {
-        void NeueMeldung(string Typ, string Message);
-        List<string> GetMeldungen() ;
-    }
+        public static Func<string, string, string> messageDelegate;
 
-    public class ConsoleLogger : ILogger
-    {
-        public List<string> GetMeldungen()
+        public static void SetupLogger(Func<string, string, string> LogEventHandler)
         {
-            throw new NotImplementedException();
+            messageDelegate += LogEventHandler;
         }
 
-        public void NeueMeldung(string Typ, string Message)
+        public static string CallMessage()
         {
-            throw new NotImplementedException();
+            return messageDelegate("Typ1", "Fehlermeldung");
         }
     }
 

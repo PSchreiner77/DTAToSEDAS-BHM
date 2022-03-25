@@ -8,6 +8,7 @@ namespace Dat2Sedas_Neu
 {
     class Program
     {
+
         public Parameters Param;
         private Logger log;
         private ArticleChangeList sedasArticleChangeList { get; set; }
