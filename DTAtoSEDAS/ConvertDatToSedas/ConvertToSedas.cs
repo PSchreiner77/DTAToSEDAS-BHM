@@ -35,6 +35,8 @@ namespace ConvertDatToSedas
         /// <returns></returns>
         public DatFile ImportDatFileContent(List<string> datFileLines)
         {
+            SedasLogger.Log(this, "Importieren der Bestelldatei...");
+
             if (datFileLines.Count() <= 0)
                 return null;
 
