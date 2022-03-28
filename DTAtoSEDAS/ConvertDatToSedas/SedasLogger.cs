@@ -6,6 +6,16 @@ using System.Threading.Tasks;
 
 namespace ConvertDatToSedas
 {
+    public delegate string SedasLogHandler(string Message);
 
-   
+    public static class SedasLogger
+    {
+        public static event SedasLogHandler SedasLogHandler;
+
+
+        public static void Log(string Message)
+        {
+            SedasLogHandler("test");
+        }
+    }
 }
