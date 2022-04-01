@@ -4,7 +4,7 @@ namespace Dat2Sedas_Neu
 {
    public class Parameters
     {
-        #region SINGLETON
+        #region # SINGLETON
         //SINGLETON Definition
         private static Parameters instance;
 
@@ -27,8 +27,8 @@ namespace Dat2Sedas_Neu
         #endregion
 
 
-        //EIGENSCHAFTEN
-        public string[] Arguments = new string[] { };
+        #region # EIGENSCHAFTEN
+        public string[] StartArguments = new string[] { };
         
         public string SourceFileName { get; set; }
         public string SourceFileFolder { get; set; }
@@ -50,7 +50,7 @@ namespace Dat2Sedas_Neu
         public bool AppendToSedas { get; set; } = false;
 
         public int Counter { get; set; }
-
+        #endregion
 
         //METHODEN
         //DELETE
@@ -77,9 +77,9 @@ namespace Dat2Sedas_Neu
         //        DestinationFileName = "Sedas.dat";
         //    this.DestinationFileName = DestinationFileName;
         //}
-        
 
-       //DELETE private string FolderPathCorrection(string folderPath)
+
+        //DELETE private string FolderPathCorrection(string folderPath)
         //{
         //    if (folderPath != "")
         //    {
