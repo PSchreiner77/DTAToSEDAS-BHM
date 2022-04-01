@@ -15,18 +15,4 @@ namespace ConvertDatToSedas
         Error
     }
 
-    
-
-    //public static class Logger
-    //{
-    //    internal static void Log(object sender, string message, LogMessageLevel level)
-    //    {
-    //        SedasLogger.LogMessage(sender,message, level);
-    //    }
-    //} 
-
-    internal interface ISedasLogger
-    {
-        event LogMessageEventHandler SedasLogMessage;     
-    }
 }
