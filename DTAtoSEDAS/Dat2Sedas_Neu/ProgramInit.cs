@@ -27,6 +27,8 @@ namespace Dat2Sedas_Neu
                 return false;
             if (!CheckSource())
                 return false;
+
+            Param.Counter = SetCounter(Param.Counter);
             
             //DELETE SetDestinationPath();
 
@@ -222,6 +224,17 @@ namespace Dat2Sedas_Neu
             return true;
         }
 
+        private static int SetCounter(int counter)
+        {
+            if (counter >= 990)
+            {
+                string message = "Counter von {0} zurückgesetzt.";
+                string messageTitle = "Counter reset";
+                log.Log(message, messageTitle, Logger.MsgType.Message);
+                counter = 0;
+            }
+            return ++counter;
+        }
 
         //private static void SetDestinationPath()
         //{

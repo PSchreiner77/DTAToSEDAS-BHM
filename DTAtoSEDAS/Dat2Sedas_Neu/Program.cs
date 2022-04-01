@@ -48,8 +48,6 @@ namespace Dat2Sedas_Neu
 
             log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages; //TODO Widersprüchliche Angabe von True/False
 
-            Param.Counter = SetCounter(Param.Counter);
-
             ConvertToSedas SedasConverter = new ConvertToSedas();
             SedasConverter.LogEventHandler += NewSedas_SedasLogEventHandler; // Sedas LogEventHandler abonnieren
 
@@ -94,16 +92,6 @@ namespace Dat2Sedas_Neu
                     break;
             }
             this.log.Log(logMessage, type);
-        }
-
-        private int SetCounter(int counter)
-        {
-            if (counter >= 990)
-            {
-                Console.WriteLine("Counter von {0} zurückgesetzt.");
-                counter = 0;
-            }
-            return ++counter;
         }
 
 
