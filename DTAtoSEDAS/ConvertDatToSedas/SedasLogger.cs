@@ -7,12 +7,6 @@ using System.Windows.Input;
 
 namespace ConvertDatToSedas
 {
-   public enum LogMessageLevel
-    {
-        Information,
-        Warning,
-        Critical,
-        Error
-    }
+  
 
 }

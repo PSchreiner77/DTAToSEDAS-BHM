@@ -5,12 +5,19 @@ using System.Linq;
 
 namespace ConvertDatToSedas
 {
-    //TODO TEST: Dateien vom Wochenende mit 9000er Nummern.
-    //TODO Gruppieren der Daten nach Kundennummer. Es soll vermieden werden, dass in der Sedas.dat 
-    //     Kundennummern wiederholt auftauchen. Sie sollen en-block gelistet werden (sortiert nach Art.Nr).
+    public enum LogMessageLevel
+    {
+        Information,
+        Warning,
+        Critical,
+        Error
+    }
 
     public delegate void LogMessageEventHandler(object sender, string message, LogMessageLevel level);
 
+    //TODO TEST: Dateien vom Wochenende mit 9000er Nummern.
+    //TODO Gruppieren der Daten nach Kundennummer. Es soll vermieden werden, dass in der Sedas.dat 
+    //     Kundennummern wiederholt auftauchen. Sie sollen en-block gelistet werden (sortiert nach Art.Nr).
     public class ConvertToSedas
     {
         #region # Properties
