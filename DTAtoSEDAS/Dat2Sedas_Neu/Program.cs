@@ -108,13 +108,6 @@ namespace Dat2Sedas_Neu
             return ++counter;
         }
 
-        private void GenerateCorrectionLists()
-        {
-            this.sedasArticleChangeList = DataProcessing.GetChangeArticlesList(Param.PathChangeArticlesList);
-            this.sedasArticleDeletionList = DataProcessing.GetDeleteArticlesList(Param.PathDeleteArticleList);
-            this.sedasCustomerDeletionList = DataProcessing.GetDeleteCustomersList(Param.PathDeleteCustomerList);
-
-        }
 
         private void RewriteSettingsToConfig()
         {
