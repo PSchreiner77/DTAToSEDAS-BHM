@@ -14,7 +14,7 @@ namespace Dat2Sedas_Neu
 
         public Parameters Param;
         private Logger log;
-      
+
 
         static void Main()
         {
@@ -64,8 +64,6 @@ namespace Dat2Sedas_Neu
             newSedasFile.ChangeArticles(correctionLists.sedasArticleChangeList);
 
             DataProcessing.WriteToFile(newSedasFile.ToString(), Param.DestinationFullPath);
-
-            //Settings zurückschreiben
             RewriteSettingsToConfig();
 
             log.Log("--- Programm normal beendet. ---");
