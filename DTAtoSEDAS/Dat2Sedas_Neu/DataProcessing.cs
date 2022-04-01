@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ConvertDatToSedas;
 
-namespace ConvertDatToSedas
+namespace Dat2Sedas_Neu
 {
     public static class DataProcessing
     {

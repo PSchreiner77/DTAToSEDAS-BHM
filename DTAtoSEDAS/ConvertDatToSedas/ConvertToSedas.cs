@@ -5,15 +5,25 @@ using System.Linq;
 
 namespace ConvertDatToSedas
 {
-
     //TODO TEST: Dateien vom Wochenende mit 9000er Nummern.
     //TODO Gruppieren der Daten nach Kundennummer. Es soll vermieden werden, dass in der Sedas.dat 
     //     Kundennummern wiederholt auftauchen. Sie sollen en-block gelistet werden (sortiert nach Art.Nr).
+
+    public delegate void LogMessageEventHandler(object sender, string message, LogMessageLevel level);
+
     public class ConvertToSedas
     {
-        private string _SedasErstellDatumJJMMTT;  //Datum der Dateierstellung / des Programmlaufs
+        #region # Properties
+        public event LogMessageEventHandler LogEventHandler;
+        public ArticleChangeList sedasArticleChangeList { get; private set; }
+        public ArticleDeletionList sedasArticleDeletionList { get; private set; }
+        public CustomerDeletionList sedasCustomerDeletionList { get; private set; }
 
-        //KONSTRUKTOR
+        private string _SedasErstellDatumJJMMTT { get; set; }  //Datum der Dateierstellung / des Programmlaufs    
+        #endregion
+
+
+        #region # KONSTRUKTOR
 
         /// <summary>
         /// Erstellt ein Objekt zum Erzeugen einer SEDAS.DAT Datei aus einer Bestell.dat Datei.
@@ -25,9 +35,9 @@ namespace ConvertDatToSedas
         {
             this._SedasErstellDatumJJMMTT = SedasTools.ConvertToSedasDateJJMMTT(DateTime.Now);
         }
+        #endregion
 
-
-        //METHODEN
+        #region # METHODEN
         /// <summary>
         /// Importiert eine *.dat-Datei zum Konvertieren in eine CSB-Sedas-Datei.
         /// </summary>
@@ -35,11 +45,10 @@ namespace ConvertDatToSedas
         /// <returns></returns>
         public DatFile ImportDatFileContent(List<string> datFileLines)
         {
-            SedasLogger.Log(this, "Importieren der Bestelldatei...");
+            Log(this,"Einlesen der Importdateien...",LogMessageLevel.Information);
 
             if (datFileLines.Count() <= 0)
                 return null;
-
 
             List<DatOrderLine> newOrderLines = GenerateDatOrderLines(datFileLines);
             List<DatOrder> newOrders = GenerateDatOrders(newOrderLines);
@@ -83,9 +92,15 @@ namespace ConvertDatToSedas
             return null;
         }
 
+        private void Log(object sender, string message, LogMessageLevel level)
+        {
+            LogEventHandler?.Invoke(this.ToString(), message, level);
+        }
+
 
         private List<DatOrderLine> GenerateDatOrderLines(List<string> datFileLines)
         {
+            Log(this, "Einlesen der Bestellzeilen...", LogMessageLevel.Information);
             List<DatOrderLine> newOrderLines = new List<DatOrderLine>();
             foreach (string line in datFileLines)
             {
@@ -117,6 +132,6 @@ namespace ConvertDatToSedas
             SedasOrderLine sol = new SedasOrderLine(datOrderLine.BHMArtikelNummer, datOrderLine.BestellMenge);
             return sol;
         }
-
+        #endregion
     }
 }

@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CorrectionLists.cs" />
     <Compile Include="DataProcessing.cs" />
     <Compile Include="Help.cs" />
     <Compile Include="INIManager.cs" />

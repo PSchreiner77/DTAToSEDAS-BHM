@@ -8,20 +8,25 @@ namespace Dat2Sedas_Neu
 {
     class Program
     {
+        public ArticleChangeList sedasArticleChangeList { get; set; }
+        public ArticleDeletionList sedasArticleDeletionList { get; set; }
+        public CustomerDeletionList sedasCustomerDeletionList { get; set; }
 
         public Parameters Param;
         private Logger log;
-        private ArticleChangeList sedasArticleChangeList { get; set; }
-        private ArticleDeletionList sedasArticleDeletionList { get; set; }
-        private CustomerDeletionList sedasCustomerDeletionList { get; set; }
+      
 
         static void Main()
         {
             Program prog = new Program();
             prog.ProgramLoop();
+
+            // ### TEST
             Console.WriteLine("Testhalt");
             Console.ReadKey();
+            // ###
         }
+
 
         public void ProgramLoop()
         {
@@ -44,16 +49,19 @@ namespace Dat2Sedas_Neu
             log.HaltOnCriticalErrors = Param.IgnoreCriticalMessages; //TODO Widersprüchliche Angabe von True/False
 
             Param.Counter = SetCounter(Param.Counter);
-            
-            List<string> newOrders = DataProcessing.LoadInputFile(Param.SourceFullPath);
-            ConvertToSedas newSedas = new ConvertToSedas();
-            DatFile newSourceOrders = newSedas.ImportDatFileContent(newOrders);
-            SedasFile newSedasFile = newSedas.ToSedas(newSourceOrders, Param.Counter);
 
-            GenerateCorrectionLists();
-            newSedasFile.RemoveCustomers(sedasCustomerDeletionList);
-            newSedasFile.RemoveArticles(sedasArticleDeletionList);
-            newSedasFile.ChangeArticles(sedasArticleChangeList);
+            ConvertToSedas SedasConverter = new ConvertToSedas();
+            SedasConverter.LogEventHandler += NewSedas_SedasLogEventHandler; // Sedas LogEventHandler abonnieren
+
+            List<string> newOrders = DataProcessing.LoadInputFile(Param.SourceFullPath);
+            DatFile newSourceOrders = SedasConverter.ImportDatFileContent(newOrders);
+            SedasFile newSedasFile = SedasConverter.ToSedas(newSourceOrders, Param.Counter);
+
+            CorrectionLists correctionLists = new CorrectionLists();
+            correctionLists.Generate();
+            newSedasFile.RemoveCustomers(correctionLists.sedasCustomerDeletionList);
+            newSedasFile.RemoveArticles(correctionLists.sedasArticleDeletionList);
+            newSedasFile.ChangeArticles(correctionLists.sedasArticleChangeList);
 
             DataProcessing.WriteToFile(newSedasFile.ToString(), Param.DestinationFullPath);
 
@@ -65,6 +73,30 @@ namespace Dat2Sedas_Neu
             log.Log("");
         }
 
+        private void NewSedas_SedasLogEventHandler(object sender, string message, LogMessageLevel level)
+        {
+            Console.WriteLine($"{level.ToString().ToUpper()}: {message}");
+            Logger.MsgType type = Logger.MsgType.Message;
+            string logMessage = $"[{sender}] [{level}] - {message}";
+
+            switch (level)
+            {
+                case LogMessageLevel.Information:
+                    type = Logger.MsgType.Message;
+                    break;
+                case LogMessageLevel.Warning:
+                    type = Logger.MsgType.Warning;
+                    break;
+                case LogMessageLevel.Critical:
+                    break;
+                case LogMessageLevel.Error:
+                    type = Logger.MsgType.Critical;
+                    break;
+                default:
+                    break;
+            }
+            this.log.Log(logMessage, type);
+        }
 
         private int SetCounter(int counter)
         {
@@ -81,8 +113,9 @@ namespace Dat2Sedas_Neu
             this.sedasArticleChangeList = DataProcessing.GetChangeArticlesList(Param.PathChangeArticlesList);
             this.sedasArticleDeletionList = DataProcessing.GetDeleteArticlesList(Param.PathDeleteArticleList);
             this.sedasCustomerDeletionList = DataProcessing.GetDeleteCustomersList(Param.PathDeleteCustomerList);
+
         }
-       
+
         private void RewriteSettingsToConfig()
         {
             log.Log("Zurückschreiben der Einstellungen...", "Speichern", Logger.MsgType.Message);

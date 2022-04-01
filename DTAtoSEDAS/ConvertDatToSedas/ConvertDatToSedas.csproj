@@ -45,7 +45,6 @@
     <Compile Include="Objects\SedasOrder.cs" />
     <Compile Include="Objects\ArticleChangePair.cs" />
     <Compile Include="Objects\CustomerDeletionList.cs" />
-    <Compile Include="DataProcessing.cs" />
     <Compile Include="Objects\ArticleChangeList.cs" />
     <Compile Include="Objects\DatOrder.cs" />
     <Compile Include="SedasTools.cs" />
