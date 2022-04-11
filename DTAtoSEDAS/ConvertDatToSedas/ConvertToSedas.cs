@@ -57,6 +57,7 @@ namespace ConvertDatToSedas
             if (datFileLines.Count() <= 0)
                 return null;
 
+            //TODO Fehlerausgabe, wenn Zeile nicht importiert werden kann!
             List<DatOrderLine> newOrderLines = GenerateDatOrderLines(datFileLines);
             List<DatOrder> newOrders = GenerateDatOrders(newOrderLines);
 
